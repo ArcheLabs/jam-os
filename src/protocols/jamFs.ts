@@ -1,14 +1,16 @@
 import { JamInvalidPathError } from "../jam/errors";
 
-export const MAX_PATH_LENGTH = 1024;
+export const MAX_PATH_LENGTH = 512;
+export const MAX_COMPONENT_LENGTH = 128;
 export function normalizePath(input: string, cwd = "/home/user"): string {
+  if (input.includes("\0")) throw new JamInvalidPathError("NUL is not valid in a JAM FS path");
   if (!input) return normalizePath(cwd);
   const raw = input.startsWith("/") ? input : `${cwd}/${input}`;
   const parts: string[] = [];
   for (const part of raw.split("/")) {
     if (!part || part === ".") continue;
     if (part === "..") { if (parts.length) parts.pop(); else throw new JamInvalidPathError("Path escapes root"); }
-    else parts.push(part);
+    else { if (part.length > MAX_COMPONENT_LENGTH) throw new JamInvalidPathError("Path component is too long"); parts.push(part); }
   }
   const result = `/${parts.join("/")}`;
   if (result.length > MAX_PATH_LENGTH) throw new JamInvalidPathError("Path is too long");

@@ -14,4 +14,6 @@ MiniJAM Services
 
 Window positions, focus, and open windows are ephemeral local UI state. Files, published site manifests, names, and service calls are JAM state. In mock mode those same adapter contracts are backed by an isolated mock client, never by the live path.
 
+`MiniJamTransport` is shared by `RealJamClient` and `RealPlaygroundAdapter`. It owns the current Playground `/config`, `/build`, `/actions/prepare`, `/services`, `/work`, `/operations`, and service storage transport. The UI never calls those endpoints directly. The current testnet exposes finalized service storage and controller-authorized Work; public Computer reads therefore use the documented storage-key adapter and fail with `COMPUTER_SERVICE_ABI_MISMATCH` when a deployed artifact does not expose the frozen V0.2 key layout.
+
 The six V0 apps are registered in `src/App.tsx`. The Browser owns one shared history and routes `jam://`, `file://`, `http://`, `https://`, and `about:` through handlers. JAM/file HTML is sanitized and rendered in a sandboxed iframe; page-authored JavaScript is removed and only the small Browser-owned JAM link bridge is injected.

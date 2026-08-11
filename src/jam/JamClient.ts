@@ -1,15 +1,28 @@
-import { JamNetworkError } from "./errors";
-import type { AccountInfo, InvokeOptions, InvokeResult, JamClient as JamClientType, NetworkInfo } from "./types";
+import { JamNetworkError, JamServiceError } from "./errors";
+import type { AccountAdapter, AccountInfo, InvokeOptions, InvokeResult, JamClient as JamClientType, NetworkInfo } from "./types";
+import { MiniJamTransport } from "./transport";
 
 const encoder = new TextEncoder();
-export const jsonBytes = (value: unknown) => encoder.encode(JSON.stringify(value));
+export const jsonBytes = (value: unknown) => {
+  const body = value && typeof value === "object" && !Array.isArray(value) && "op" in value && !("v" in value)
+    ? { v: 1, ...(value as Record<string, unknown>) }
+    : value;
+  return encoder.encode(JSON.stringify(body));
+};
 export const parseBytes = <T>(bytes: Uint8Array): T => JSON.parse(new TextDecoder().decode(bytes)) as T;
+export const decodeServiceBytes = <T>(bytes: Uint8Array): T => {
+  const value = parseBytes<unknown>(bytes);
+  if (value && typeof value === "object" && !Array.isArray(value) && "ok" in value && (value as { ok: boolean }).ok === false) {
+    const error = (value as { error?: { code?: string; message?: string } }).error;
+    throw new JamServiceError(error?.message || "JAM Service rejected the request", error?.code || "SERVICE_ERROR");
+  }
+  return value as T;
+};
 
 export class RealJamClient implements JamClientType {
-  constructor(private readonly endpoint = import.meta.env.VITE_MINIJAM_API_URL as string | undefined) {}
-  private ensureEndpoint(): string { if (!this.endpoint) throw new JamNetworkError("Live MiniJAM API endpoint is not configured"); return this.endpoint.replace(/\/$/, ""); }
-  async network(): Promise<NetworkInfo> { const endpoint = this.ensureEndpoint(); try { const response = await fetch(`${endpoint}/health`); if (!response.ok) throw new Error(); return { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM", endpoint, healthy: true }; } catch { throw new JamNetworkError(`Unable to reach MiniJAM at ${endpoint}`); } }
-  async readService(serviceId: string, request: Uint8Array): Promise<Uint8Array> { void serviceId; void request; throw new JamNetworkError("The live Service ABI is not configured yet"); }
-  async invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult> { void serviceId; void request; void options; throw new JamNetworkError("The live Service ABI is not configured yet"); }
-  async getCurrentAccount(): Promise<AccountInfo | null> { return null; }
+  constructor(private readonly transport: MiniJamTransport, private readonly account: AccountAdapter) {}
+  async network(): Promise<NetworkInfo> { return this.transport.network(); }
+  async readService(serviceId: string, request: Uint8Array): Promise<Uint8Array> { return this.transport.readService(serviceId, request); }
+  async invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult> { return this.transport.invokeService(serviceId, request, options, this.account); }
+  async getCurrentAccount(): Promise<AccountInfo | null> { return this.account.current(); }
 }
