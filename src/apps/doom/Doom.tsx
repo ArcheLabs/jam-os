@@ -1,0 +1,1 @@
+export function Doom() { return <div className="doom-app"><div className="doom-mark">DOOM</div><h2>JAM DOOM</h2><p>The showcase adapter is reserved for a real JAM execution path.</p><span className="coming-soon">Coming soon · no client-only game shipped</span></div>; }

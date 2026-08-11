@@ -1,0 +1,2 @@
+import type { BrowserResolvedDocument } from "../protocolRouter";
+export function resolveHttp(url: string): BrowserResolvedDocument { const parsed = new URL(url); if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error("Not an HTTP URL"); return { canonicalUrl: url, scheme: parsed.protocol.slice(0, -1) as "http" | "https", mode: "remote-frame", frameUrl: url, title: parsed.hostname }; }
