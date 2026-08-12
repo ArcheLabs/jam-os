@@ -20,9 +20,13 @@ export const decodeServiceBytes = <T>(bytes: Uint8Array): T => {
 };
 
 export class RealJamClient implements JamClientType {
+  readonly isMock = false;
   constructor(private readonly transport: MiniJamTransport, private readonly account: AccountAdapter) {}
   async network(): Promise<NetworkInfo> { return this.transport.network(); }
   async readService(serviceId: string, request: Uint8Array): Promise<Uint8Array> { return this.transport.readService(serviceId, request); }
-  async invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult> { return this.transport.invokeService(serviceId, request, options, this.account); }
+  async invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult> {
+    const account = options?.account === undefined ? await this.account.current() : options.account;
+    return this.transport.invokeService(serviceId, request, { ...options, account }, this.account);
+  }
   async getCurrentAccount(): Promise<AccountInfo | null> { return this.account.current(); }
 }

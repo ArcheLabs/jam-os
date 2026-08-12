@@ -1,8 +1,10 @@
-export interface NetworkInfo { name: string; endpoint: string; healthy: boolean; block?: string; }
+export interface NetworkInfo { name: string; endpoint: string; healthy: boolean; block?: string; genesisHash?: string; }
 export interface AccountInfo { address: string; name?: string; source?: string; type?: string; }
+export interface ComputerInspection { kind: string; protocolVersion: number; serviceId: string; controller: string; owner?: string; codeHash: string; }
 export interface InvokeOptions { account?: AccountInfo | null; }
 export interface InvokeResult { output: Uint8Array; operationId?: string; }
 export interface JamClient {
+  readonly isMock?: boolean;
   network(): Promise<NetworkInfo>;
   readService(serviceId: string, request: Uint8Array): Promise<Uint8Array>;
   invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult>;

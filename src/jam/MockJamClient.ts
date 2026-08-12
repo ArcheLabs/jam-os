@@ -3,6 +3,7 @@ import { jsonBytes, parseBytes } from "./JamClient";
 import { base64ToBytes } from "./encoding";
 import type { AccountInfo, InvokeOptions, InvokeResult, JamClient, NetworkInfo } from "./types";
 import { basename, normalizePath, parentPath } from "../protocols/jamFs";
+import { MOCK_COMPUTER_CODE_HASH } from "./constants";
 
 type StoredFile = { kind: "file"; bytes: number[]; mime: string; hash: string; updatedAt: number };
 type ServiceState = { owner: string; files: Record<string, StoredFile>; dirs: Set<string>; manifest: unknown | null };
@@ -14,6 +15,7 @@ const MAX_FILE_COUNT = 128;
 
 interface Snapshot { nextId: number; services: Record<string, { owner: string; files: Record<string, StoredFile>; dirs: string[]; manifest: unknown | null }>; names: Record<string, { owner: string; serviceId: string }>; }
 export class MockJamClient implements JamClient {
+  readonly isMock = true;
   private state: Snapshot;
   private account: AccountInfo = { address: "5MockJAMComputerAccount", name: "Mock account", source: "mock" };
   constructor() { this.state = this.load(); }
@@ -21,7 +23,7 @@ export class MockJamClient implements JamClient {
   private save() { try { localStorage.setItem(KEY, JSON.stringify(this.state)); } catch { /* optional persistence */ } }
   private service(serviceId: string): ServiceState { const value = this.state.services[serviceId]; if (!value) throw new JamNotFoundError(`Service ${serviceId} was not found`); return { owner: value.owner, files: value.files, dirs: new Set(value.dirs), manifest: value.manifest }; }
   private commit(id: string, service: ServiceState) { this.state.services[id] = { owner: service.owner, files: service.files, dirs: [...service.dirs], manifest: service.manifest }; this.save(); }
-  async network(): Promise<NetworkInfo> { return { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: "mock://minijam", healthy: true, block: "mock-finalized" }; }
+  async network(): Promise<NetworkInfo> { return { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: "mock://minijam", healthy: true, block: "mock-finalized", genesisHash: "0xmock-genesis-v1" }; }
   async getCurrentAccount() { return this.account; }
   async readService(serviceId: string, request: Uint8Array): Promise<Uint8Array> { return this.execute(serviceId, parseBytes<{ op: string; [key: string]: unknown }>(request), null, false); }
   async invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult> { return { output: this.execute(serviceId, parseBytes<{ op: string; [key: string]: unknown }>(request), options?.account ?? this.account, true) }; }
@@ -40,7 +42,8 @@ export class MockJamClient implements JamClient {
       case "site:manifest": return jsonBytes(svc.manifest);
       case "site:publish": { const source = normalizePath(String(req.path)); const files: Record<string, { mime: string; size: number; contentHash: string; chunks: number }> = {}; let total = 0; Object.entries(svc.files).filter(([p]) => p === source || p.startsWith(`${source}/`)).forEach(([p, f]) => { const sitePath = p.slice(source.length) || "/"; total += f.bytes.length; files[sitePath] = { mime: f.mime, size: f.bytes.length, contentHash: f.hash, chunks: 1 }; }); if (total > MAX_SITE_BYTES) throw new JamProtocolError(`Published site exceeds the ${MAX_SITE_BYTES} byte limit`, "SITE_TOO_LARGE"); svc.manifest = { version: 1, root: source, publishedAt: Date.now(), generatedAt: Date.now(), index: "/index.html", files }; this.commit(serviceId, svc); return jsonBytes(svc.manifest); }
       case "site:read": { const manifest = svc.manifest as { files?: Record<string, { contentHash: string }> } | null; const path = normalizePath(String(req.path)); const file = manifest?.files?.[path]; if (!file) throw new JamNotFoundError(`Published file ${path}`); const match = Object.values(svc.files).find((f) => f.hash === file.contentHash); if (!match) throw new JamNotFoundError(path); return jsonBytes({ bytes: match.bytes, mime: match.mime }); }
-      case "service:inspect": return jsonBytes({ kind: "jam-computer", protocolVersion: 1, serviceId, owner: svc.owner, createdAt: 0, files: Object.keys(svc.files).length });
+      case "computer:init": return jsonBytes({ ok: true, initialized: true });
+      case "service:inspect": return jsonBytes({ kind: "jam-computer", protocolVersion: 1, serviceId, owner: svc.owner, controller: svc.owner, codeHash: MOCK_COMPUTER_CODE_HASH, createdAt: 0, files: Object.keys(svc.files).length });
       case "service:call": return jsonBytes({ status: "succeeded", output: `Mock service ${serviceId} received ${String(req.payload || "")}` });
       default: throw new Error(`Unknown mock operation ${req.op}`);
     }

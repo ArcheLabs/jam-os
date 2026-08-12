@@ -162,7 +162,9 @@ static void dispatch(const uint8_t *payload, size_t payload_size) {
   ((uint8_t *)payload)[payload_size] = 0;
   initialize();
   if (!string_value(payload, payload_size, "op", op, sizeof(op))) return;
-  if (strcmp(op, "fs:write") == 0) {
+  if (strcmp(op, "computer:init") == 0) {
+    initialize();
+  } else if (strcmp(op, "fs:write") == 0) {
     if (!string_value(payload, payload_size, "path", path, sizeof(path)) || !string_value(payload, payload_size, "contentBase64", encoded, sizeof(encoded))) return;
     if (!string_value(payload, payload_size, "mime", mime, sizeof(mime))) { copy_bytes(mime, "application/octet-stream", 25); mime[24] = 0; }
     size_t size = base64_decode(encoded, file_buffer, sizeof(file_buffer)); write_file(path, file_buffer, size, mime);

@@ -1,2 +1,2 @@
-import type { ReactNode } from "react";
-export function DesktopIcon({ icon, title, onOpen }: { icon: ReactNode; title: string; onOpen: () => void }) { return <button className="desktop-icon" onDoubleClick={onOpen} onClick={onOpen}><span className="icon-glyph">{icon}</span><span>{title}</span></button>; }
+import type { ComponentType } from "react";
+export function DesktopIcon({ icon: Icon, title, selected, onSelect, onOpen }: { icon: ComponentType<{ size?: number; strokeWidth?: number }>; title: string; selected: boolean; onSelect: () => void; onOpen: () => void }) { return <button className={`desktop-icon ${selected ? "selected" : ""}`} onClick={(event) => { event.stopPropagation(); onSelect(); }} onDoubleClick={(event) => { event.stopPropagation(); onOpen(); }}><span className="icon-glyph"><Icon size={40} strokeWidth={1.5} /></span><span>{title}</span></button>; }
