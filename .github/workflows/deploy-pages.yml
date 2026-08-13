@@ -17,6 +17,13 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
+  PLAYGROUND_API_URL: https://playground.minijam.xyz/api/v1
+  VITE_JAM_MODE: live
+  VITE_MINIJAM_NETWORK_NAME: MiniJAM
+  VITE_PLAYGROUND_API_URL: https://playground.minijam.xyz/api/v1
+  VITE_COMPUTER_SERVICE_ARTIFACT_URL: ./computer-service.bin
+  VITE_COMPUTER_SERVICE_MIN_ITEM_GAS: "10000000"
+  VITE_COMPUTER_SERVICE_MIN_MEMO_GAS: "10000000"
 
 jobs:
   build:
@@ -38,19 +45,56 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Build canonical Computer Service artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public
+
+          jq -Rs \
+            '{language:"c", source:., optimization:"O0"}' \
+            services/computer/src/service.c \
+            > /tmp/computer-service-build.json
+
+          curl --fail --silent --show-error \
+            --retry 3 \
+            --retry-all-errors \
+            --header 'content-type: application/json' \
+            --data-binary @/tmp/computer-service-build.json \
+            "${PLAYGROUND_API_URL}/build" \
+            > /tmp/computer-service-build-response.json
+
+          jq -e '
+            .success == true and
+            (.blobBase64 | type == "string" and length > 0) and
+            (.codeHash | type == "string" and test("^0x[0-9a-fA-F]{64}$"))
+          ' /tmp/computer-service-build-response.json >/dev/null
+
+          jq -r '.blobBase64' /tmp/computer-service-build-response.json \
+            | base64 --decode \
+            > public/computer-service.bin
+
+          test -s public/computer-service.bin
+          code_hash="$(jq -r '.codeHash' /tmp/computer-service-build-response.json)"
+          echo "VITE_COMPUTER_SERVICE_CODE_HASH=${code_hash}" >> "${GITHUB_ENV}"
+
+          {
+            echo "## Canonical Computer Service"
+            echo
+            echo "Code hash: \`${code_hash}\`"
+            echo "Artifact: \`computer-service.bin\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Build
-        env:
-          VITE_JAM_MODE: ${{ vars.VITE_JAM_MODE || 'live' }}
-          VITE_MINIJAM_NETWORK_NAME: ${{ vars.VITE_MINIJAM_NETWORK_NAME || 'MiniJAM Stage 0' }}
-          VITE_MINIJAM_API_URL: ${{ vars.VITE_MINIJAM_API_URL }}
-          VITE_PLAYGROUND_API_URL: ${{ vars.VITE_PLAYGROUND_API_URL || 'https://playground.minijam.xyz/api/v1' }}
-          VITE_JNS_SERVICE_ID: ${{ vars.VITE_JNS_SERVICE_ID }}
-          VITE_COMPUTER_SERVICE_CODE_HASH: ${{ vars.VITE_COMPUTER_SERVICE_CODE_HASH }}
-          VITE_COMPUTER_SERVICE_ARTIFACT_URL: ${{ vars.VITE_COMPUTER_SERVICE_ARTIFACT_URL }}
-          VITE_COMPUTER_SERVICE_MIN_ITEM_GAS: ${{ vars.VITE_COMPUTER_SERVICE_MIN_ITEM_GAS || '10000000' }}
-          VITE_COMPUTER_SERVICE_MIN_MEMO_GAS: ${{ vars.VITE_COMPUTER_SERVICE_MIN_MEMO_GAS || '10000000' }}
-          VITE_MINIJAM_GENESIS_HASH: ${{ vars.VITE_MINIJAM_GENESIS_HASH }}
         run: npm run build
+
+      - name: Verify production artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/index.html
+          test -s dist/computer-service.bin
+          grep -R --fixed-strings "${VITE_COMPUTER_SERVICE_CODE_HASH}" dist >/dev/null
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
