@@ -18,11 +18,11 @@ import "./styles/global.css";
 const runtime: Runtime = createRuntime();
 const apps = [
   { id: "computer", title: "My Computer", icon: Monitor, size: [720, 500] },
-  { id: "settings", title: "Settings", icon: SettingsIcon, size: [520, 560] },
-  { id: "browser", title: "Browser", icon: Globe2, size: [900, 620] },
-  { id: "terminal", title: "Terminal", icon: SquareTerminal, size: [700, 420] },
+  { id: "terminal", title: "Terminal", icon: SquareTerminal, size: [760, 460] },
   { id: "playground", title: "Playground", icon: Code2, size: [1000, 700] },
+  { id: "browser", title: "Browser", icon: Globe2, size: [900, 620] },
   { id: "doom", title: "DOOM", icon: Gamepad2, size: [720, 520] },
+  { id: "settings", title: "Settings", icon: SettingsIcon, size: [520, 560] },
 ] as const;
 
 type Phase = "boot" | "login" | "provisioning" | "desktop" | "error";
@@ -51,6 +51,9 @@ export default function App() {
     try {
       const result = await runtime.computer.provision((item) => setProgress((old) => [...old.filter((entry) => entry.step !== item.step), item]));
       setServiceId(result.serviceId);
+      setWindows([{ id: `terminal-${Date.now()}`, appId: "terminal", title: "Terminal", x: 150, y: 80, width: 760, height: 460, zIndex: 10, minimized: false, maximized: false }]);
+      setNextZ(11);
+      setSelectedDesktopIcon("terminal");
       setPhase("desktop");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to start JAM Computer");
@@ -71,8 +74,8 @@ export default function App() {
   };
   const update = (id: string, fn: (window: WindowInstance) => WindowInstance) => setWindows((old) => old.map((window) => window.id === id ? fn(window) : window));
   const focus = (id: string) => { setNextZ((z) => z + 1); update(id, (window) => ({ ...window, zIndex: nextZ, minimized: false })); };
-  const appContent = (item: WindowInstance) => { switch (item.appId) { case "computer": return <MyComputer runtime={runtime} serviceId={serviceId} openEditor={(path) => openApp("playground", path)} />; case "settings": return <Settings runtime={runtime} serviceId={serviceId} />; case "browser": return <Browser runtime={runtime} serviceId={serviceId} />; case "terminal": return <TerminalApp runtime={runtime} serviceId={serviceId} openApp={openApp} />; case "playground": return <Playground runtime={runtime} serviceId={serviceId} />; case "doom": return <Doom />; } };
+  const appContent = (item: WindowInstance) => { switch (item.appId) { case "computer": return <MyComputer runtime={runtime} serviceId={serviceId} openEditor={(path) => openApp("playground", path)} />; case "settings": return <Settings runtime={runtime} serviceId={serviceId} />; case "browser": return <Browser runtime={runtime} serviceId={serviceId} />; case "terminal": return <TerminalApp runtime={runtime} serviceId={serviceId} openApp={openApp} />; case "playground": return <Playground runtime={runtime} serviceId={serviceId} />; case "doom": return <Doom mode={runtime.mode} openPlayground={() => openApp("playground")} />; } };
 
-  if (phase !== "desktop") return <BootScreen phase={phase === "error" ? "error" : phase} networkName={networkName} progress={progress} error={error} onSignIn={() => void provision()} onRetry={() => void provision()} />;
-  return <main className="desktop-shell"><div className="desktop-background" onClick={() => setSelectedDesktopIcon(null)}><div className="brand-mark"><span>JAM COMPUTER</span><small>A computer that runs on JAM.</small></div><div className="desktop-icons">{apps.map((app) => <DesktopIcon key={app.id} icon={app.icon} title={app.title} selected={selectedDesktopIcon === app.id} onSelect={() => setSelectedDesktopIcon(app.id)} onOpen={() => openApp(app.id)} />)}</div>{windows.map((item) => <Window key={item.id} window={item} onFocus={() => focus(item.id)} onMove={(x, y) => update(item.id, (window) => ({ ...window, x, y }))} onResize={(width, height) => update(item.id, (window) => ({ ...window, width, height }))} onMinimize={() => update(item.id, (window) => ({ ...window, minimized: true }))} onMaximize={() => update(item.id, (window) => ({ ...window, maximized: !window.maximized }))} onClose={() => setWindows((old) => old.filter((window) => window.id !== item.id))}>{appContent(item)}</Window>)}</div><Taskbar windows={windows} mode={runtime.mode} network={networkName} onOpen={() => setShowStart((value) => !value)} onFocus={focus} />{showStart && <div className="start-menu"><div className="start-heading">JAM Computer</div>{apps.map((app) => { const Icon = app.icon; return <button key={app.id} onClick={() => openApp(app.id)}><Icon size={18} strokeWidth={1.5} />{app.title}</button>; })}</div>}</main>;
+  if (phase !== "desktop") return <BootScreen phase={phase === "error" ? "error" : phase} mode={runtime.mode} networkName={networkName} progress={progress} error={error} onSignIn={() => void provision()} onRetry={() => void provision()} />;
+  return <main className="desktop-shell"><div className="desktop-background" onClick={() => setSelectedDesktopIcon(null)}><div className="brand-mark"><span>JAM COMPUTER</span><small>{runtime.mode === "live" ? "LIVE · MiniJAM-backed services" : "DEMO · local mock runtime"}</small></div><div className="desktop-icons">{apps.map((app) => <DesktopIcon key={app.id} icon={app.icon} title={app.title} selected={selectedDesktopIcon === app.id} onSelect={() => setSelectedDesktopIcon(app.id)} onOpen={() => openApp(app.id)} />)}</div>{windows.map((item) => <Window key={item.id} window={item} onFocus={() => focus(item.id)} onMove={(x, y) => update(item.id, (window) => ({ ...window, x, y }))} onResize={(width, height) => update(item.id, (window) => ({ ...window, width, height }))} onMinimize={() => update(item.id, (window) => ({ ...window, minimized: true }))} onMaximize={() => update(item.id, (window) => ({ ...window, maximized: !window.maximized }))} onClose={() => setWindows((old) => old.filter((window) => window.id !== item.id))}>{appContent(item)}</Window>)}</div><Taskbar windows={windows} mode={runtime.mode} network={networkName} onOpen={() => setShowStart((value) => !value)} onFocus={focus} />{showStart && <div className="start-menu"><div className="start-heading">JAM Computer · {runtime.mode.toUpperCase()}</div>{apps.map((app) => { const Icon = app.icon; return <button key={app.id} onClick={() => openApp(app.id)}><Icon size={18} strokeWidth={1.5} />{app.title}</button>; })}</div>}</main>;
 }
