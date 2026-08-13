@@ -1,0 +1,73 @@
+name: Deploy JAM Computer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  build:
+    name: Build JAM Computer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        env:
+          VITE_JAM_MODE: ${{ vars.VITE_JAM_MODE || 'live' }}
+          VITE_MINIJAM_NETWORK_NAME: ${{ vars.VITE_MINIJAM_NETWORK_NAME || 'MiniJAM Stage 0' }}
+          VITE_MINIJAM_API_URL: ${{ vars.VITE_MINIJAM_API_URL }}
+          VITE_PLAYGROUND_API_URL: ${{ vars.VITE_PLAYGROUND_API_URL || 'https://playground.minijam.xyz/api/v1' }}
+          VITE_JNS_SERVICE_ID: ${{ vars.VITE_JNS_SERVICE_ID }}
+          VITE_COMPUTER_SERVICE_CODE_HASH: ${{ vars.VITE_COMPUTER_SERVICE_CODE_HASH }}
+          VITE_COMPUTER_SERVICE_ARTIFACT_URL: ${{ vars.VITE_COMPUTER_SERVICE_ARTIFACT_URL }}
+          VITE_COMPUTER_SERVICE_MIN_ITEM_GAS: ${{ vars.VITE_COMPUTER_SERVICE_MIN_ITEM_GAS || '10000000' }}
+          VITE_COMPUTER_SERVICE_MIN_MEMO_GAS: ${{ vars.VITE_COMPUTER_SERVICE_MIN_MEMO_GAS || '10000000' }}
+          VITE_MINIJAM_GENESIS_HASH: ${{ vars.VITE_MINIJAM_GENESIS_HASH }}
+        run: npm run build
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
