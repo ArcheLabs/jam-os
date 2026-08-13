@@ -11,31 +11,34 @@ npm install
 npm run dev
 ```
 
-The default `VITE_JAM_MODE=mock` mode is fully usable without a testnet and is used by CI:
+The default `VITE_JAM_MODE=mock` mode is fully usable without a testnet and is used by CI.
+
+## Live deployment
+
+Production GitHub Pages deployment is self-contained and does not require GitHub Repository Variables.
+
+`.github/workflows/deploy-pages.yml` pins the public MiniJAM Playground API URL, network label, and Computer Service gas limits directly in the repository. During every Pages deployment, the workflow compiles `services/computer/src/service.c` through the live Playground API, writes the reviewed result to `computer-service.bin`, injects the returned Blake2-256 code hash into the frontend build, and verifies that the artifact is present in the final `dist` output.
+
+The live client still fails closed: it verifies the downloaded Computer Service artifact hash before deployment and verifies the deployed Service controller/code hash before reuse. Genesis identity is read from the Playground `/config` endpoint. JNS remains disabled until a canonical JNS Service ID is intentionally promoted in the repository.
+
+A Polkadot wallet extension with an sr25519 account is required for state-changing live operations.
+
+Run the non-mutating live smoke check with `VITE_SMOKE_COMPUTER_SERVICE_ID` when testing an existing Computer Service:
 
 ```bash
-npm install
-npm run dev
-```
-
-## Live mode
-
-Set `VITE_JAM_MODE=live` and configure `.env` with the current MiniJAM Playground/API URL, JNS Service ID, and the reviewed Computer Service artifact hash and URL. A Polkadot wallet extension with an sr25519 account is required for mutations. Live mode fails closed with a typed error when any of these are missing; it never substitutes mock state.
-
-Run the non-mutating live smoke check with `VITE_SMOKE_COMPUTER_SERVICE_ID`:
-
-```bash
-VITE_JAM_MODE=live npm run smoke:live
+VITE_JAM_MODE=live VITE_PLAYGROUND_API_URL=https://playground.minijam.xyz/api/v1 \
+VITE_SMOKE_COMPUTER_SERVICE_ID=<service-id> npm run smoke:live
 ```
 
 ## First demo
 
-1. Open Settings and choose **Create Computer**.
-2. Open Terminal and run `ls`.
-3. Run `name claim alice`, then `site publish ~/Sites/home`.
-4. Run `browser jam://alice`.
+1. Sign in with Polkadot and let JAM Computer create or reconnect to your Computer Service.
+2. The Terminal opens automatically. Run `ls` and inspect the initialized filesystem.
+3. Open **My Computer** to browse files stored through the Computer Service.
+4. Open **Playground** to compile, deploy, and interact with MiniJAM services.
+5. Open **Browser** for `file://` pages and, once JNS is promoted, `jam://` names.
 
-The same Browser handles native `jam://` pages, JAM FS `file://` pages, and best-effort ordinary HTTP(S) iframe navigation. Sites that disallow embedding can be opened in the system browser; no proxy is used.
+The Browser also supports best-effort ordinary HTTP(S) iframe navigation. Sites that disallow embedding can be opened in the system browser; no proxy is used.
 
 ## Architecture
 
@@ -45,7 +48,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PRO
 
 Local browser: pixels, windows, keyboard/mouse input, Monaco, xterm, browser history, and ephemeral window state.
 
-MiniJAM: Computer Service state, files, published site snapshots, JNS records, and Service execution.
+MiniJAM: Computer Service state, files, published site snapshots, JNS records when enabled, and Service execution.
 
 MiniJAM Playground infrastructure: C/C++ compilation, Service deployment, and Work submission.
 
