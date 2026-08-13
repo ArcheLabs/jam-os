@@ -13,7 +13,9 @@ import { Window } from "./desktop/Window";
 import type { WindowInstance } from "./desktop/types";
 import { createRuntime, type Runtime } from "./runtime";
 import type { ProvisionProgress } from "./jam/computer";
+import type { AccountInfo } from "./jam/types";
 import "./styles/global.css";
+import "./styles/boot-polish.css";
 
 const runtime: Runtime = createRuntime();
 const apps = [
@@ -25,10 +27,11 @@ const apps = [
   { id: "settings", title: "Settings", icon: SettingsIcon, size: [520, 560] },
 ] as const;
 
-type Phase = "boot" | "login" | "provisioning" | "desktop" | "error";
+type Phase = "boot" | "login" | "connecting" | "account" | "provisioning" | "desktop" | "error";
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>("boot");
+  const [account, setAccount] = useState<AccountInfo | null>(null);
   const [serviceId, setServiceId] = useState<string | null>(null);
   const [progress, setProgress] = useState<ProvisionProgress[]>([]);
   const [error, setError] = useState("");
@@ -40,9 +43,22 @@ export default function App() {
 
   useEffect(() => {
     if (phase !== "boot") return;
-    const timer = window.setTimeout(() => setPhase("login"), 650);
+    const timer = window.setTimeout(() => setPhase("login"), 1500);
     return () => window.clearTimeout(timer);
   }, [phase]);
+
+  const connectAccount = async () => {
+    setPhase("connecting");
+    setError("");
+    try {
+      const connected = await runtime.account.connect();
+      setAccount(connected);
+      setPhase("account");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to connect Polkadot account");
+      setPhase("login");
+    }
+  };
 
   const provision = async () => {
     setPhase("provisioning");
@@ -50,6 +66,7 @@ export default function App() {
     setProgress([]);
     try {
       const result = await runtime.computer.provision((item) => setProgress((old) => [...old.filter((entry) => entry.step !== item.step), item]));
+      setAccount(result.account);
       setServiceId(result.serviceId);
       setWindows([{ id: `terminal-${Date.now()}`, appId: "terminal", title: "Terminal", x: 150, y: 80, width: 760, height: 460, zIndex: 10, minimized: false, maximized: false }]);
       setNextZ(11);
@@ -76,6 +93,6 @@ export default function App() {
   const focus = (id: string) => { setNextZ((z) => z + 1); update(id, (window) => ({ ...window, zIndex: nextZ, minimized: false })); };
   const appContent = (item: WindowInstance) => { switch (item.appId) { case "computer": return <MyComputer runtime={runtime} serviceId={serviceId} openEditor={(path) => openApp("playground", path)} />; case "settings": return <Settings runtime={runtime} serviceId={serviceId} />; case "browser": return <Browser runtime={runtime} serviceId={serviceId} />; case "terminal": return <TerminalApp runtime={runtime} serviceId={serviceId} openApp={openApp} />; case "playground": return <Playground runtime={runtime} serviceId={serviceId} />; case "doom": return <Doom mode={runtime.mode} openPlayground={() => openApp("playground")} />; } };
 
-  if (phase !== "desktop") return <BootScreen phase={phase === "error" ? "error" : phase} mode={runtime.mode} networkName={networkName} progress={progress} error={error} onSignIn={() => void provision()} onRetry={() => void provision()} />;
+  if (phase !== "desktop") return <BootScreen phase={phase} mode={runtime.mode} networkName={networkName} account={account} progress={progress} error={error} onSignIn={() => void connectAccount()} onContinue={() => void provision()} onRetry={() => void provision()} />;
   return <main className="desktop-shell"><div className="desktop-background" onClick={() => setSelectedDesktopIcon(null)}><div className="brand-mark"><span>JAM COMPUTER</span><small>{runtime.mode === "live" ? "LIVE · MiniJAM-backed services" : "DEMO · local mock runtime"}</small></div><div className="desktop-icons">{apps.map((app) => <DesktopIcon key={app.id} icon={app.icon} title={app.title} selected={selectedDesktopIcon === app.id} onSelect={() => setSelectedDesktopIcon(app.id)} onOpen={() => openApp(app.id)} />)}</div>{windows.map((item) => <Window key={item.id} window={item} onFocus={() => focus(item.id)} onMove={(x, y) => update(item.id, (window) => ({ ...window, x, y }))} onResize={(width, height) => update(item.id, (window) => ({ ...window, width, height }))} onMinimize={() => update(item.id, (window) => ({ ...window, minimized: true }))} onMaximize={() => update(item.id, (window) => ({ ...window, maximized: !window.maximized }))} onClose={() => setWindows((old) => old.filter((window) => window.id !== item.id))}>{appContent(item)}</Window>)}</div><Taskbar windows={windows} mode={runtime.mode} network={networkName} onOpen={() => setShowStart((value) => !value)} onFocus={focus} />{showStart && <div className="start-menu"><div className="start-heading">JAM Computer · {runtime.mode.toUpperCase()}</div>{apps.map((app) => { const Icon = app.icon; return <button key={app.id} onClick={() => openApp(app.id)}><Icon size={18} strokeWidth={1.5} />{app.title}</button>; })}</div>}</main>;
 }
