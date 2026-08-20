@@ -1,7 +1,5 @@
-import type { AccountInfo, AccountAdapter, JamClient, PlaygroundAdapter } from "../jam/types";
-import type { ComputerService } from "../jam/computer";
-import type { JamFileSystem } from "../jam/filesystem";
-import type { JamNameService } from "../jam/names";
+import type { AccountInfo, AccountAdapter, CompileInput, CompileOutput, DeployInput, DeployOutput, InteractInput, InteractOutput } from "../jam/types";
+import type { ProvisionProgress, ProvisionedComputer } from "../jam/computer";
 
 export type RuntimeMode = "mock" | "live";
 export type RuntimeSource = "real" | "mock" | "unavailable";
@@ -30,15 +28,34 @@ export interface FileEntry {
   updatedAt?: number;
   mime?: string;
 }
+export interface FileManifest { files: Record<string, { path?: string }> | Array<{ path: string }>; }
 
 export interface FileSystemRuntime {
   list(path: string): Promise<FileEntry[]>;
   read(path: string): Promise<Uint8Array>;
-  write(path: string, data: Uint8Array): Promise<void>;
+  write(path: string, data: Uint8Array, options?: { mime?: string }): Promise<void>;
   mkdir(path: string): Promise<void>;
-  remove(path: string): Promise<void>;
+  remove(path: string, options?: { recursive?: boolean }): Promise<void>;
   stat(path: string): Promise<FileEntry | null>;
-  mount?(serviceId: string): FileSystemRuntime;
+  readText(path: string): Promise<string>;
+  writeText(path: string, content: string, mime?: string): Promise<void>;
+  rename(from: string, to: string): Promise<void>;
+  publish(path?: string): Promise<FileManifest>;
+  manifest(): Promise<FileManifest | null>;
+  readPublished(path: string): Promise<{ bytes: Uint8Array; mime: string }>;
+  mount(serviceId: string): FileSystemRuntime;
+}
+
+export interface ComputerRuntime {
+  current(): Promise<ProvisionedComputer | null>;
+  provision(onProgress?: (progress: ProvisionProgress) => void): Promise<ProvisionedComputer>;
+  inspect(serviceId: string): Promise<unknown>;
+}
+
+export interface PlaygroundRuntime {
+  compile(input: CompileInput): Promise<CompileOutput>;
+  deploy(input: DeployInput): Promise<DeployOutput>;
+  interact(input: InteractInput): Promise<InteractOutput>;
 }
 
 export interface ServiceInfo {
@@ -74,11 +91,12 @@ export interface WorkRequest {
 
 export interface WorkHandle { id: string; submittedAt: number; }
 export interface WorkStatus { id: string; state: "queued" | "running" | "complete" | "failed"; detail?: string; }
-export interface WorkResult { id: string; output: Uint8Array; completedAt: number; }
+export interface WorkResult { id: string; output: Uint8Array; completedAt: number; serviceId?: string; workId?: string; operationId?: string; receiptHash?: string; }
+export interface WorkWaitOptions { signal?: AbortSignal; timeoutMs?: number; }
 export interface WorkRuntime {
   submit(input: WorkRequest): Promise<WorkHandle>;
   status(workId: string): Promise<WorkStatus>;
-  wait(workId: string): Promise<WorkResult>;
+  wait(workId: string, options?: WorkWaitOptions): Promise<WorkResult>;
 }
 
 export interface NameRuntime {
@@ -147,8 +165,10 @@ export interface EventRuntime {
 export interface JamOsRuntimeV2 {
   mode: RuntimeMode;
   account: AccountAdapter;
+  computer: ComputerRuntime;
   system: { getInfo(): Promise<SystemInfo> };
   fs: FileSystemRuntime;
+  playground: PlaygroundRuntime;
   services: ServiceRuntime;
   work: WorkRuntime;
   network: NetworkRuntime;
@@ -157,13 +177,5 @@ export interface JamOsRuntimeV2 {
   events: EventRuntime;
 }
 
-/** Transitional access for existing protocol adapters. UI code should prefer the V2 fields above. */
-export interface RuntimeCompatibility {
-  client: JamClient;
-  computer: ComputerService;
-  namesService: JamNameService;
-  playground: PlaygroundAdapter;
-}
-
 export type AccountRuntime = JamOsRuntimeV2["account"];
-export type { AccountInfo, AccountAdapter, JamClient, PlaygroundAdapter, ComputerService, JamFileSystem };
+export type { AccountInfo, AccountAdapter };

@@ -3,13 +3,14 @@ import type { ComponentType } from "react";
 import { Code2, Folder, Gamepad2, Globe2, HelpCircle, Monitor, Settings, SquareTerminal, Trash2 } from "lucide-react";
 import { Browser } from "../apps/browser/Browser";
 import { MyComputer } from "../apps/computer/MyComputer";
+import { Files } from "../apps/files/Files";
 import { Doom } from "../apps/doom/Doom";
 import { Playground } from "../apps/playground/Playground";
 import { Settings as SettingsApp } from "../apps/settings/Settings";
-import type { Runtime } from "../runtime";
+import type { JamOsRuntimeV2 } from "../runtime";
 
 export interface AppProps {
-  runtime: Runtime;
+  runtime: JamOsRuntimeV2;
   serviceId: string | null;
   openApp: (id: string, args?: string) => void;
 }
@@ -29,7 +30,7 @@ export const systemApps: AppManifest[] = [
   // Keep xterm out of the registry's eager import graph so unit tests and lightweight tooling can inspect manifests without a DOM.
   { id: "terminal", name: "Terminal", icon: SquareTerminal, defaultWidth: 760, defaultHeight: 460, singleton: true, component: lazy(() => import("../apps/terminal/TerminalApp").then((module) => ({ default: module.TerminalApp }))) as unknown as ComponentType<AppProps> },
   { id: "computer", name: "JAM Computer", icon: Monitor, defaultWidth: 720, defaultHeight: 500, singleton: true, component: ({ runtime, serviceId, openApp }) => <MyComputer runtime={runtime} serviceId={serviceId} openEditor={(path) => openApp("playground", path)} /> },
-  { id: "files", name: "Files", icon: Folder, defaultWidth: 720, defaultHeight: 500, singleton: true, component: ({ runtime, serviceId, openApp }) => <MyComputer runtime={runtime} serviceId={serviceId} openEditor={(path) => openApp("playground", path)} /> },
+  { id: "files", name: "Files", icon: Folder, defaultWidth: 720, defaultHeight: 500, singleton: true, component: ({ runtime, serviceId, openApp }) => <Files runtime={runtime} serviceId={serviceId} openApp={openApp} /> },
   { id: "browser", name: "Browser", icon: Globe2, defaultWidth: 900, defaultHeight: 620, component: ({ runtime, serviceId }) => <Browser runtime={runtime} serviceId={serviceId} /> },
   { id: "playground", name: "Playground", icon: Code2, defaultWidth: 1000, defaultHeight: 700, component: ({ runtime, serviceId }) => <Playground runtime={runtime} serviceId={serviceId} /> },
   { id: "doom", name: "DOOM", icon: Gamepad2, defaultWidth: 760, defaultHeight: 600, component: ({ runtime, openApp }) => <Doom runtime={runtime} openPlayground={() => openApp("playground")} /> },

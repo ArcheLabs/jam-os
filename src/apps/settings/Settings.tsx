@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { Runtime } from "../../runtime";
+import type { JamOsRuntimeV2 } from "../../runtime/types";
 
-export function Settings({ runtime, serviceId }: { runtime: Runtime; serviceId: string | null }) {
+export function Settings({ runtime, serviceId }: { runtime: JamOsRuntimeV2; serviceId: string | null }) {
   const [network, setNetwork] = useState<{ name: string; endpoint: string; healthy: boolean } | null>(null);
   const [account, setAccount] = useState<{ address: string } | null>(null);
   const [message, setMessage] = useState("");

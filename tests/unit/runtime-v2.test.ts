@@ -14,7 +14,7 @@ describe("JamOsRuntimeV2 mock adapter", () => {
 
   it("mounts the existing Computer Service filesystem behind fs", async () => {
     const runtime = new MockJamOsRuntime();
-    const serviceId = await runtime.computer.create();
+    const serviceId = (await runtime.computer.provision()).serviceId;
     const fs = runtime.fs.mount!(serviceId);
     await fs.write("/home/user/Documents/runtime-v2.txt", new TextEncoder().encode("hello"));
     expect(new TextDecoder().decode(await fs.read("/home/user/Documents/runtime-v2.txt"))).toBe("hello");

@@ -4,29 +4,51 @@ import { RealJamClient } from "../../jam/JamClient";
 import { JamNameService } from "../../jam/names";
 import { RealPlaygroundAdapter } from "../../jam/playground";
 import { MiniJamTransport } from "../../jam/transport";
-import type { RuntimeCompatibility } from "../types";
-import type { DoomInput, DoomRuntime, DoomLeaderboardEntry, DoomSession, DoomResult, DoomStartOptions } from "../types";
-import { MockJamOsRuntime } from "../mock/MockJamOsRuntime";
+import type { AccountInfo, AccountAdapter, JamClient, PlaygroundAdapter } from "../../jam/types";
+import type { ComputerRuntime, DoomInput, DoomLeaderboardEntry, DoomResult, DoomRuntime, DoomSession, DoomStartOptions, EventRuntime, FileSystemRuntime, JamOsRuntimeV2, NameRuntime, NetworkRuntime, PlaygroundRuntime, ServiceRuntime, WorkRuntime } from "../types";
+import { CapabilityUnavailableError } from "../errors";
+import { MiniJamApiClient } from "./MiniJamApiClient";
+import { LiveFileSystemRuntime } from "./LiveFileSystemRuntime";
+import { LiveWorkRuntime } from "./LiveWorkRuntime";
 
-/** Live adapter. The V2 surface is stable while the existing protocol client remains behind it. */
-export class MiniJamRuntime extends MockJamOsRuntime implements RuntimeCompatibility {
-  override readonly mode = "live" as const;
-  override readonly account = new BrowserAccountAdapter();
-  override readonly client = new RealJamClient(new MiniJamTransport(), this.account);
-  override readonly playground = new RealPlaygroundAdapter(new MiniJamTransport(), this.account);
-  override readonly computer = new ComputerService(this.client, this.account, this.playground);
-  override readonly namesService = new JamNameService(this.client, this.account);
-  override readonly network = { getInfo: async () => { const network = await this.client.network(); return { ...network, source: "real" as const }; } };
-  override readonly system = { getInfo: async () => ({ osVersion: "0.1", networkName: (await this.client.network()).name, status: "online" as const }) };
-  override readonly services = { list: async () => [{ id: "computer", name: "Computer Service", status: "running" as const, source: "real" as const }], inspect: (id: string) => this.computer.inspect(id), call: async (id: string, payload: Uint8Array, account?: import("../../jam/types").AccountInfo | null) => (await this.client.invokeService(id, payload, { account })).output };
-  override readonly doom: DoomRuntime = new UnavailableDoom();
-  override readonly names = { resolve: (name: string) => this.namesService.resolve(name), claim: (name: string, id: string) => this.namesService.claim(name, id), bind: (name: string, id: string) => this.namesService.bind(name, id) };
+class LiveEvents implements EventRuntime {
+  private listeners = new Map<string, Set<(payload: unknown) => void>>();
+  subscribe(event: string, callback: (payload: unknown) => void) {
+    const listeners = this.listeners.get(event) || new Set<(payload: unknown) => void>();
+    listeners.add(callback);
+    this.listeners.set(event, listeners);
+    return () => listeners.delete(callback);
+  }
+  emit(event: string, payload: unknown) { this.listeners.get(event)?.forEach((callback) => callback(payload)); }
 }
 
 class UnavailableDoom implements DoomRuntime {
   async status() { return "unavailable" as const; }
-  async start(_options?: DoomStartOptions): Promise<DoomSession> { throw new Error("PVM DOOM runtime is not connected"); }
-  async input(_sessionId: string, _input: DoomInput) { throw new Error("PVM DOOM runtime is not connected"); }
-  async stop(_sessionId: string): Promise<DoomResult> { throw new Error("PVM DOOM runtime is not connected"); }
+  async start(_options?: DoomStartOptions): Promise<DoomSession> { throw new CapabilityUnavailableError("PVM DOOM runtime"); }
+  async input(_sessionId: string, _input: DoomInput) { throw new CapabilityUnavailableError("PVM DOOM runtime"); }
+  async stop(_sessionId: string): Promise<DoomResult> { throw new CapabilityUnavailableError("PVM DOOM runtime"); }
   async leaderboard(): Promise<DoomLeaderboardEntry[]> { return []; }
+}
+
+/** Live adapter is intentionally parallel to MockJamOsRuntime. No capability falls through to preview data. */
+export class MiniJamRuntime implements JamOsRuntimeV2 {
+  readonly mode = "live" as const;
+  readonly account: AccountAdapter = new BrowserAccountAdapter();
+  private readonly transport = new MiniJamTransport();
+  private readonly client: JamClient = new RealJamClient(this.transport, this.account);
+  private readonly api = new MiniJamApiClient(this.transport);
+  private readonly playgroundAdapter: PlaygroundAdapter = new RealPlaygroundAdapter(this.transport, this.account);
+  private readonly computerAdapter = new ComputerService(this.client, this.account, this.playgroundAdapter);
+  private readonly namesAdapter = new JamNameService(this.client, this.account);
+  private readonly liveEvents = new LiveEvents();
+  readonly computer: ComputerRuntime = { current: () => this.computerAdapter.current(), provision: (onProgress) => this.computerAdapter.provision(onProgress), inspect: (id) => this.computerAdapter.inspect(id) };
+  readonly playground: PlaygroundRuntime = this.playgroundAdapter;
+  readonly events: EventRuntime = this.liveEvents;
+  readonly work: WorkRuntime = new LiveWorkRuntime(this.api, this.account, this.events);
+  readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work);
+  readonly doom: DoomRuntime = new UnavailableDoom();
+  readonly system: JamOsRuntimeV2["system"] = { getInfo: async () => { const network = await this.network.getInfo(); return { osVersion: "0.1", networkName: network.name, status: network.healthy ? "online" as const : "offline" as const }; } };
+  readonly network: NetworkRuntime = { getInfo: async () => { try { const network = await this.client.network(); const info = { ...network, source: "real" as const }; this.liveEvents.emit("network:online", info); return info; } catch { const info = { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: this.transport.base || "unconfigured", healthy: false, source: "unavailable" as const }; this.liveEvents.emit("network:offline", info); return info; } } };
+  readonly services: ServiceRuntime = { list: async () => { try { const current = await this.computerAdapter.current(); return [{ id: "computer", name: "Computer Service", status: current ? "running" as const : "stopped" as const, source: current ? "real" as const : "unavailable" as const }]; } catch { return [{ id: "computer", name: "Computer Service", status: "stopped" as const, source: "unavailable" as const }]; } }, inspect: (id: string) => this.computerAdapter.inspect(id), call: async (id: string, payload: Uint8Array, account?: AccountInfo | null) => (await this.client.invokeService(id, payload, { account })).output };
+  readonly names: NameRuntime = { resolve: (name: string) => this.namesAdapter.resolve(name), claim: (name: string, id: string) => this.namesAdapter.claim(name, id), bind: (name: string, id: string) => this.namesAdapter.bind(name, id) };
 }
