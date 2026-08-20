@@ -38,7 +38,7 @@ export interface DoomStateObject {
   alive: boolean;
 }
 
-export interface DoomState {
+export interface DoomServiceState {
   tick: number;
   stateHash: string;
   health: number;
@@ -46,6 +46,9 @@ export interface DoomState {
   kills: number;
   score: number;
   completed: boolean;
+}
+
+export interface DoomState extends DoomServiceState {
   /** A small, stable summary used for verification; it is not the full engine state. */
   objects?: DoomStateObject[];
 }
@@ -70,11 +73,15 @@ export interface DoomResult {
   runtimeVersion: string;
   rulesetVersion: number;
   finalStateHash: string;
-  execution?: {
-    serviceId?: string;
-    workId?: string;
-    receiptHash?: string;
-  };
+  execution?: DoomExecutionReceipt;
+}
+
+export interface DoomExecutionReceipt {
+  serviceId: string;
+  workId: string;
+  receiptHash?: string;
+  stateHash: string;
+  completedAt: number;
 }
 
 export interface DoomLeaderboardQuery { account?: string; limit?: number; }

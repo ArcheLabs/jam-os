@@ -128,4 +128,4 @@ export interface JamOsRuntimeV2 {
 
 export type AccountRuntime = JamOsRuntimeV2["account"];
 export type { AccountInfo, AccountAdapter };
-export type { DoomAction, DoomExecutionResult, DoomInput, DoomInputBatch, DoomLeaderboardEntry, DoomLeaderboardQuery, DoomResult, DoomRuntime, DoomRuntimeStatus, DoomSession, DoomSessionOptions, DoomState } from "./doom/types";
+export type { DoomAction, DoomExecutionReceipt, DoomExecutionResult, DoomInput, DoomInputBatch, DoomLeaderboardEntry, DoomLeaderboardQuery, DoomResult, DoomRuntime, DoomRuntimeStatus, DoomServiceState, DoomSession, DoomSessionOptions, DoomState } from "./doom/types";

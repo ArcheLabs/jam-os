@@ -21,6 +21,12 @@ Production GitHub Pages deployment is self-contained and does not require GitHub
 
 The live client still fails closed: it verifies the downloaded Computer Service artifact hash before deployment and verifies the deployed Service controller/code hash before reuse. Genesis identity is read from the Playground `/config` endpoint. JNS remains disabled until a canonical JNS Service ID is intentionally promoted in the repository.
 
+Phase 3B adds the ordinary MiniJAM DOOM Service in `services/doom`. Its
+versioned requests are submitted through the existing Work path and its
+recoverable state is read from finalized `doom:session:<id>:*` storage. Set the
+deployed service ID through the `MINIJAM_DOOM_SERVICE_ID` Pages variable; an
+unset value keeps the Live DOOM adapter unavailable.
+
 A Polkadot wallet extension with an sr25519 account is required for state-changing live operations.
 
 Run the non-mutating live smoke check with `VITE_SMOKE_COMPUTER_SERVICE_ID` when testing an existing Computer Service:
