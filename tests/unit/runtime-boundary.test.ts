@@ -27,7 +27,7 @@ describe("Phase 2 runtime boundary", () => {
   it("reports live DOOM as unavailable rather than mock-ready", async () => {
     const live = new MiniJamRuntime();
     expect(await live.doom.status()).toBe("unavailable");
-    await expect(live.doom.start()).rejects.toThrow("not available in this runtime");
+    await expect(live.doom.createSession()).rejects.toMatchObject({ code: "DOOM_RUNTIME_UNAVAILABLE" });
   });
 
   it("keeps preview fully usable through the V2 surface", async () => {

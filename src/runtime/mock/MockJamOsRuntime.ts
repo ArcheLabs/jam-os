@@ -4,8 +4,9 @@ import { JamFileSystem } from "../../jam/filesystem";
 import { MockJamClient } from "../../jam/MockJamClient";
 import { JamNameService } from "../../jam/names";
 import { MockPlaygroundAdapter } from "../../jam/playground";
+import { MockDoomRuntime } from "../doom/MockDoomRuntime";
 import type { AccountAdapter, JamClient, PlaygroundAdapter } from "../../jam/types";
-import type { ComputerRuntime, DoomInput, DoomLeaderboardEntry, DoomLeaderboardQuery, DoomResult, DoomRuntime, DoomRuntimeStatus, DoomSession, DoomStartOptions, EventRuntime, FileEntry, FileSystemRuntime, JamOsRuntimeV2, NameRuntime, NetworkInfoV2, NetworkRuntime, PlaygroundRuntime, RuntimeMode, ServiceInfo, ServiceRuntime, WorkHandle, WorkRequest, WorkResult, WorkRuntime, WorkStatus } from "../types";
+import type { ComputerRuntime, EventRuntime, FileEntry, FileSystemRuntime, JamOsRuntimeV2, NameRuntime, NetworkInfoV2, NetworkRuntime, PlaygroundRuntime, RuntimeMode, ServiceInfo, ServiceRuntime, WorkHandle, WorkRequest, WorkResult, WorkRuntime, WorkStatus } from "../types";
 
 class MockEvents implements EventRuntime {
   private listeners = new Map<string, Set<(payload: unknown) => void>>();
@@ -31,21 +32,6 @@ class MountedFileSystem implements FileSystemRuntime {
   mount(_serviceId: string) { return this; }
 }
 
-class MockDoom implements DoomRuntime {
-  private sessions = new Map<string, DoomSession>();
-  private results: DoomResult[] = [];
-  private readonly entries: DoomLeaderboardEntry[] = [
-    { id: "demo-1", account: "5F8…cx2", displayName: "Alice", score: 42840, map: "E1M4", difficulty: "Hurt Me Plenty", kills: 31, durationMs: 184000, completedAt: 1710000000000, rulesetVersion: 1, sessionId: "demo-session-1", runId: "demo-run-1", runtime: "mock" },
-    { id: "demo-2", account: "5Gav…in7", displayName: "Gavin", score: 39120, map: "E1M4", difficulty: "Hurt Me Plenty", kills: 28, durationMs: 210000, completedAt: 1710000000000, rulesetVersion: 1, sessionId: "demo-session-2", runId: "demo-run-2", runtime: "mock" },
-    { id: "demo-3", account: "14F…91k", displayName: "Charlie", score: 35540, map: "E1M3", difficulty: "Hurt Me Plenty", kills: 25, durationMs: 226000, completedAt: 1710000000000, rulesetVersion: 1, sessionId: "demo-session-3", runId: "demo-run-3", runtime: "mock" },
-  ];
-  async status(): Promise<DoomRuntimeStatus> { return "ready"; }
-  async start(options: DoomStartOptions = {}) { const session = { id: `mock-doom-${Date.now()}`, startedAt: Date.now(), mode: "mock" as const, map: options.map || "E1M1", difficulty: options.difficulty || "Hurt Me Plenty" }; this.sessions.set(session.id, session); return session; }
-  async input(sessionId: string, _input: DoomInput) { if (!this.sessions.has(sessionId)) throw new Error("DOOM session is not running"); }
-  async stop(sessionId: string) { const session = this.sessions.get(sessionId); if (!session) throw new Error("DOOM session is not running"); this.sessions.delete(sessionId); const result = { sessionId, account: "5MockJAMComputerAccount", score: 12400, map: session.map || "E1M1", difficulty: session.difficulty || "Hurt Me Plenty", kills: 12, durationMs: Math.max(1000, Date.now() - session.startedAt), finishedAt: Date.now(), completed: true }; this.results.unshift(result); return result; }
-  async leaderboard(query: DoomLeaderboardQuery = {}) { const own = this.results.map((result) => ({ id: `mock-result-${result.sessionId}`, account: result.account, displayName: "You", score: result.score, map: result.map, difficulty: result.difficulty, kills: result.kills, durationMs: result.durationMs, completedAt: result.finishedAt, rulesetVersion: 1, sessionId: result.sessionId, runId: `mock-run-${result.sessionId}`, runtime: "mock" as const })); const values = [...this.entries, ...own].filter((entry) => !query.account || entry.account === query.account).sort((a, b) => b.score - a.score); return values.slice(0, query.limit || 20).map((entry, index) => ({ ...entry, rank: index + 1 } as DoomLeaderboardEntry & { rank: number })); }
-}
-
 class MockWork implements WorkRuntime {
   private statuses = new Map<string, WorkStatus>();
   constructor(private readonly events: MockEvents) {}
@@ -62,7 +48,7 @@ export class MockJamOsRuntime implements JamOsRuntimeV2 {
   private readonly computerAdapter = new ComputerService(this.client, this.account, this.playgroundAdapter);
   private readonly namesAdapter = new JamNameService(this.client, this.account);
   readonly events = new MockEvents();
-  readonly doom: DoomRuntime = new MockDoom();
+  readonly doom = new MockDoomRuntime(this.account, this.events);
   readonly computer: ComputerRuntime = { current: () => this.computerAdapter.current(), provision: (onProgress) => this.computerAdapter.provision(onProgress), inspect: (id) => this.computerAdapter.inspect(id) };
   readonly playground: PlaygroundRuntime = this.playgroundAdapter;
   readonly fs: FileSystemRuntime = { list: async () => [], read: async () => new Uint8Array(), write: async () => undefined, mkdir: async () => undefined, remove: async () => undefined, stat: async () => null, readText: async () => "", writeText: async () => undefined, rename: async () => undefined, publish: async () => ({ files: {} }), manifest: async () => null, readPublished: async () => ({ bytes: new Uint8Array(), mime: "application/octet-stream" }), mount: (id) => new MountedFileSystem(this.computerAdapter.fs(id)) };

@@ -1,5 +1,6 @@
 import type { AccountInfo, AccountAdapter, CompileInput, CompileOutput, DeployInput, DeployOutput, InteractInput, InteractOutput } from "../jam/types";
 import type { ProvisionProgress, ProvisionedComputer } from "../jam/computer";
+import type { DoomRuntime } from "./doom/types";
 
 export type RuntimeMode = "mock" | "live";
 export type RuntimeSource = "real" | "mock" | "unavailable";
@@ -105,58 +106,6 @@ export interface NameRuntime {
   bind(name: string, serviceId: string): Promise<{ name: string; owner: string; serviceId: string }>;
 }
 
-export interface DoomStartOptions {
-  map?: string;
-  difficulty?: string;
-}
-export type DoomRuntimeStatus = "unavailable" | "ready" | "running";
-export interface DoomInput { type: "key" | "mouse"; value: string; pressed?: boolean; }
-export interface DoomSession {
-  id: string;
-  startedAt: number;
-  mode: RuntimeMode;
-  map?: string;
-  difficulty?: string;
-}
-export interface DoomResult {
-  sessionId: string;
-  account: string;
-  score: number;
-  map: string;
-  difficulty: string;
-  kills: number;
-  durationMs: number;
-  finishedAt: number;
-  completed: boolean;
-  execution?: { serviceId: string; workId: string; receiptHash: string };
-}
-export interface DoomLeaderboardQuery { account?: string; limit?: number; }
-export interface DoomLeaderboardEntry {
-  id: string;
-  account: string;
-  displayName?: string;
-  score: number;
-  map: string;
-  difficulty: string;
-  kills: number;
-  durationMs: number;
-  completedAt: number;
-  rulesetVersion: number;
-  sessionId: string;
-  runId: string;
-  runtime: RuntimeMode;
-  serviceId?: string;
-  workId?: string;
-  receiptHash?: string;
-}
-export interface DoomRuntime {
-  status(): Promise<DoomRuntimeStatus>;
-  start(options?: DoomStartOptions): Promise<DoomSession>;
-  input(sessionId: string, input: DoomInput): Promise<void>;
-  stop(sessionId: string): Promise<DoomResult>;
-  leaderboard(query?: DoomLeaderboardQuery): Promise<DoomLeaderboardEntry[]>;
-}
-
 export interface EventRuntime {
   subscribe(event: string, callback: (payload: unknown) => void): () => void;
   emit?(event: string, payload: unknown): void;
@@ -179,3 +128,4 @@ export interface JamOsRuntimeV2 {
 
 export type AccountRuntime = JamOsRuntimeV2["account"];
 export type { AccountInfo, AccountAdapter };
+export type { DoomAction, DoomExecutionResult, DoomInput, DoomInputBatch, DoomLeaderboardEntry, DoomLeaderboardQuery, DoomResult, DoomRuntime, DoomRuntimeStatus, DoomSession, DoomSessionOptions, DoomState } from "./doom/types";

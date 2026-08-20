@@ -5,11 +5,11 @@ import { JamNameService } from "../../jam/names";
 import { RealPlaygroundAdapter } from "../../jam/playground";
 import { MiniJamTransport } from "../../jam/transport";
 import type { AccountInfo, AccountAdapter, JamClient, PlaygroundAdapter } from "../../jam/types";
-import type { ComputerRuntime, DoomInput, DoomLeaderboardEntry, DoomResult, DoomRuntime, DoomSession, DoomStartOptions, EventRuntime, FileSystemRuntime, JamOsRuntimeV2, NameRuntime, NetworkRuntime, PlaygroundRuntime, ServiceRuntime, WorkRuntime } from "../types";
-import { CapabilityUnavailableError } from "../errors";
+import type { ComputerRuntime, DoomRuntime, EventRuntime, FileSystemRuntime, JamOsRuntimeV2, NameRuntime, NetworkRuntime, PlaygroundRuntime, ServiceRuntime, WorkRuntime } from "../types";
 import { MiniJamApiClient } from "./MiniJamApiClient";
 import { LiveFileSystemRuntime } from "./LiveFileSystemRuntime";
 import { LiveWorkRuntime } from "./LiveWorkRuntime";
+import { MiniJamDoomRuntime } from "../doom/MiniJamDoomRuntime";
 
 class LiveEvents implements EventRuntime {
   private listeners = new Map<string, Set<(payload: unknown) => void>>();
@@ -20,14 +20,6 @@ class LiveEvents implements EventRuntime {
     return () => listeners.delete(callback);
   }
   emit(event: string, payload: unknown) { this.listeners.get(event)?.forEach((callback) => callback(payload)); }
-}
-
-class UnavailableDoom implements DoomRuntime {
-  async status() { return "unavailable" as const; }
-  async start(_options?: DoomStartOptions): Promise<DoomSession> { throw new CapabilityUnavailableError("PVM DOOM runtime"); }
-  async input(_sessionId: string, _input: DoomInput) { throw new CapabilityUnavailableError("PVM DOOM runtime"); }
-  async stop(_sessionId: string): Promise<DoomResult> { throw new CapabilityUnavailableError("PVM DOOM runtime"); }
-  async leaderboard(): Promise<DoomLeaderboardEntry[]> { return []; }
 }
 
 /** Live adapter is intentionally parallel to MockJamOsRuntime. No capability falls through to preview data. */
@@ -46,7 +38,7 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   readonly events: EventRuntime = this.liveEvents;
   readonly work: WorkRuntime = new LiveWorkRuntime(this.api, this.account, this.events);
   readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work);
-  readonly doom: DoomRuntime = new UnavailableDoom();
+  readonly doom: DoomRuntime = new MiniJamDoomRuntime();
   readonly system: JamOsRuntimeV2["system"] = { getInfo: async () => { const network = await this.network.getInfo(); return { osVersion: "0.1", networkName: network.name, status: network.healthy ? "online" as const : "offline" as const }; } };
   readonly network: NetworkRuntime = { getInfo: async () => { try { const network = await this.client.network(); const info = { ...network, source: "real" as const }; this.liveEvents.emit("network:online", info); return info; } catch { const info = { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: this.transport.base || "unconfigured", healthy: false, source: "unavailable" as const }; this.liveEvents.emit("network:offline", info); return info; } } };
   readonly services: ServiceRuntime = { list: async () => { try { const current = await this.computerAdapter.current(); return [{ id: "computer", name: "Computer Service", status: current ? "running" as const : "stopped" as const, source: current ? "real" as const : "unavailable" as const }]; } catch { return [{ id: "computer", name: "Computer Service", status: "stopped" as const, source: "unavailable" as const }]; } }, inspect: (id: string) => this.computerAdapter.inspect(id), call: async (id: string, payload: Uint8Array, account?: AccountInfo | null) => (await this.client.invokeService(id, payload, { account })).output };
