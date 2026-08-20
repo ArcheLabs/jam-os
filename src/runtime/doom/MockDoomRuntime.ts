@@ -4,6 +4,7 @@ import { deterministicRandom, hashState } from "./hashing";
 import { DoomRuntimeError } from "./errors";
 import { DOOM_RULESET_VERSION, DOOM_RUNTIME_VERSION, type DoomAction, type DoomExecutionResult, type DoomInputBatch, type DoomLeaderboardEntry, type DoomLeaderboardQuery, type DoomResult, type DoomRuntime, type DoomRuntimeStatus, type DoomSession, type DoomSessionOptions, type DoomState, type DoomStateObject } from "./types";
 import { SCORE_PER_KILL, SCORE_PER_USE, scoreForState } from "./scoring";
+import { LocalDoomRealtimeSession } from "./realtime-local";
 
 interface InternalState extends DoomState { objects: DoomStateObject[]; x: number; y: number; }
 interface SessionRecord { session: DoomSession; state: InternalState; inputs: Map<number, DoomAction[]>; finished: boolean; }
@@ -14,7 +15,7 @@ function initialState(): InternalState {
   return state;
 }
 
-function validAction(action: string): action is DoomAction { return ["forward", "backward", "left", "right", "fire", "use"].includes(action); }
+function validAction(action: string): action is DoomAction { return ["forward", "backward", "left", "right", "fire", "use", "weapon_next"].includes(action); }
 
 export class MockDoomRuntime implements DoomRuntime {
   private readonly sessions = new Map<string, SessionRecord>();
@@ -70,6 +71,13 @@ export class MockDoomRuntime implements DoomRuntime {
     this.results.unshift(result);
     this.events?.emit?.("doom:finished", result);
     return result;
+  }
+
+  async connectRealtime(sessionId: string) {
+    this.get(sessionId);
+    const realtime = new LocalDoomRealtimeSession(this, sessionId);
+    await realtime.ready();
+    return realtime;
   }
 
   async leaderboard(query: DoomLeaderboardQuery = {}): Promise<DoomLeaderboardEntry[]> {

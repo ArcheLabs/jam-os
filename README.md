@@ -27,6 +27,12 @@ recoverable state is read from finalized `doom:session:<id>:*` storage. Set the
 deployed service ID through the `MINIJAM_DOOM_SERVICE_ID` Pages variable; an
 unset value keeps the Live DOOM adapter unavailable.
 
+Phase 3C adds a separate realtime path. Preview sessions run locally at 30 FPS
+with deterministic Canvas frames and input buffering. Live sessions use the
+same frame/input contract over a WebSocket gateway configured with
+`MINIJAM_DOOM_GATEWAY_URL`; the gateway relays messages but does not author
+game state. Checkpoints still use the verified MiniJAM path.
+
 A Polkadot wallet extension with an sr25519 account is required for state-changing live operations.
 
 Run the non-mutating live smoke check with `VITE_SMOKE_COMPUTER_SERVICE_ID` when testing an existing Computer Service:

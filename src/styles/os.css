@@ -59,3 +59,18 @@
 @media (max-width: 1023px) { body { min-width: 0; overflow: auto; }.desktop-shell::after { content: "JAM Computer works best on desktop."; position: fixed; inset: 40% 20px auto; z-index: 100; padding: 18px; color: #dcecff; border: 1px solid var(--os-border); border-radius: 9px; background: #0b1726f2; text-align: center; } }
 .doom-preview-frame { display: flex; min-height: 230px; margin: auto 0; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: #d7a877; border: 1px solid rgba(234, 122, 91, .32); background: #06080c; font: 12px 'DM Mono', monospace; text-align: center; }
 .doom-preview-frame span { color: #728493; font-size: 9px; }
+.doom-canvas-shell { position: relative; display: flex; align-items: center; justify-content: center; min-height: 270px; margin: auto 0 8px; overflow: hidden; border: 1px solid rgba(234, 122, 91, .38); background: #06080c; box-shadow: inset 0 0 28px rgba(0,0,0,.5); }
+.doom-canvas { display: block; width: min(100%, 640px); height: auto; max-height: 330px; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; cursor: crosshair; }
+.doom-paused { position: absolute; inset: 0; display: grid; place-items: center; color: #f4ce9b; background: rgba(5, 8, 13, .56); font: 18px 'DM Mono', monospace; letter-spacing: .18em; }
+.doom-hud-live { margin-top: 0; justify-content: space-between; font-size: 9px; }
+.doom-connection { color: #79e3a0 !important; }
+.doom-connection.paused, .doom-connection.checkpointing { color: #f0ca82 !important; }
+.doom-connection.error, .doom-connection.disconnected, .doom-connection.closed { color: #ff8e96 !important; }
+.doom-game-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 9px; }
+.doom-game-actions button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; color: #d9bca9; border: 1px solid rgba(219, 147, 116, .25); border-radius: 5px; background: rgba(110, 52, 49, .22); font: 10px 'DM Mono', monospace; }
+.doom-game-actions button:disabled { opacity: .55; }
+.doom-checkpoint-line { display: flex; align-items: center; gap: 5px; min-height: 20px; color: #8d9eac; font: 9px 'DM Mono', monospace; }
+.doom-checkpoint-line svg { color: #79e3a0; }
+.doom-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; color: #718394; font: 8px 'DM Mono', monospace; }
+.doom-mouse-capture { display: none; }
+.doom-runtime-meta { overflow: hidden; margin-top: 7px; color: #596d81; font: 8px 'DM Mono', monospace; text-overflow: ellipsis; white-space: nowrap; }

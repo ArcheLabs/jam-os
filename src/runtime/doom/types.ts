@@ -2,7 +2,7 @@ export const DOOM_RUNTIME_VERSION = "doom-runtime/1";
 export const DOOM_RULESET_VERSION = 1;
 
 export type DoomRuntimeStatus = "unavailable" | "ready" | "running";
-export type DoomAction = "forward" | "backward" | "left" | "right" | "fire" | "use";
+export type DoomAction = "forward" | "backward" | "left" | "right" | "fire" | "use" | "weapon_next";
 
 export interface DoomSessionOptions {
   sessionId?: string;
@@ -84,6 +84,40 @@ export interface DoomExecutionReceipt {
   completedAt: number;
 }
 
+export type DoomRealtimeStatus = "connecting" | "running" | "paused" | "checkpointing" | "disconnected" | "closed" | "error";
+
+export interface DoomFrame {
+  sessionId: string;
+  tick: number;
+  width: number;
+  height: number;
+  /** RGBA pixels for rendering only; this is not canonical game state. */
+  pixels: Uint8Array;
+  stateHash?: string;
+}
+
+export interface DoomCheckpoint {
+  sessionId: string;
+  tick: number;
+  stateHash: string;
+  score: number;
+  verified?: boolean;
+  execution?: DoomExecutionReceipt;
+}
+
+export type DoomUnsubscribe = () => void;
+
+export interface DoomRealtimeSession {
+  id: string;
+  status(): DoomRealtimeStatus;
+  sendInput(input: DoomInput): void;
+  subscribeFrame(callback: (frame: DoomFrame) => void): DoomUnsubscribe;
+  checkpoint(): Promise<DoomCheckpoint>;
+  pause(): Promise<void>;
+  resume(): Promise<void>;
+  close(): Promise<void>;
+}
+
 export interface DoomLeaderboardQuery { account?: string; limit?: number; }
 export interface DoomLeaderboardEntry {
   id: string;
@@ -111,6 +145,7 @@ export interface DoomRuntime {
   executeTicks(sessionId: string, ticks: number): Promise<DoomExecutionResult>;
   getState(sessionId: string): Promise<DoomState>;
   finish(sessionId: string): Promise<DoomResult>;
+  connectRealtime(sessionId: string): Promise<DoomRealtimeSession>;
   /** Local preview compatibility; no leaderboard service is part of Phase 3A. */
   leaderboard?(query?: DoomLeaderboardQuery): Promise<DoomLeaderboardEntry[]>;
 }

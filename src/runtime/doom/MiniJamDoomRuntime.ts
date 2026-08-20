@@ -4,12 +4,14 @@ import { MiniJamApiError } from "../minijam/MiniJamApiClient";
 import type { WorkResult, WorkRuntime } from "../types";
 import { DoomRuntimeError } from "./errors";
 import { createSessionRequest, executeRequest, finishRequest, inputRequest } from "./protocol";
+import { WebSocketDoomRealtimeSession, WebSocketDoomTransport } from "./realtime";
 import { DOOM_RULESET_VERSION, DOOM_RUNTIME_VERSION, type DoomExecutionReceipt, type DoomExecutionResult, type DoomInput, type DoomInputBatch, type DoomResult, type DoomRuntime, type DoomRuntimeStatus, type DoomSession, type DoomSessionOptions, type DoomState } from "./types";
 
 export interface MiniJamDoomRuntimeOptions {
   api: MiniJamApiClient;
   work: WorkRuntime;
   serviceId?: string;
+  gatewayUrl?: string;
 }
 
 function parse<T>(bytes: Uint8Array | null, description: string): T {
@@ -34,7 +36,7 @@ function validateBatch(batch: DoomInputBatch) {
   let previous = batch.fromTick - 1;
   for (const input of batch.inputs) {
     if (!Number.isSafeInteger(input.tick) || input.tick < batch.fromTick || input.tick <= previous) throw new DoomRuntimeError("INVALID_INPUT", `Input tick ${input.tick} is not strictly ordered`);
-    if (input.actions.some((action) => !["forward", "backward", "left", "right", "fire", "use"].includes(action))) throw new DoomRuntimeError("INVALID_INPUT", "Input contains an unsupported DOOM action");
+    if (input.actions.some((action) => !["forward", "backward", "left", "right", "fire", "use", "weapon_next"].includes(action))) throw new DoomRuntimeError("INVALID_INPUT", "Input contains an unsupported DOOM action");
     previous = input.tick;
   }
 }
@@ -88,6 +90,16 @@ export class MiniJamDoomRuntime implements DoomRuntime {
       const receipt = this.recordReceipt(sessionId, state.stateHash, work);
       if (stored.finalStateHash && stored.finalStateHash !== state.stateHash) throw new DoomRuntimeError("INVALID_RECEIPT", "DOOM result does not match finalized state");
       return { sessionId, account: stored.account, score: stored.score ?? state.score, kills: stored.kills ?? state.kills, durationTicks: stored.durationTicks ?? state.tick, completed: stored.completed ?? state.completed, map: stored.map || "E1M1", difficulty: stored.difficulty || "normal", runtimeVersion: stored.runtimeVersion || DOOM_RUNTIME_VERSION, rulesetVersion: stored.rulesetVersion || DOOM_RULESET_VERSION, finalStateHash: stored.finalStateHash || state.stateHash, execution: receipt };
+    } catch (error) { throw mapError(error); }
+  }
+
+  async connectRealtime(sessionId: string) {
+    if (!this.options.gatewayUrl) throw new DoomRuntimeError("SERVICE_UNAVAILABLE", "VITE_DOOM_GATEWAY_URL is not configured");
+    try {
+      await this.getState(sessionId);
+      const realtime = new WebSocketDoomRealtimeSession(new WebSocketDoomTransport(this.options.gatewayUrl), sessionId);
+      await realtime.connect();
+      return realtime;
     } catch (error) { throw mapError(error); }
   }
 
