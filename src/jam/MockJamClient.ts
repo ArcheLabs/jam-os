@@ -1,4 +1,4 @@
-import { JamNotFoundError, JamPermissionError, JamProtocolError, JnsNameTakenError } from "./errors";
+import { JamNotFoundError, JamPermissionError, JamProtocolError } from "./errors";
 import { jsonBytes, parseBytes } from "./JamClient";
 import { base64ToBytes } from "./encoding";
 import type { AccountInfo, InvokeOptions, InvokeResult, JamClient, NetworkInfo } from "./types";
@@ -13,13 +13,13 @@ const MAX_FILE_BYTES = 128 * 1024;
 const MAX_SITE_BYTES = 512 * 1024;
 const MAX_FILE_COUNT = 128;
 
-interface Snapshot { nextId: number; services: Record<string, { owner: string; files: Record<string, StoredFile>; dirs: string[]; manifest: unknown | null }>; names: Record<string, { owner: string; serviceId: string }>; }
+interface Snapshot { nextId: number; services: Record<string, { owner: string; files: Record<string, StoredFile>; dirs: string[]; manifest: unknown | null }>; }
 export class MockJamClient implements JamClient {
   readonly isMock = true;
   private state: Snapshot;
   private account: AccountInfo = { address: "5MockJAMComputerAccount", name: "Mock account", source: "mock" };
   constructor() { this.state = this.load(); }
-  private load(): Snapshot { try { const saved = localStorage.getItem(KEY); if (saved) return JSON.parse(saved) as Snapshot; } catch { /* private browsing */ } return { nextId: 1000, services: {}, names: {} }; }
+  private load(): Snapshot { try { const saved = localStorage.getItem(KEY); if (saved) return JSON.parse(saved) as Snapshot; } catch { /* private browsing */ } return { nextId: 1000, services: {} }; }
   private save() { try { localStorage.setItem(KEY, JSON.stringify(this.state)); } catch { /* optional persistence */ } }
   private service(serviceId: string): ServiceState { const value = this.state.services[serviceId]; if (!value) throw new JamNotFoundError(`Service ${serviceId} was not found`); return { owner: value.owner, files: value.files, dirs: new Set(value.dirs), manifest: value.manifest }; }
   private commit(id: string, service: ServiceState) { this.state.services[id] = { owner: service.owner, files: service.files, dirs: [...service.dirs], manifest: service.manifest }; this.save(); }
@@ -29,7 +29,6 @@ export class MockJamClient implements JamClient {
   async invokeService(serviceId: string, request: Uint8Array, options?: InvokeOptions): Promise<InvokeResult> { return { output: this.execute(serviceId, parseBytes<{ op: string; [key: string]: unknown }>(request), options?.account ?? this.account, true) }; }
   private execute(serviceId: string, req: { op: string; [key: string]: unknown }, account: AccountInfo | null, write: boolean): Uint8Array {
     if (req.op === "computer:create") { const id = String(this.state.nextId++); this.state.services[id] = { owner: account?.address ?? this.account.address, files: {}, dirs: ["/", "/home", "/home/user", "/home/user/Documents", "/home/user/Projects", "/home/user/Projects/counter", "/home/user/Sites", "/home/user/Sites/home"], manifest: null }; const svc = this.service(id); this.put(svc, "/home/user/Sites/home/index.html", new TextEncoder().encode(HOME_HTML), "text/html"); this.put(svc, "/home/user/Projects/counter/main.c", new TextEncoder().encode("#include <stdint.h>\nint main(void) { return 0; }\n"), "text/x-c"); this.put(svc, "/home/user/Projects/counter/README.md", new TextEncoder().encode("# Counter\n\nA MiniJAM project.\n"), "text/markdown"); this.commit(id, svc); return jsonBytes({ serviceId: id }); }
-    if (req.op.startsWith("jns:")) return this.jns(req, account);
     const svc = this.service(serviceId); if (write && account?.address !== svc.owner) throw new JamPermissionError("Only the Computer Service owner can write");
     switch (req.op) {
       case "fs:stat": { const path = normalizePath(String(req.path)); if (svc.files[path]) return jsonBytes(this.fileNode(path, svc.files[path])); if (svc.dirs.has(path)) return jsonBytes({ version: 1, type: "directory", path, children: this.children(svc, path) }); throw new JamNotFoundError(path); }
@@ -48,7 +47,6 @@ export class MockJamClient implements JamClient {
       default: throw new Error(`Unknown mock operation ${req.op}`);
     }
   }
-  private jns(req: { op: string; [key: string]: unknown }, account: AccountInfo | null): Uint8Array { const name = String(req.name || ""); if (req.op === "jns:resolve" || req.op === "jns:record") { const record = this.state.names[name]; if (!record) throw new JamNotFoundError(`Name ${name} was not found`); return jsonBytes({ version: 1, name, owner: record.owner, serviceId: record.serviceId }); } if (!account) throw new JamPermissionError("An account is required"); if (req.op === "jns:claim" && this.state.names[name]) throw new JnsNameTakenError(`Name ${name} is already claimed`); if (req.op === "jns:claim" || req.op === "jns:bind") { const existing = this.state.names[name]; if (existing && existing.owner !== account.address) throw new JamPermissionError("Only the name owner can bind it"); this.state.names[name] = { owner: existing?.owner ?? account.address, serviceId: String(req.serviceId) }; this.save(); return jsonBytes({ name, serviceId: String(req.serviceId) }); } throw new Error(`Unknown JNS operation ${req.op}`); }
   private children(svc: ServiceState, path: string): string[] { const prefix = path === "/" ? "/" : `${path}/`; const names = new Set<string>(); [...svc.dirs].filter((p) => p.startsWith(prefix) && p !== path).forEach((p) => { const rest = p.slice(prefix.length); if (rest && !rest.includes("/")) names.add(rest); }); Object.keys(svc.files).filter((p) => p.startsWith(prefix)).forEach((p) => { const rest = p.slice(prefix.length); if (rest && !rest.includes("/")) names.add(rest); }); return [...names].sort(); }
   private ensureParents(svc: ServiceState, path: string) { const parts = path.split("/"); let current = ""; for (const part of parts) { if (!part) continue; current += `/${part}`; svc.dirs.add(current); } }
   private fileNode(path: string, file: StoredFile) { return { version: 1, type: "file" as const, path, size: file.bytes.length, contentHash: file.hash, chunkSize: file.bytes.length || 1, chunks: 1, mime: file.mime, updatedAt: file.updatedAt }; }

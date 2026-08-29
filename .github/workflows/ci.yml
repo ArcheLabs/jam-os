@@ -13,6 +13,26 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Read JamScript toolchain pin
+        id: jamscript-pin
+        shell: bash
+        run: |
+          revision="$(sed -n 's/^revision = "\([0-9a-f]*\)"$/\1/p' toolchains/jamscript.lock)"
+          test "${#revision}" -eq 40
+          echo "revision=${revision}" >> "${GITHUB_OUTPUT}"
+      - uses: actions/checkout@v4
+        with:
+          repository: ArcheLabs/JamScript
+          ref: ${{ steps.jamscript-pin.outputs.revision }}
+          path: .jamscript-toolchain
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-02
+      - name: Verify canonical JNS ABI
+        working-directory: .jamscript-toolchain
+        run: |
+          cargo run --quiet --locked --bin jamscript -- abi ../services/jns > /tmp/jns-service.abi.json
+          diff --unified ../services/jns/abi/service.abi.json /tmp/jns-service.abi.json
       - run: npm ci
       - run: npm test
       - run: npm run build

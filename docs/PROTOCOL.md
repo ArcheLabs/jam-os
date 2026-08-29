@@ -10,7 +10,23 @@ Paths are UTF-8, absolute, `/`-separated, normalized, reject NUL/traversal above
 
 ## JNS
 
-The V0 record is `name -> service_id`, with owner authorization for `claim` and `bind`. It is not DNS and has no pricing, expiry, auction, or subdomain semantics.
+JNS is a JamScript application with canonical ABI version 1. Names are
+lowercase ASCII byte labels of 3–32 bytes. Its Managed State schema is
+`jns.names/v1`:
+
+```text
+bytes(32) -> { owner: address, serviceId: u32 }
+```
+
+Wallet-authenticated `claim` and `bind` actions use SignedActionV2; ownership
+is derived exclusively from `ctx.sender`. `resolve` is a typed, proof-backed
+state query. The old JSON operations (`jns:claim`, `jns:bind`, `jns:resolve`)
+and raw `jns:<name>` Service storage belong to the deprecated test Service and
+are not the canonical JNS protocol.
+
+Live use remains disabled until JamScript's generic typed ScriptC runtime/state
+bridge is released and a deployment descriptor is manually promoted. JNS is
+not DNS and has no pricing, expiry, auction, or subdomain semantics.
 
 ## Playground
 

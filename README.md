@@ -19,7 +19,7 @@ Production GitHub Pages deployment is self-contained and does not require GitHub
 
 `.github/workflows/deploy-pages.yml` pins the public MiniJAM Playground API URL, network label, and Computer Service gas limits directly in the repository. During every Pages deployment, the workflow compiles `services/computer/src/service.c` through the live Playground API, writes the reviewed result to `computer-service.bin`, injects the returned Blake2-256 code hash into the frontend build, and verifies that the artifact is present in the final `dist` output.
 
-The live client still fails closed: it verifies the downloaded Computer Service artifact hash before deployment and verifies the deployed Service controller/code hash before reuse. Genesis identity is read from the Playground `/config` endpoint. JNS remains disabled until a canonical JNS Service ID is intentionally promoted in the repository.
+The live client still fails closed: it verifies the downloaded Computer Service artifact hash before deployment and verifies the deployed Service controller/code hash before reuse. Genesis identity is read from the Playground `/config` endpoint. JNS is now owned here as a downstream JamScript application, but live use remains disabled until the typed runtime bridge and a complete canonical deployment descriptor are intentionally promoted.
 
 Phase 3B adds the ordinary MiniJAM DOOM Service in `services/doom`. Its
 versioned requests are submitted through the existing Work path and its

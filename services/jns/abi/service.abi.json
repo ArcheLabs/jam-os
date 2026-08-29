@@ -1,0 +1,167 @@
+{
+  "abi_version": 1,
+  "language_version": "0.2",
+  "package": {
+    "name": "jam-os-jns",
+    "version": "0.1.0"
+  },
+  "actions": [
+    {
+      "name": "claim",
+      "selector": "0xa128aeadde466e98",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "serviceId",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "u64"
+      }
+    },
+    {
+      "name": "bind",
+      "selector": "0x54fcf78326ca5d6b",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "serviceId",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "u64"
+      }
+    }
+  ],
+  "queries": [
+    {
+      "name": "resolve",
+      "kind": "state_get",
+      "state": "names",
+      "keyType": {
+        "kind": "bytes",
+        "max": 32
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "owner",
+              "type": {
+                "kind": "address"
+              }
+            },
+            {
+              "name": "serviceId",
+              "type": {
+                "kind": "u32"
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    }
+  ],
+  "types": {
+    "Bytes<32>": {
+      "kind": "bytes",
+      "max": 32,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 32
+      }
+    },
+    "Record<owner:address,serviceId:u32>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "owner",
+            "type": {
+              "kind": "address"
+            }
+          },
+          {
+            "name": "serviceId",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    "address": {
+      "kind": "address",
+      "max": 32,
+      "descriptor": {
+        "kind": "address"
+      }
+    },
+    "u32": {
+      "kind": "u32",
+      "max": null,
+      "descriptor": {
+        "kind": "u32"
+      }
+    },
+    "u64": {
+      "kind": "u64",
+      "max": null,
+      "descriptor": {
+        "kind": "u64"
+      }
+    }
+  },
+  "state": [
+    {
+      "name": "names",
+      "schema": "jns.names/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 32
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "owner",
+            "type": {
+              "kind": "address"
+            }
+          },
+          {
+            "name": "serviceId",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
