@@ -1,5 +1,25 @@
-# JNS Service
+# JNS
 
-JNS is the small `name -> service_id` mapping used by `jam://` URLs. Names are lowercase ASCII labels validated by `src/jam/names.ts`. The live service ID is configured with `VITE_JNS_SERVICE_ID`; mock mode keeps an isolated in-memory/persisted simulation.
+JNS is JAM OS's canonical `jam://` name registry. The Service is implemented
+in JamScript and owned by this repository.
 
-`src/service.c` is compiled against the pinned MiniJAM SDK and stores records under `jns:<name>`. The current Playground API authorizes Work against a Service controller; deployment environments that need per-user claim authorization must enforce that policy in the deployed JNS Service or its canonical system path rather than trusting browser UI checks.
+Names are canonical lowercase ASCII labels of 3–32 bytes using `a-z`, `0-9`,
+and interior hyphens. The Service validates names again and never normalizes
+on-chain input.
+
+State:
+
+```text
+name -> { owner, serviceId }
+```
+
+Actions are `claim` and `bind`; the query is `resolve`. Ownership comes only
+from `ctx.sender` and is never trusted from browser input. The canonical state
+schema is `jns.names/v1`.
+
+The JamScript toolchain is pinned in `toolchains/jamscript.lock`. The generated
+ABI is committed at `services/jns/abi/service.abi.json` and CI checks it for
+drift. Live resolution uses the proof-backed JamScript client when
+`VITE_JNS_SERVICE_ID`, `VITE_JNS_SERVICE_CODE_HASH`,
+`VITE_MINIJAM_GENESIS_HASH`, and `VITE_MINIJAM_RPC_URL` identify a manually
+promoted canonical deployment; otherwise the runtime stays disabled.

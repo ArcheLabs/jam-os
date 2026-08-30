@@ -1,0 +1,4 @@
+repository = "https://github.com/ArcheLabs/JamScript"
+revision = "23f3adac02eb1648e4005586190dee6715c994c8"
+abi = 1
+language = "0.2"
