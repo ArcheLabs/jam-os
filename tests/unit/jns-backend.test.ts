@@ -69,10 +69,10 @@ describe("JamScript JNS backend", () => {
       },
       async submitAction(action: string, input: Record<string, unknown>) {
         calls.push({ action, input });
-        return { packageHash: "0x01", submissionHash: "0x02", context: {} as never };
+        return { packageHash: "0x01", submissionHash: "0x02", actionHash: "0x03", context: {} as never };
       },
-      async waitForWork() {
-        return { status: "imported" } as never;
+      async waitForAction() {
+        return { status: "imported", actionReceipt: { actionHash: "0x03", status: "applied", errorCode: null } } as never;
       },
     };
     const account = new MutableAccount(alice);

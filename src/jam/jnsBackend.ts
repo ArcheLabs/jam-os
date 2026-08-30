@@ -1,10 +1,12 @@
 import {
   JamAuthorizationError,
+  JnsInvalidNameError,
   JnsNameNotFoundError,
   JnsNameTakenError,
   JnsNotConfiguredError,
   JnsNotOwnerError,
   JamServiceError,
+  JamProtocolError,
 } from "./errors";
 import type { AccountAdapter, JamClient } from "./types";
 import {
@@ -122,7 +124,7 @@ class DisabledJnsBackend implements JnsBackend {
   async bind(_name: Uint8Array, _serviceId: number): Promise<void> { this.unavailable(); }
 }
 
-type JamScriptJnsApi = Pick<JamScriptClient, "queryLatest" | "submitAction" | "waitForWork">;
+type JamScriptJnsApi = Pick<JamScriptClient, "queryLatest" | "submitAction" | "waitForAction">;
 
 /** Live JNS adapter. The deployment is configured separately from Service identity. */
 export class JamScriptJnsBackend implements JnsBackend {
@@ -162,10 +164,19 @@ export class JamScriptJnsBackend implements JnsBackend {
       signRaw: async (message) => parseHex(await signature.call(this.account, toHex(message), { action: "work" })),
     };
     const submitted = await this.client.submitAction(action, { name, serviceId }, signer);
-    const completed = await this.client.waitForWork(submitted.packageHash);
-    if (completed.status === "failed") {
-      throw new JamServiceError("JNS action was rejected by the canonical Service", "JNS_ACTION_REJECTED");
+    const completed = await this.client.waitForAction(submitted.packageHash, submitted.actionHash);
+    const receipt = completed.actionReceipt;
+    if (receipt.status === "applied") return;
+    if (receipt.status === "failed" && receipt.errorCode !== null && (receipt.errorCode & 0x8000_0000) === 0) {
+      switch (receipt.errorCode) {
+        case 1: throw new JnsInvalidNameError();
+        case 2: throw new JnsNameTakenError();
+        case 3: throw new JnsNameNotFoundError();
+        case 4: throw new JnsNotOwnerError();
+        default: throw new JamServiceError("JNS action failed", "JNS_ACTION_FAILED", { errorCode: receipt.errorCode });
+      }
     }
+    throw new JamProtocolError("JNS action was rejected by the canonical Service", "JNS_ACTION_REJECTED");
   }
 }
 
