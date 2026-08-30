@@ -19,6 +19,7 @@ schema is `jns.names/v1`.
 
 The JamScript toolchain is pinned in `toolchains/jamscript.lock`. The generated
 ABI is committed at `services/jns/abi/service.abi.json` and CI checks it for
-drift. No deployment descriptor exists yet: live JNS remains disabled until
-the generic ScriptC typed runtime/state bridge is complete and a canonical
-MiniJAM deployment is manually promoted.
+drift. Live resolution uses the proof-backed JamScript client when
+`VITE_JNS_SERVICE_ID`, `VITE_JNS_SERVICE_CODE_HASH`,
+`VITE_MINIJAM_GENESIS_HASH`, and `VITE_MINIJAM_RPC_URL` identify a manually
+promoted canonical deployment; otherwise the runtime stays disabled.

@@ -1,5 +1,6 @@
 import {
   action,
+  abort,
   wallet,
   stateMap,
   query,
@@ -52,8 +53,8 @@ export const claim = action({
     serviceId: u32,
   },
   execute(ctx, input) {
-    if (!validName(input.name)) throw new Error("INVALID_NAME");
-    if (names.has(input.name)) throw new Error("NAME_TAKEN");
+    if (!validName(input.name)) abort(1);
+    if (names.has(input.name)) abort(2);
     names.set(input.name, {
       owner: ctx.sender,
       serviceId: input.serviceId,
@@ -68,11 +69,11 @@ export const bind = action({
     serviceId: u32,
   },
   execute(ctx, input) {
-    if (!validName(input.name)) throw new Error("INVALID_NAME");
+    if (!validName(input.name)) abort(1);
 
     const current = names.get(input.name);
-    if (!current) throw new Error("NAME_NOT_FOUND");
-    if (!sameAddress(current.owner, ctx.sender)) throw new Error("NOT_OWNER");
+    if (!current) abort(3);
+    if (!sameAddress(current.owner, ctx.sender)) abort(4);
 
     names.set(input.name, {
       owner: current.owner,

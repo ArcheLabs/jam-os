@@ -25,9 +25,7 @@
           }
         }
       ],
-      "executeOutput": {
-        "kind": "u64"
-      }
+      "executeOutput": "unit"
     },
     {
       "name": "bind",
@@ -48,9 +46,7 @@
           }
         }
       ],
-      "executeOutput": {
-        "kind": "u64"
-      }
+      "executeOutput": "unit"
     }
   ],
   "queries": [

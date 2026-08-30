@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AccountAdapter, AccountInfo } from "../../src/jam/types";
-import { MockJnsBackend } from "../../src/jam/jnsBackend";
+import type { AccountAdapter, AccountInfo, SignContext } from "../../src/jam/types";
+import { JamScriptJnsBackend, MockJnsBackend } from "../../src/jam/jnsBackend";
 import { encodeJnsName, JamNameService } from "../../src/jam/names";
 
 const alice = { address: `0x${"11".repeat(32)}`, name: "Alice" };
@@ -8,6 +8,7 @@ const bob = { address: `0x${"22".repeat(32)}`, name: "Bob" };
 
 class MutableAccount implements AccountAdapter {
   constructor(private value: AccountInfo | null) {}
+  sign?: (payloadHex: string, context: SignContext) => Promise<string>;
   use(value: AccountInfo | null) { this.value = value; }
   async current() { return this.value; }
   async connect() { if (!this.value) throw new Error("No account"); return this.value; }
@@ -50,5 +51,36 @@ describe("Mock JNS backend", () => {
   it("requires an account for mutations", async () => {
     const names = new JamNameService(new MockJnsBackend(new MutableAccount(null)));
     await expect(names.claim("alice", "1000")).rejects.toMatchObject({ code: "ACCOUNT_SIGNING_UNAVAILABLE" });
+  });
+});
+
+describe("JamScript JNS backend", () => {
+  it("resolves through the proof-backed JamScript client and submits typed actions", async () => {
+    const calls: Array<{ action: string; input: Record<string, unknown> }> = [];
+    const api = {
+      async queryLatest(query: string, name: Uint8Array) {
+        expect(query).toBe("resolve");
+        expect(name).toEqual(encodeJnsName("alice"));
+        return {
+          value: { owner: Uint8Array.from({ length: 32 }, () => 0x11), serviceId: 1000 },
+          context: {} as never,
+          stateRoot: "0x00",
+        };
+      },
+      async submitAction(action: string, input: Record<string, unknown>) {
+        calls.push({ action, input });
+        return { packageHash: "0x01", submissionHash: "0x02", context: {} as never };
+      },
+      async waitForWork() {
+        return { status: "imported" } as never;
+      },
+    };
+    const account = new MutableAccount(alice);
+    account.sign = async () => "0x" + "33".repeat(64);
+    const backend = new JamScriptJnsBackend(api, account);
+
+    await expect(backend.resolve(encodeJnsName("alice"))).resolves.toMatchObject({ serviceId: 1000 });
+    await backend.claim(encodeJnsName("alice"), 1001);
+    expect(calls[0]).toMatchObject({ action: "claim", input: { serviceId: 1001 } });
   });
 });

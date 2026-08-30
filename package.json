@@ -12,6 +12,7 @@
     "smoke:live": "node scripts/smoke-live.mjs"
   },
   "dependencies": {
+    "@jamscript/minijam-client": "file:../JamScript/packages/client",
     "@monaco-editor/react": "^4.7.0",
     "@polkadot/extension-dapp": "^0.62.6",
     "@polkadot/util": "^14.0.1",

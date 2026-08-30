@@ -10,7 +10,7 @@ Desktop / apps
 └── JamNameService
     └── JnsBackend
         ├── MockJnsBackend
-        └── JamScriptJnsBackend (pending)
+        └── JamScriptJnsBackend
             └── JamScriptClient
                 └── JNS Service
                     └── Managed State
@@ -22,9 +22,10 @@ Window positions, focus, and open windows are ephemeral local UI state. Files, p
 
 JNS is no longer a JSON operation inside the generic JamClient. `JamNameService`
 is the UI-facing facade and delegates to `JnsBackend`. Mock mode uses
-`MockJnsBackend`, which models owner and binding rules directly. The future live
-backend will consume the released `@jamscript/minijam-client`; until then it
-fails closed and no JNS deployment is inferred from an environment-only
-Service ID.
+`MockJnsBackend`, which models owner and binding rules directly. The live
+backend consumes the released `@jamscript/minijam-client` and remains
+fail-closed unless the canonical JNS deployment identity and RPC endpoint are
+configured. Provider infrastructure is runtime configuration, not part of the
+JNS Service identity.
 
 The six V0 apps are registered in `src/App.tsx`. The Browser owns one shared history and routes `jam://`, `file://`, `http://`, `https://`, and `about:` through handlers. JAM/file HTML is sanitized and rendered in a sandboxed iframe; page-authored JavaScript is removed and only the small Browser-owned JAM link bridge is injected.
