@@ -1,9 +1,10 @@
-# DOOM Service
+# DOOM-inspired Simulation Service
 
-This is the Phase 3B deterministic DOOM Service. It is an ordinary MiniJAM
-Service: the browser sends versioned JSON requests as Work payloads, `refine`
-returns the payload, and `accumulate` applies the request to finalized Service
-storage.
+This is a deterministic, DOOM-inspired protocol simulation implemented as an
+ordinary MiniJAM Service. It is not the original DOOM game: it does not embed a
+DOOM engine, WAD files, original maps, enemy AI, or game assets. The browser
+sends versioned JSON requests as Work payloads, `refine` returns the payload,
+and `accumulate` applies the request to finalized Service storage.
 
 State is stored under:
 
@@ -12,7 +13,16 @@ doom:session:<id>:meta
 doom:session:<id>:inputs
 doom:session:<id>:state
 doom:session:<id>:result
+doom:best:<account>
 ```
+
+Every request currently carries a wallet account from the browser payload. The
+Service binds that value when the session is created, rejects later requests
+with a different value, and stores that account's highest completed result.
+This is only safe behind the Stage 0 trusted-relayer identity model. Stage 1
+direct node ingress must authenticate the same principal in the chain protocol
+before scores can be treated as authoritative; a browser-supplied account alone
+is not proof of identity.
 
 Build it with the MiniJAM compiler API:
 

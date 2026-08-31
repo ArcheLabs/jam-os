@@ -38,7 +38,8 @@ A Polkadot wallet extension with an sr25519 account is required for state-changi
 Run the non-mutating live smoke check with `VITE_SMOKE_COMPUTER_SERVICE_ID` when testing an existing Computer Service:
 
 ```bash
-VITE_JAM_MODE=live VITE_PLAYGROUND_API_URL=https://playground.minijam.xyz/api/v1 \
+VITE_JAM_MODE=live VITE_MINIJAM_NODE_RPC_URL=http://127.0.0.1:9944 \
+VITE_MINIJAM_WORK_RPC_URL=http://127.0.0.1:8080 \
 VITE_SMOKE_COMPUTER_SERVICE_ID=<service-id> npm run smoke:live
 ```
 
@@ -53,6 +54,11 @@ VITE_SMOKE_COMPUTER_SERVICE_ID=<service-id> npm run smoke:live
 The Browser also supports best-effort ordinary HTTP(S) iframe navigation. Sites that disallow embedding can be opened in the system browser; no proxy is used.
 
 ## Architecture
+
+The Stage-1 production path composes the neutral MiniJAM node, Formal Work,
+state, and deployment RPCs. Playground is a legacy Stage-0 product and is not
+a runtime or build dependency. Computer and DOOM artifacts are compiled by a
+pinned local MiniJAM toolchain.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md). The implementation has no jam-os backend, database, proxy, AI agent, or client-only DOOM claim.
 

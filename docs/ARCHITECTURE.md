@@ -18,7 +18,11 @@ Desktop / apps
 
 Window positions, focus, and open windows are ephemeral local UI state. Files, published site manifests, names, and service calls are JAM state. In mock mode those same adapter contracts are backed by an isolated mock client, never by the live path.
 
-`MiniJamTransport` is shared by `RealJamClient` and `RealPlaygroundAdapter`. It owns the current Playground `/config`, `/build`, `/actions/prepare`, `/services`, `/work`, `/operations`, and service storage transport. The UI never calls those endpoints directly. The current testnet exposes finalized service storage and controller-authorized Work; public Computer reads therefore use the documented storage-key adapter and fail with `COMPUTER_SERVICE_ABI_MISMATCH` when a deployed artifact does not expose the frozen V0.2 key layout.
+The Stage-1 `MiniJamTransport` composes the node JSON-RPC, Formal Work RPC,
+neutral deployment RPC, and finalized state reads. It neither compiles source
+nor uses Playground identity. Service artifacts are built locally, Work is
+submitted with `minijam_submitWorkV1`, and deployment succeeds only after the
+finalized ServiceInfo code hash matches the local artifact.
 
 JNS is no longer a JSON operation inside the generic JamClient. `JamNameService`
 is the UI-facing facade and delegates to `JnsBackend`. Mock mode uses

@@ -3,22 +3,21 @@ import { MiniJamTransport } from "../../src/jam/transport";
 import { MiniJamApiClient } from "../../src/runtime/minijam/MiniJamApiClient";
 
 describe("MiniJAM API client", () => {
-  it("normalizes service and storage requests onto the live API", async () => {
+  it("normalizes service and storage requests onto finalized node RPC", async () => {
     const originalFetch = globalThis.fetch;
     const requests: string[] = [];
-    globalThis.fetch = async (input) => {
+    globalThis.fetch = async (input, init) => {
       requests.push(String(input));
-      if (String(input).includes("/storage?key=")) return new Response(JSON.stringify({ value: "0x6869" }), { status: 200 });
-      return new Response(JSON.stringify({ serviceId: 183, controller: "5Alice", codeHash: "0xabc", codeLength: 3, preimageReady: true, finalizedBlock: "0x01", finalizedBlockNumber: 1 }), { status: 200 });
+      const request = JSON.parse(String(init?.body)) as { method: string };
+      if (request.method === "minijam_getFinalizedContext") return new Response(JSON.stringify({ result: { blockHash: "0x01", blockNumber: 1, stateRoot: "0x02", slot: 1 } }), { status: 200 });
+      if (request.method === "minijam_getServiceStorageAt") return new Response(JSON.stringify({ result: "0x6869" }), { status: 200 });
+      return new Response(JSON.stringify({ result: "0x0102" }), { status: 200 });
     };
     try {
-      const api = new MiniJamApiClient(new MiniJamTransport("https://example.test/api/v1"));
+      const api = new MiniJamApiClient(new MiniJamTransport("https://node.example.test"));
       await expect(api.getService("183")).resolves.toMatchObject({ serviceId: 183 });
       await expect(api.getStorage("183", "fs:node:/home/user")).resolves.toEqual(new Uint8Array([0x68, 0x69]));
-      expect(requests).toEqual([
-        "https://example.test/api/v1/services/183",
-        "https://example.test/api/v1/services/183/storage?key=0x66733a6e6f64653a2f686f6d652f75736572",
-      ]);
+      expect(requests).toEqual(Array(4).fill("https://node.example.test"));
     } finally {
       globalThis.fetch = originalFetch;
     }

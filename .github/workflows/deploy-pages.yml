@@ -17,10 +17,11 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  PLAYGROUND_API_URL: https://playground.minijam.xyz/api/v1
   VITE_JAM_MODE: live
   VITE_MINIJAM_NETWORK_NAME: MiniJAM
-  VITE_PLAYGROUND_API_URL: https://playground.minijam.xyz/api/v1
+  VITE_MINIJAM_NODE_RPC_URL: ${{ vars.MINIJAM_NODE_RPC_URL }}
+  VITE_MINIJAM_WORK_RPC_URL: ${{ vars.MINIJAM_WORK_RPC_URL }}
+  VITE_MINIJAM_DEPLOYMENT_RPC_URL: ${{ vars.MINIJAM_DEPLOYMENT_RPC_URL }}
   VITE_DOOM_SERVICE_ID: ${{ vars.MINIJAM_DOOM_SERVICE_ID }}
   VITE_DOOM_GATEWAY_URL: ${{ vars.MINIJAM_DOOM_GATEWAY_URL }}
   VITE_COMPUTER_SERVICE_ARTIFACT_URL: ./computer-service.bin
@@ -44,6 +45,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Checkout pinned MiniJAM toolchain
+        uses: actions/checkout@v4
+        with:
+          repository: ArcheLabs/minijam-client
+          ref: 18de55e175abb1cb40679be2e538644e2387655f
+          path: .toolchain/minijam-client
+
       - name: Test
         run: npm test
 
@@ -52,32 +60,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p public
-
-          jq -Rs \
-            '{language:"c", source:., optimization:"O0"}' \
-            services/computer/src/service.c \
-            > /tmp/computer-service-build.json
-
-          curl --fail --silent --show-error \
-            --retry 3 \
-            --retry-all-errors \
-            --header 'content-type: application/json' \
-            --data-binary @/tmp/computer-service-build.json \
-            "${PLAYGROUND_API_URL}/build" \
-            > /tmp/computer-service-build-response.json
-
-          jq -e '
-            .success == true and
-            (.blobBase64 | type == "string" and length > 0) and
-            (.codeHash | type == "string" and test("^0x[0-9a-fA-F]{64}$"))
-          ' /tmp/computer-service-build-response.json >/dev/null
-
-          jq -r '.blobBase64' /tmp/computer-service-build-response.json \
-            | base64 --decode \
-            > public/computer-service.bin
-
+          .toolchain/minijam-client/scripts/compile-service c services/computer/src/service.c /tmp/computer-service O0
+          cp /tmp/computer-service/service.blob public/computer-service.bin
           test -s public/computer-service.bin
-          code_hash="$(jq -r '.codeHash' /tmp/computer-service-build-response.json)"
+          code_hash="$(node -e "const fs=require('fs');const {blake2AsHex}=require('@polkadot/util-crypto');process.stdout.write(blake2AsHex(fs.readFileSync('public/computer-service.bin'),256))")"
           echo "VITE_COMPUTER_SERVICE_CODE_HASH=${code_hash}" >> "${GITHUB_ENV}"
 
           {
@@ -91,31 +77,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -Rs \
-            '{language:"c", source:., optimization:"O0"}' \
-            services/doom/src/service.c \
-            > /tmp/doom-service-build.json
-
-          curl --fail --silent --show-error \
-            --retry 3 \
-            --retry-all-errors \
-            --header 'content-type: application/json' \
-            --data-binary @/tmp/doom-service-build.json \
-            "${PLAYGROUND_API_URL}/build" \
-            > /tmp/doom-service-build-response.json
-
-          jq -e '
-            .success == true and
-            (.blobBase64 | type == "string" and length > 0) and
-            (.codeHash | type == "string" and test("^0x[0-9a-fA-F]{64}$"))
-          ' /tmp/doom-service-build-response.json >/dev/null
-
-          jq -r '.blobBase64' /tmp/doom-service-build-response.json \
-            | base64 --decode \
-            > public/doom-service.bin
-
+          .toolchain/minijam-client/scripts/compile-service c services/doom/src/service.c /tmp/doom-service O0
+          cp /tmp/doom-service/service.blob public/doom-service.bin
           test -s public/doom-service.bin
-          doom_code_hash="$(jq -r '.codeHash' /tmp/doom-service-build-response.json)"
+          doom_code_hash="$(node -e "const fs=require('fs');const {blake2AsHex}=require('@polkadot/util-crypto');process.stdout.write(blake2AsHex(fs.readFileSync('public/doom-service.bin'),256))")"
           {
             echo "## Canonical DOOM Service"
             echo
