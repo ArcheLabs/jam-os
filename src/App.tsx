@@ -13,15 +13,18 @@ import { getAppManifest, systemApps } from "./os/appRegistry";
 import "./styles/global.css";
 import "./styles/boot-polish.css";
 import "./styles/os.css";
+import { PublicComputerPage } from "./public/PublicComputerPage";
 
 type Phase = "boot" | "login" | "connecting" | "account" | "provisioning" | "desktop" | "error";
 
 export default function App() {
   const preview = new URLSearchParams(window.location.search).get("preview") === "1" || window.location.hash === "#preview";
   const runtime = useMemo(() => createRuntime(preview), [preview]);
+  const publicName = window.location.pathname.match(/^\/@([a-z0-9-]+)$/i)?.[1]?.toLowerCase();
   const [phase, setPhase] = useState<Phase>("boot"); const [account, setAccount] = useState<AccountInfo | null>(null); const [serviceId, setServiceId] = useState<string | null>(null); const [progress, setProgress] = useState<ProvisionProgress[]>([]); const [error, setError] = useState(""); const [windows, setWindows] = useState<WindowInstance[]>([]); const [showStart, setShowStart] = useState(false); const [selected, setSelected] = useState<string | null>(null); const [networkName, setNetworkName] = useState("MiniJAM"); const zIndex = useRef(20);
   useEffect(() => { if (phase !== "boot") return; const timer = window.setTimeout(() => setPhase("login"), 1200); return () => window.clearTimeout(timer); }, [phase]);
   useEffect(() => { void runtime.network.getInfo().then((info) => setNetworkName(info.name)).catch(() => undefined); }, [runtime]);
+  if (publicName) return <PublicComputerPage name={publicName} runtime={runtime} />;
   const connectAccount = async () => { setPhase("connecting"); setError(""); try { const connected = await runtime.account.connect(); setAccount(connected); setPhase("account"); runtime.events.emit?.("account:connected", connected); } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to connect account"); setPhase("login"); } };
   const openApp = (appId: string, args?: string) => { const manifest = getAppManifest(appId); setWindows((old) => { const existing = manifest.singleton ? old.find((item) => item.appId === appId) : undefined; if (existing) return old.map((item) => item.id === existing.id ? { ...item, minimized: false, args, zIndex: ++zIndex.current } : item); const offset = old.length * 26; return [...old, { id: `${appId}-${Date.now()}`, appId, title: manifest.name, x: 105 + offset, y: 58 + offset, width: manifest.defaultWidth, height: manifest.defaultHeight, zIndex: ++zIndex.current, minimized: false, maximized: false, args }]; }); setSelected(appId); setShowStart(false); };
   const provision = async () => { setPhase("provisioning"); setProgress([]); setError(""); try { const result = await runtime.computer.provision((item) => setProgress((old) => [...old.filter((entry) => entry.step !== item.step), item])); setAccount(result.account); setServiceId(result.serviceId); setPhase("desktop"); runtime.events.emit?.("service:started", result.serviceId); openApp("computer"); } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to start JAM Computer"); setPhase("error"); } };
