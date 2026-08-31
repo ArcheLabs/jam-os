@@ -1,0 +1,104 @@
+{
+  "serviceKey": "0xb5de71cbd87b48abf62a4289172a5c1506c4638869a00f95e4f9b22ef279aba8",
+  "serviceInstanceId": "0xe26f31f5386ac558846da8bb32925a11e8d76c3386aaf784e572eb50053002a4",
+  "management": {
+    "mode": "immutable"
+  },
+  "language_version": "0.2",
+  "compiler_version": "0.1.0",
+  "runtime_version": "0.1.0",
+  "runtimePackageVersion": "service-runtime-0.1.0",
+  "managedStateProtocolVersion": 1,
+  "managedStateLayoutVersion": 1,
+  "runtimeRefineInputVersion": 1,
+  "signedActionVersion": 1,
+  "recoveryFormatVersion": 1,
+  "abi_version": 1,
+  "target_adapter_version": "minijam-0.2",
+  "pvm_toolchain": "official polkavm-linker 0.30.0 target + rust-lld",
+  "rustToolchain": "nightly-2026-05-02",
+  "rustcVersion": "rustc 1.97.0-nightly (67bcaa9c4 2026-05-01)",
+  "polkavmLinkerVersion": "0.30.0",
+  "polkavmTargetVariant": "1_91",
+  "polkavmTargetHash": "0x228b0990d1360dfaf346f90a1e8d8a35620e179ee81f46d21ed1900150a12c1e",
+  "guestArchitecture": "riscv64",
+  "guestAbi": "lp64e",
+  "cCompiler": "Ubuntu clang version 20.1.8 (++20250708083436+6fb913d3e2ec-1~exp1~20250708203453.133)",
+  "finalElfLinker": "rust-lld",
+  "finalElfLinkerOverrides": [
+    "-z",
+    "notext"
+  ],
+  "targetEnvironment": "polkavm",
+  "minimumStackBytes": 2097152,
+  "clang_version": "Ubuntu clang version 20.1.8 (++20250708083436+6fb913d3e2ec-1~exp1~20250708203453.133)",
+  "minijam_sdk_revision": "37828e00ff2b503ea86e3f70b42c5850b03d022a",
+  "minijamConverterRevision": "37828e00ff2b503ea86e3f70b42c5850b03d022a",
+  "source_hash": "0xaaff8529fe5f23a4d0007ec468fef3d9b9397880a1c460f84629d00ff2250058",
+  "abi_hash": "0x5ff6f6c61159a9c19645f48a129d41ece59fb4c528a6184c241e11eb499bfd60",
+  "code_hash": "0x302e03ecd76d9f9869b725a5b9e7a245717e022440e529d699c58f0abba94d2f",
+  "native_abi_version": 1,
+  "native_modules": [],
+  "backend": "scriptc-m2",
+  "scriptc_version": "0.0.34",
+  "scriptc_revision": "d7b4480",
+  "node_version": "24.15.0",
+  "typescript_version": "7.0.2",
+  "surface_manifest_hash": "0x5bc22383db4e57edf171bfeb6dd518e964844efae54b6a2574e2bd29afb134c9",
+  "package_lock_hash": "0x2f77827ddb076bd238bc5d82a5f1f66daf6c73689971d4fcc2f1f5be2c6d9d4d",
+  "runtime_profile_version": "scriptc-deterministic-v1",
+  "generated_actions": [
+    {
+      "name": "initialize",
+      "selector": "0xd65e4894e33cb2cd",
+      "symbol": "jamscript_scriptc_initialize_entry_v1"
+    },
+    {
+      "name": "setProfile",
+      "selector": "0x6db43e2c3db7103d",
+      "symbol": "jamscript_scriptc_setProfile_entry_v1"
+    },
+    {
+      "name": "setAppearance",
+      "selector": "0x36ad13bfab76bf37",
+      "symbol": "jamscript_scriptc_setAppearance_entry_v1"
+    },
+    {
+      "name": "upsertDesktopIcon",
+      "selector": "0xa678eb998789759e",
+      "symbol": "jamscript_scriptc_upsertDesktopIcon_entry_v1"
+    },
+    {
+      "name": "removeDesktopIcon",
+      "selector": "0x33f92c85f666a0d9",
+      "symbol": "jamscript_scriptc_removeDesktopIcon_entry_v1"
+    },
+    {
+      "name": "setNodeMetadata",
+      "selector": "0xa398af675307c322",
+      "symbol": "jamscript_scriptc_setNodeMetadata_entry_v1"
+    },
+    {
+      "name": "removeNodeMetadata",
+      "selector": "0x8e1fa7e0930b66e8",
+      "symbol": "jamscript_scriptc_removeNodeMetadata_entry_v1"
+    },
+    {
+      "name": "publishSite",
+      "selector": "0x62397d54cf31c62f",
+      "symbol": "jamscript_scriptc_publishSite_entry_v1"
+    },
+    {
+      "name": "setDesktopIndex",
+      "selector": "0xbddba710d9554704",
+      "symbol": "jamscript_scriptc_setDesktopIndex_entry_v1"
+    },
+    {
+      "name": "setDirectoryIndex",
+      "selector": "0xc468726e148410ba",
+      "symbol": "jamscript_scriptc_setDirectoryIndex_entry_v1"
+    }
+  ],
+  "typedRuntimeVersion": 1,
+  "stateViewVersion": 1
+}

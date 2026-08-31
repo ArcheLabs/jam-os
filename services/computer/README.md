@@ -15,3 +15,7 @@ For local artifact validation from a checkout that also contains `minijam-client
 
 The reviewed Stage-1 ScriptC artifact is promoted under `artifacts/computer/stage1/scriptc/` with code hash
 `0x302e03ecd76d9f9869b725a5b9e7a245717e022440e529d699c58f0abba94d2f`.
+
+The accompanying `build.json` records the exact JamScript SDK revision
+(`37828e00ff2b503ea86e3f70b42c5850b03d022a`), ScriptC `0.0.34`, Node
+`24.15.0`, and pinned MiniJAM build metadata.
