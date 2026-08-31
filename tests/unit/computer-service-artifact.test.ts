@@ -16,6 +16,10 @@ const source = fs.readFileSync(
   new URL("../../services/computer/src/service.ts", import.meta.url),
   "utf8",
 );
+const computerClient = fs.readFileSync(
+  new URL("../../src/jam/computer.ts", import.meta.url),
+  "utf8",
+);
 const blob = fs.readFileSync(
   new URL("../../artifacts/computer/stage1/scriptc/service.blob", import.meta.url),
 );
@@ -60,5 +64,11 @@ describe("canonical Computer JamScript artifact", () => {
 
   it("matches the promoted content-addressed production blob", () => {
     expect(blake2AsHex(blob, 256)).toBe("0xb8ae2888af4b0a73b93016580202e8fa2abdb4b971e17f9b40460994468198b9");
+  });
+
+  it("keeps live Computer deployment independent from Playground", () => {
+    expect(computerClient).not.toContain("PlaygroundAdapter");
+    expect(computerClient).not.toContain("this.playground.deploy");
+    expect(computerClient).toContain("Stage-1 deployment client");
   });
 });
