@@ -147,4 +147,7 @@
 .public-error h1 { margin: 18px 0 8px; }
 .public-error p { color: #a8bdd3; line-height: 1.5; }
 .public-error a { justify-content: center; margin-top: 22px; }
+.share-row { display: flex; gap: 7px; margin-top: 10px; }
+.share-row input { min-width: 0; flex: 1; padding: 8px 9px; color: #dceafa; border: 1px solid rgba(156, 194, 236, .16); border-radius: 6px; background: rgba(255,255,255,.04); font: 11px 'DM Mono', monospace; }
+.share-row button { white-space: nowrap; }
 @media (max-width: 720px) { .public-desktop-card { flex-direction: column; align-items: flex-start; } .public-service-meta { align-self: flex-start; margin-left: 0; align-items: flex-start; } .public-computer-header { margin-bottom: 28px; } }
