@@ -171,6 +171,18 @@
           }
         },
         {
+          "name": "x",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "y",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
           "name": "updatedAt",
           "type": {
             "kind": "u32"
@@ -361,6 +373,30 @@
       "executeOutput": {
         "kind": "unit"
       }
+    },
+    {
+      "name": "setDesktopIndex",
+      "selector": "0xbddba710d9554704",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "entries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
     }
   ],
   "queries": [
@@ -510,6 +546,18 @@
               }
             },
             {
+              "name": "x",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "y",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
               "name": "updatedAt",
               "type": {
                 "kind": "u32"
@@ -652,6 +700,30 @@
         },
         "nullable": true
       }
+    },
+    {
+      "name": "getDesktopIndex",
+      "kind": "state_get",
+      "state": "desktopIndexes",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "entries",
+              "type": {
+                "kind": "bytes",
+                "max": 4096
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
     }
   ],
   "types": {
@@ -687,6 +759,14 @@
         "max": 32
       }
     },
+    "Bytes<4096>": {
+      "kind": "bytes",
+      "max": 4096,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 4096
+      }
+    },
     "Bytes<64>": {
       "kind": "bytes",
       "max": 64,
@@ -703,7 +783,23 @@
         "max": 96
       }
     },
-    "Record<label:Bytes<64>,target:Bytes<256>,iconRoot:Bytes<32>,iconSize:u32,visible:bool,removed:bool,updatedAt:u32>": {
+    "Record<entries:Bytes<4096>>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          }
+        ]
+      }
+    },
+    "Record<label:Bytes<64>,target:Bytes<256>,iconRoot:Bytes<32>,iconSize:u32,visible:bool,removed:bool,x:u32,y:u32,updatedAt:u32>": {
       "kind": "record",
       "max": null,
       "descriptor": {
@@ -746,6 +842,18 @@
             "name": "removed",
             "type": {
               "kind": "bool"
+            }
+          },
+          {
+            "name": "x",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "y",
+            "type": {
+              "kind": "u32"
             }
           },
           {
@@ -1121,6 +1229,18 @@
             }
           },
           {
+            "name": "x",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "y",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
             "name": "updatedAt",
             "type": {
               "kind": "u32"
@@ -1251,6 +1371,27 @@
             "name": "published",
             "type": {
               "kind": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "desktopIndexes",
+      "schema": "computer.desktop-index/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
             }
           }
         ]

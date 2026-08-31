@@ -14,4 +14,4 @@ For local artifact validation from a checkout that also contains `minijam-client
 `src/service.c` is retained as a historical protocol fixture only; it is not the production Computer implementation. Keep generated blobs out of source control unless they are intentionally promoted as reviewed canonical artifacts.
 
 The reviewed Stage-1 ScriptC artifact is promoted under `artifacts/computer/stage1/scriptc/` with code hash
-`0xb8ae2888af4b0a73b93016580202e8fa2abdb4b971e17f9b40460994468198b9`.
+`0x375532e134f651d46350a3a66d6206841a1677fa696354310f7f070d113fb895`.

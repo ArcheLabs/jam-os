@@ -37,6 +37,7 @@ describe("canonical Computer JamScript artifact", () => {
       "setNodeMetadata",
       "removeNodeMetadata",
       "publishSite",
+      "setDesktopIndex",
     ]);
     expect(abi.queries.map((query) => query.name)).toEqual([
       "getProfile",
@@ -44,6 +45,7 @@ describe("canonical Computer JamScript artifact", () => {
       "getDesktopIcon",
       "getNodeMetadata",
       "getSiteManifest",
+      "getDesktopIndex",
     ]);
     expect(abi.state.map((entry) => entry.schema)).toEqual([
       "computer.profile/v1",
@@ -51,6 +53,7 @@ describe("canonical Computer JamScript artifact", () => {
       "computer.desktop-icons/v1",
       "computer.nodes/v1",
       "computer.site-manifest/v1",
+      "computer.desktop-index/v1",
     ]);
   });
 
@@ -63,7 +66,7 @@ describe("canonical Computer JamScript artifact", () => {
   });
 
   it("matches the promoted content-addressed production blob", () => {
-    expect(blake2AsHex(blob, 256)).toBe("0xb8ae2888af4b0a73b93016580202e8fa2abdb4b971e17f9b40460994468198b9");
+    expect(blake2AsHex(blob, 256)).toBe("0x375532e134f651d46350a3a66d6206841a1677fa696354310f7f070d113fb895");
   });
 
   it("keeps live Computer deployment independent from Playground", () => {

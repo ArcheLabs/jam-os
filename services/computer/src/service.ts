@@ -11,6 +11,7 @@ const Bio = bytes(256);
 const Mime = bytes(96);
 const Kind = bytes(16);
 const Theme = bytes(32);
+const DesktopIndex = bytes(4096);
 
 const Profile = record({
   owner: address,
@@ -34,6 +35,8 @@ const DesktopIcon = record({
   iconSize: u32,
   visible: bool,
   removed: bool,
+  x: u32,
+  y: u32,
   updatedAt: u32,
 });
 
@@ -63,6 +66,7 @@ const appearances = stateMap({ schema: "computer.appearance/v1", key: RootKey, v
 const desktopIcons = stateMap({ schema: "computer.desktop-icons/v1", key: IconId, value: DesktopIcon });
 const nodes = stateMap({ schema: "computer.nodes/v1", key: Path, value: NodeMetadata });
 const manifests = stateMap({ schema: "computer.site-manifest/v1", key: RootKey, value: SiteManifest });
+const desktopIndexes = stateMap({ schema: "computer.desktop-index/v1", key: RootKey, value: record({ entries: DesktopIndex }) });
 
 function isRootKey(key: Uint8Array): boolean {
   return key.length === 1 && key[0] === 0;
@@ -86,6 +90,8 @@ function requireSender(key: Uint8Array, sender: Uint8Array) {
   if (!sameAddress(current.owner, sender)) abort(3);
   return current;
 }
+
+function validCoordinate(value: number): boolean { return value <= 10000; }
 
 export const initialize = action({
   auth: wallet(),
@@ -115,6 +121,7 @@ export const initialize = action({
       publishedAt: 0,
       published: false,
     });
+    desktopIndexes.set(input.key, { entries: new Uint8Array(0) });
   },
 });
 
@@ -149,9 +156,10 @@ export const setAppearance = action({
 
 export const upsertDesktopIcon = action({
   auth: wallet(),
-  input: { key: RootKey, iconId: IconId, label: IconId, target: Path, iconRoot: ContentRoot, iconSize: u32, visible: bool, updatedAt: u32 },
+  input: { key: RootKey, iconId: IconId, label: IconId, target: Path, iconRoot: ContentRoot, iconSize: u32, visible: bool, x: u32, y: u32, updatedAt: u32 },
   execute(ctx, input) {
     requireSender(input.key, ctx.sender);
+    if (!validCoordinate(input.x) || !validCoordinate(input.y)) abort(7);
     desktopIcons.set(input.iconId, {
       label: input.label,
       target: input.target,
@@ -159,6 +167,8 @@ export const upsertDesktopIcon = action({
       iconSize: input.iconSize,
       visible: input.visible,
       removed: false,
+      x: input.x,
+      y: input.y,
       updatedAt: input.updatedAt,
     });
   },
@@ -178,6 +188,8 @@ export const removeDesktopIcon = action({
       iconSize: current.iconSize,
       visible: false,
       removed: true,
+      x: current.x,
+      y: current.y,
       updatedAt: input.updatedAt,
     });
   },
@@ -238,8 +250,18 @@ export const publishSite = action({
   },
 });
 
+export const setDesktopIndex = action({
+  auth: wallet(),
+  input: { key: RootKey, entries: DesktopIndex },
+  execute(ctx, input) {
+    requireSender(input.key, ctx.sender);
+    desktopIndexes.set(input.key, { entries: input.entries });
+  },
+});
+
 export const getProfile = query(profiles);
 export const getAppearance = query(appearances);
 export const getDesktopIcon = query(desktopIcons);
 export const getNodeMetadata = query(nodes);
 export const getSiteManifest = query(manifests);
+export const getDesktopIndex = query(desktopIndexes);
