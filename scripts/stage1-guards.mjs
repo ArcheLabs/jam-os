@@ -8,7 +8,7 @@ const productionFiles = [
   "src/jam/computer.ts",
   "src/public/PublicComputerPage.tsx",
 ];
-const forbidden = ["RealPlaygroundAdapter", "VITE_PLAYGROUND_API_URL", "playground.minijam.xyz", "this.playground.deploy", "fs:blob:", "fs:dir:"];
+const forbidden = ["RealPlaygroundAdapter", "MiniJamDoomRuntime", "scoreForState", "VITE_PLAYGROUND_API_URL", "playground.minijam.xyz", "this.playground.deploy", "fs:blob:", "fs:dir:"];
 const violations = [];
 for (const relative of productionFiles) {
   const file = path.join(root, relative);
