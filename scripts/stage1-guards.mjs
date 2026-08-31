@@ -15,6 +15,10 @@ for (const relative of productionFiles) {
   const source = fs.readFileSync(file, "utf8");
   for (const marker of forbidden) if (source.includes(marker)) violations.push(`${relative}: ${marker}`);
 }
+const filesystemSource = fs.readFileSync(path.join(root, "src/runtime/minijam/LiveFileSystemRuntime.ts"), "utf8");
+for (const marker of ["action(\"setNodeMetadata\"", "action(\"removeNodeMetadata\"", "action(\"setDirectoryIndex\""]) {
+  if (filesystemSource.includes(marker)) violations.push(`src/runtime/minijam/LiveFileSystemRuntime.ts: non-atomic filesystem action ${marker}`);
+}
 for (const file of ["src/runtime/minijam/MiniJamRuntime.ts", "src/public/PublicComputerPage.tsx"]) {
   if (fs.readFileSync(path.join(root, file), "utf8").includes("VITE_CONTENT_UPLOAD_TOKEN")) violations.push(`${file}: browser-exposed upload secret`);
 }

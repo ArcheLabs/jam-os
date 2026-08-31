@@ -11,7 +11,7 @@ closure work:
 | Jambda (unchanged) | `368584d452e4e5d0eef5a304b9f481bdc8ce2c50` |
 
 The rebuilt Computer artifact is Blake2-256
-`0x302e03ecd76d9f9869b725a5b9e7a245717e022440e529d699c58f0abba94d2f`.
+`0x0ad190b04882827d032f5cc61fcb9961ed8c32d2a162f95436be9ed0ea8b5045`.
 Its ABI and source are generated from the checked-in service with JamScript
 0.2 ScriptC and the pinned Node 24.15.0 toolchain.
 

@@ -69,7 +69,7 @@ describe("canonical Computer JamScript artifact", () => {
   });
 
   it("matches the promoted content-addressed production blob", () => {
-    expect(blake2AsHex(blob, 256)).toBe("0x302e03ecd76d9f9869b725a5b9e7a245717e022440e529d699c58f0abba94d2f");
+    expect(blake2AsHex(blob, 256)).toBe("0x0ad190b04882827d032f5cc61fcb9961ed8c32d2a162f95436be9ed0ea8b5045");
   });
 
   it("keeps live Computer deployment independent from Playground", () => {

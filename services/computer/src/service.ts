@@ -270,6 +270,71 @@ export const setDirectoryIndex = action({
   },
 });
 
+// Semantic filesystem operations. Each operation commits the node mutation
+// and its parent directory index in one service transition, so a failed work
+// item cannot leave a half-updated filesystem view.
+export const writeFile = action({
+  auth: wallet(),
+  input: { key: RootKey, path: Path, parent: Path, mime: Mime, size: u32, contentRoot: ContentRoot, updatedAt: u32, parentEntries: DirectoryIndex },
+  execute(ctx, input) {
+    requireSender(input.key, ctx.sender);
+    if (input.path.length === 0 || input.path[0] !== 47 || input.path.length === 1) abort(8);
+    const parent = nodes.get(input.parent);
+    if (!parent || parent.removed || parent.kind.length !== 8) abort(9);
+    nodes.set(input.path, { path: input.path, kind: new Uint8Array([102, 105, 108, 101]), parent: input.parent, mime: input.mime, size: input.size, contentRoot: input.contentRoot, removed: false, updatedAt: input.updatedAt });
+    directoryIndexes.set(input.parent, { entries: input.parentEntries });
+  },
+});
+
+export const mkdir = action({
+  auth: wallet(),
+  input: { key: RootKey, path: Path, parent: Path, updatedAt: u32, parentEntries: DirectoryIndex },
+  execute(ctx, input) {
+    requireSender(input.key, ctx.sender);
+    if (input.path.length === 0 || input.path[0] !== 47 || input.path.length === 1) abort(8);
+    const parent = nodes.get(input.parent);
+    if (!parent || parent.removed || parent.kind.length !== 8) abort(9);
+    nodes.set(input.path, { path: input.path, kind: new Uint8Array([100, 105, 114, 101, 99, 116, 111, 114, 121]), parent: input.parent, mime: new Uint8Array([105, 110, 111, 100, 101, 47, 100, 105, 114, 101, 99, 116, 111, 114, 121]), size: 0, contentRoot: new Uint8Array(32), removed: false, updatedAt: input.updatedAt });
+    directoryIndexes.set(input.path, { entries: new Uint8Array(0) });
+    directoryIndexes.set(input.parent, { entries: input.parentEntries });
+  },
+});
+
+export const removeNode = action({
+  auth: wallet(),
+  input: { key: RootKey, path: Path, updatedAt: u32, parentEntries: DirectoryIndex },
+  execute(ctx, input) {
+    const owner = requireSender(input.key, ctx.sender);
+    const current = nodes.get(input.path);
+    if (!current || current.removed || current.path.length === 1) abort(6);
+    nodes.set(input.path, { path: current.path, kind: current.kind, parent: current.parent, mime: current.mime, size: current.size, contentRoot: current.contentRoot, removed: true, updatedAt: input.updatedAt });
+    directoryIndexes.set(current.parent, { entries: input.parentEntries });
+    void owner;
+  },
+});
+
+export const renameFile = action({
+  auth: wallet(),
+  input: { key: RootKey, from: Path, to: Path, fromParent: Path, toParent: Path, updatedAt: u32, fromEntries: DirectoryIndex, toEntries: DirectoryIndex },
+  execute(ctx, input) {
+    requireSender(input.key, ctx.sender);
+    const current = nodes.get(input.from);
+    if (!current || current.removed || current.kind.length !== 4 || !sameBytes(current.parent, input.fromParent)) abort(6);
+    const targetParent = nodes.get(input.toParent);
+    if (!targetParent || targetParent.removed || targetParent.kind.length !== 8) abort(9);
+    nodes.set(input.to, { path: input.to, kind: current.kind, parent: input.toParent, mime: current.mime, size: current.size, contentRoot: current.contentRoot, removed: false, updatedAt: input.updatedAt });
+    nodes.set(input.from, { path: current.path, kind: current.kind, parent: current.parent, mime: current.mime, size: current.size, contentRoot: current.contentRoot, removed: true, updatedAt: input.updatedAt });
+    directoryIndexes.set(input.fromParent, { entries: input.fromEntries });
+    directoryIndexes.set(input.toParent, { entries: input.toEntries });
+  },
+});
+
+function sameBytes(left: Uint8Array, right: Uint8Array): boolean {
+  if (left.length !== right.length) return false;
+  for (let index = 0; index < left.length; index++) if (left[index] !== right[index]) return false;
+  return true;
+}
+
 export const getProfile = query(profiles);
 export const getAppearance = query(appearances);
 export const getDesktopIcon = query(desktopIcons);

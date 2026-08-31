@@ -34,9 +34,9 @@
   "clang_version": "Ubuntu clang version 20.1.8 (++20250708083436+6fb913d3e2ec-1~exp1~20250708203453.133)",
   "minijam_sdk_revision": "37828e00ff2b503ea86e3f70b42c5850b03d022a",
   "minijamConverterRevision": "37828e00ff2b503ea86e3f70b42c5850b03d022a",
-  "source_hash": "0xaaff8529fe5f23a4d0007ec468fef3d9b9397880a1c460f84629d00ff2250058",
-  "abi_hash": "0x5ff6f6c61159a9c19645f48a129d41ece59fb4c528a6184c241e11eb499bfd60",
-  "code_hash": "0x302e03ecd76d9f9869b725a5b9e7a245717e022440e529d699c58f0abba94d2f",
+  "source_hash": "0x3eb087a396090e1372c906339d25463c23b031d9ebd528c00f529330c4e06741",
+  "abi_hash": "0xffa85759e25f30914277ae84d8860f42726588462cdb42786a516ef657fd5f6a",
+  "code_hash": "0x0ad190b04882827d032f5cc61fcb9961ed8c32d2a162f95436be9ed0ea8b5045",
   "native_abi_version": 1,
   "native_modules": [],
   "backend": "scriptc-m2",
@@ -97,6 +97,26 @@
       "name": "setDirectoryIndex",
       "selector": "0xc468726e148410ba",
       "symbol": "jamscript_scriptc_setDirectoryIndex_entry_v1"
+    },
+    {
+      "name": "writeFile",
+      "selector": "0x7e944c91d47cde38",
+      "symbol": "jamscript_scriptc_writeFile_entry_v1"
+    },
+    {
+      "name": "mkdir",
+      "selector": "0xd8b8eef579f6f936",
+      "symbol": "jamscript_scriptc_mkdir_entry_v1"
+    },
+    {
+      "name": "removeNode",
+      "selector": "0x088ae5722f7646e8",
+      "symbol": "jamscript_scriptc_removeNode_entry_v1"
+    },
+    {
+      "name": "renameFile",
+      "selector": "0x84deab86898de85f",
+      "symbol": "jamscript_scriptc_renameFile_entry_v1"
     }
   ],
   "typedRuntimeVersion": 1,

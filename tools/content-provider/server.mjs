@@ -8,10 +8,41 @@ const port = Number(process.env.CONTENT_PORT || 8787);
 const rootDir = resolve(process.env.CONTENT_VOLUME || "./.content-provider");
 const maxBytes = Number(process.env.CONTENT_MAX_BYTES || 5 * 1024 * 1024);
 const uploadToken = process.env.CONTENT_UPLOAD_TOKEN || "";
+const authMode = process.env.CONTENT_AUTH_MODE || "wallet-signature";
+const providerDomain = (process.env.CONTENT_PROVIDER_DOMAIN || "").replace(/^0x/i, "").toLowerCase();
+const uploadDomain = Buffer.from("JAM_CONTENT_UPLOAD_V1");
+let cryptoVerifier;
 
 function digest(bytes) { return createHash("blake2b512").update(bytes).digest().subarray(0, 32).toString("hex"); }
 function objectPath(root) { return join(rootDir, root.slice(0, 2), root.slice(2)); }
 function validRoot(root) { return /^[0-9a-f]{64}$/i.test(root); }
+function decodeHex(value, bytes, name) { const normalized = String(value || "").replace(/^0x/i, ""); if (!new RegExp(`^[0-9a-f]{${bytes * 2}}$`, "i").test(normalized)) throw new Error(`invalid ${name}`); return Buffer.from(normalized, "hex"); }
+function permitDigest(account, root, size, expires) {
+  const body = Buffer.alloc(1 + 32 + 32 + 32 + 8 + 8);
+  body[0] = 1;
+  Buffer.from(providerDomain, "hex").copy(body, 1);
+  account.copy(body, 33);
+  root.copy(body, 65);
+  body.writeBigUInt64LE(BigInt(size), 97);
+  body.writeBigUInt64LE(BigInt(expires), 105);
+  return createHash("blake2b512").update(Buffer.concat([uploadDomain, body])).digest().subarray(0, 32);
+}
+async function verifyWalletPermit(request, root, size) {
+  if (authMode !== "wallet-signature") return false;
+  if (!/^[0-9a-f]{64}$/.test(providerDomain)) return false;
+  if (request.headers["x-jam-upload-version"] !== "1") return false;
+  const account = decodeHex(request.headers["x-jam-account"], 32, "account");
+  const claimedDomain = decodeHex(request.headers["x-jam-provider-domain"], 32, "provider domain");
+  if (claimedDomain.toString("hex") !== providerDomain) return false;
+  const claimedSize = Number(request.headers["x-jam-content-size"]);
+  if (!Number.isSafeInteger(claimedSize) || claimedSize !== size) return false;
+  const expires = Number(request.headers["x-jam-expires"]);
+  if (!Number.isSafeInteger(expires) || expires < Math.floor(Date.now() / 1000)) return false;
+  const signature = decodeHex(request.headers["x-jam-signature"], 64, "signature");
+  cryptoVerifier ||= import("@polkadot/util-crypto").then((module) => module.sr25519Verify);
+  const sr25519Verify = await cryptoVerifier;
+  return sr25519Verify(permitDigest(account, root, size, expires), signature, account);
+}
 function send(response, status, body, headers = {}) { response.writeHead(status, { "cache-control": "public, max-age=31536000, immutable", ...headers }); response.end(body); }
 async function readBody(request) {
   const chunks = [];
@@ -33,9 +64,12 @@ const server = createServer(async (request, response) => {
     const root = match[1].toLowerCase();
     const target = objectPath(root);
     if (request.method === "PUT") {
-      if (uploadToken && request.headers.authorization !== `Bearer ${uploadToken}`) return send(response, 401, "upload authorization required");
-      if (!uploadToken) return send(response, 503, "uploads are disabled until CONTENT_UPLOAD_TOKEN is configured");
       const bytes = await readBody(request);
+      if (authMode === "test-token") {
+        if (!uploadToken || request.headers.authorization !== `Bearer ${uploadToken}`) return send(response, 401, "upload authorization required");
+      } else if (!(await verifyWalletPermit(request, root, bytes.length))) {
+        return send(response, 401, "wallet upload permit required");
+      }
       if (digest(bytes) !== root) return send(response, 422, "content hash does not match root");
       await mkdir(join(rootDir, root.slice(0, 2)), { recursive: true });
       const temporary = `${target}.${randomUUID()}.upload`;

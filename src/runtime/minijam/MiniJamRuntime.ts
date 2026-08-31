@@ -52,7 +52,7 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   /** Compatibility shim for Stage-0 UI; live Stage-1 never reaches a Playground endpoint. */
   readonly playground: PlaygroundRuntime = { compile: async () => { throw new Error("Playground is available only in preview mode"); }, deploy: async () => { throw new Error("Playground is available only in preview mode"); }, interact: async () => { throw new Error("Playground is available only in preview mode"); } };
   readonly work: WorkRuntime = new LiveWorkRuntime(this.api, this.account, this.events);
-  readonly content = import.meta.env.VITE_CONTENT_PROVIDER_URL ? new HttpContentProvider(import.meta.env.VITE_CONTENT_PROVIDER_URL, Number(import.meta.env.VITE_CONTENT_MAX_BYTES || 5 * 1024 * 1024)) : undefined;
+  readonly content = import.meta.env.VITE_CONTENT_PROVIDER_URL ? new HttpContentProvider(import.meta.env.VITE_CONTENT_PROVIDER_URL, Number(import.meta.env.VITE_CONTENT_MAX_BYTES || 5 * 1024 * 1024), { account: this.account, providerDomain: import.meta.env.VITE_CONTENT_PROVIDER_DOMAIN || "0x0000000000000000000000000000000000000000000000000000000000000000" }) : undefined;
   readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work, this.account, undefined, this.content);
   readonly doom: DoomRuntime = new MiniJamDoomRuntime({ api: this.api, work: this.work, account: this.account, serviceId: import.meta.env.VITE_DOOM_SERVICE_ID, gatewayUrl: import.meta.env.VITE_DOOM_GATEWAY_URL });
   readonly system: JamOsRuntimeV2["system"] = { getInfo: async () => { const network = await this.network.getInfo(); return { osVersion: "0.1", networkName: network.name, status: network.healthy ? "online" as const : "offline" as const }; } };
