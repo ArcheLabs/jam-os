@@ -7,6 +7,7 @@ import { clearComputerCache, readComputerCache, writeComputerCache } from "./com
 import type { AccountInfo, ComputerInspection, NetworkInfo } from "./types";
 import { MOCK_COMPUTER_CODE_HASH } from "./constants";
 import { JamScriptComputerBackend } from "./computerBackend";
+import { accountId32 } from "./accountId";
 
 export type ProvisionStep = "account" | "computer" | "filesystem" | "network";
 export interface ProvisionProgress { step: ProvisionStep; status: "active" | "done"; detail?: string; }
@@ -14,6 +15,7 @@ export interface ProvisionedComputer { account: AccountInfo; network: NetworkInf
 export interface DeploymentClient {
   createService(input: { blob: Uint8Array; codeHash: string; minItemGas: number; minMemoGas: number }): Promise<{ serviceId: string; codeHash: string; finalized: boolean }>;
 }
+function sameBytes(left: Uint8Array, right: Uint8Array): boolean { return left.length === right.length && left.every((value, index) => value === right[index]); }
 
 export class ComputerService {
   constructor(private readonly client: JamClient, private readonly account: AccountAdapter, private readonly deployment?: DeploymentClient) {}
@@ -52,7 +54,19 @@ export class ComputerService {
     }
     await new JamScriptComputerBackend(serviceId, this.account).initialize(current);
   }
-  async verify(serviceId: string, account: AccountInfo): Promise<boolean> { try { const inspection = await this.inspect(serviceId); const expectedHash = this.client.isMock ? MOCK_COMPUTER_CODE_HASH : import.meta.env.VITE_COMPUTER_SERVICE_CODE_HASH; const controller = inspection.controller || inspection.owner; const identityMatches = this.client.isMock ? typeof controller === "string" && controller.toLowerCase() === account.address.toLowerCase() : true; return String(inspection.serviceId) === serviceId && inspection.protocolVersion === 1 && inspection.codeHash.toLowerCase() === String(expectedHash).toLowerCase() && identityMatches; } catch { return false; } }
+  async verify(serviceId: string, account: AccountInfo): Promise<boolean> {
+    try {
+      const inspection = await this.inspect(serviceId);
+      const expectedHash = this.client.isMock ? MOCK_COMPUTER_CODE_HASH : import.meta.env.VITE_COMPUTER_SERVICE_CODE_HASH;
+      const controller = inspection.controller || inspection.owner;
+      let identityMatches = typeof controller === "string" && controller.toLowerCase() === account.address.toLowerCase();
+      if (!this.client.isMock) {
+        const profile = await new JamScriptComputerBackend(serviceId, this.account).query("getProfile", new Uint8Array([0]));
+        identityMatches = Boolean(profile && typeof profile === "object" && !(profile instanceof Uint8Array) && !Array.isArray(profile) && "owner" in profile && (profile as { owner?: unknown }).owner instanceof Uint8Array && sameBytes((profile as { owner: Uint8Array }).owner, accountId32(account.address)));
+      }
+      return String(inspection.serviceId) === serviceId && inspection.protocolVersion === 1 && inspection.codeHash.toLowerCase() === String(expectedHash).toLowerCase() && identityMatches;
+    } catch { return false; }
+  }
   async current(): Promise<ProvisionedComputer | null> { const account = await this.account.current(); if (!account) return null; const network = await this.client.network(); const genesisHash = network.genesisHash || import.meta.env.VITE_MINIJAM_GENESIS_HASH; if (!genesisHash) return null; const serviceId = readComputerCache(genesisHash, account.address); if (!serviceId) return null; if (!(await this.verify(serviceId, account))) { clearComputerCache(genesisHash, account.address); return null; } return { account, network, serviceId }; }
   async verifyFilesystem(serviceId: string) {
     if (!this.client.isMock) {

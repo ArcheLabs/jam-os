@@ -73,5 +73,7 @@ describe("canonical Computer JamScript artifact", () => {
     expect(computerClient).not.toContain("PlaygroundAdapter");
     expect(computerClient).not.toContain("this.playground.deploy");
     expect(computerClient).toContain("Stage-1 deployment client");
+    expect(computerClient).toContain("getProfile");
+    expect(computerClient).not.toContain(": true; } catch { return false; }");
   });
 });
