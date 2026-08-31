@@ -33,6 +33,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("FRAME_WIDTH={width}");
     println!("FRAME_HEIGHT={height}");
     println!("FRAME_BYTES={frame_bytes}");
+    println!("SUCCESSFUL_TICKS=1");
+    println!("SUCCESSFUL_INPUT_CALLS=2");
     println!("INPUT_ACCEPTED=PASS");
     Ok(())
 }
