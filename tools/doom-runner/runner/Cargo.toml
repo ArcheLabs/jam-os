@@ -1,0 +1,8 @@
+[package]
+name = "doom-runner-smoke"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+polkavm = { git = "https://github.com/paritytech/polkavm.git", rev = "5ee3a8444feb3738cbbbfc59f31ab1a7d5609909" }

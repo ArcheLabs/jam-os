@@ -1,0 +1,8 @@
+# Pinned upstream revisions for the real PolkaVM DOOM bootstrap.
+POLKAVM_REPOSITORY=https://github.com/paritytech/polkavm.git
+POLKAVM_COMMIT=5ee3a8444feb3738cbbbfc59f31ab1a7d5609909
+POLKADOOM_REPOSITORY=https://github.com/koute/polkadoom.git
+POLKADOOM_COMMIT=cc68c85c172fd3d30a5561250f027640ac4e099e
+DOOM_ROM_PATH=examples/doom/roms/doom.polkavm
+DOOM_WAD_PATH=examples/doom/roms/doom1.wad
+DOOM_LICENSE_PATH=examples/doom/roms/doom-wad-shareware-license.txt
