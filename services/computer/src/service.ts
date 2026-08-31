@@ -12,6 +12,8 @@ const Mime = bytes(96);
 const Kind = bytes(16);
 const Theme = bytes(32);
 const DesktopIndex = bytes(4096);
+const DirectoryIndex = bytes(4096);
+const ManifestEntries = bytes(4096);
 
 const Profile = record({
   owner: address,
@@ -52,11 +54,8 @@ const NodeMetadata = record({
 });
 
 const SiteManifest = record({
-  root: Path,
   index: Path,
-  mime: Mime,
-  size: u32,
-  contentRoot: ContentRoot,
+  entries: ManifestEntries,
   publishedAt: u32,
   published: bool,
 });
@@ -67,6 +66,7 @@ const desktopIcons = stateMap({ schema: "computer.desktop-icons/v1", key: IconId
 const nodes = stateMap({ schema: "computer.nodes/v1", key: Path, value: NodeMetadata });
 const manifests = stateMap({ schema: "computer.site-manifest/v1", key: RootKey, value: SiteManifest });
 const desktopIndexes = stateMap({ schema: "computer.desktop-index/v1", key: RootKey, value: record({ entries: DesktopIndex }) });
+const directoryIndexes = stateMap({ schema: "computer.directory-index/v1", key: Path, value: record({ entries: DirectoryIndex }) });
 
 function isRootKey(key: Uint8Array): boolean {
   return key.length === 1 && key[0] === 0;
@@ -92,6 +92,10 @@ function requireSender(key: Uint8Array, sender: Uint8Array) {
 }
 
 function validCoordinate(value: number): boolean { return value <= 10000; }
+function seedDirectory(path: Uint8Array, parent: Uint8Array) {
+  nodes.set(path, { path, kind: new Uint8Array([100, 105, 114, 101, 99, 116, 111, 114, 121]), parent, mime: new Uint8Array([105, 110, 111, 100, 101, 47, 100, 105, 114, 101, 99, 116, 111, 114, 121]), size: 0, contentRoot: new Uint8Array(32), removed: false, updatedAt: 0 });
+  directoryIndexes.set(path, { entries: new Uint8Array(0) });
+}
 
 export const initialize = action({
   auth: wallet(),
@@ -113,15 +117,14 @@ export const initialize = action({
       accent: new Uint8Array(0),
     });
     manifests.set(input.key, {
-      root: new Uint8Array(0),
       index: new Uint8Array(0),
-      mime: new Uint8Array(0),
-      size: 0,
-      contentRoot: new Uint8Array(32),
+      entries: new Uint8Array(0),
       publishedAt: 0,
       published: false,
     });
     desktopIndexes.set(input.key, { entries: new Uint8Array(0) });
+    directoryIndexes.set(new Uint8Array([47]), { entries: new Uint8Array(0) });
+    seedDirectory(new Uint8Array([47]), new Uint8Array(0));
   },
 });
 
@@ -235,15 +238,12 @@ export const removeNodeMetadata = action({
 
 export const publishSite = action({
   auth: wallet(),
-  input: { key: RootKey, root: Path, index: Path, mime: Mime, size: u32, contentRoot: ContentRoot, publishedAt: u32 },
+  input: { key: RootKey, index: Path, entries: ManifestEntries, publishedAt: u32 },
   execute(ctx, input) {
     requireSender(input.key, ctx.sender);
     manifests.set(input.key, {
-      root: input.root,
       index: input.index,
-      mime: input.mime,
-      size: input.size,
-      contentRoot: input.contentRoot,
+      entries: input.entries,
       publishedAt: input.publishedAt,
       published: true,
     });
@@ -259,9 +259,21 @@ export const setDesktopIndex = action({
   },
 });
 
+// Directory entries are newline-delimited canonical child names in a bounded
+// byte vector. The client sorts and de-duplicates before submitting it.
+export const setDirectoryIndex = action({
+  auth: wallet(),
+  input: { key: RootKey, path: Path, entries: DirectoryIndex },
+  execute(ctx, input) {
+    requireSender(input.key, ctx.sender);
+    directoryIndexes.set(input.path, { entries: input.entries });
+  },
+});
+
 export const getProfile = query(profiles);
 export const getAppearance = query(appearances);
 export const getDesktopIcon = query(desktopIcons);
 export const getNodeMetadata = query(nodes);
 export const getSiteManifest = query(manifests);
 export const getDesktopIndex = query(desktopIndexes);
+export const getDirectoryIndex = query(directoryIndexes);

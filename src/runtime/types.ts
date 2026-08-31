@@ -30,7 +30,7 @@ export interface FileEntry {
   updatedAt?: number;
   mime?: string;
 }
-export interface FileManifest { files: Record<string, { path?: string }> | Array<{ path: string }>; }
+export interface FileManifest { version?: 1; indexPath?: string; files: Record<string, { path?: string; mime?: string; size?: number; contentRoot?: string }> | Array<{ path: string; mime?: string; size?: number; contentRoot?: string }>; }
 
 export interface FileSystemRuntime {
   list(path: string): Promise<FileEntry[]>;
@@ -118,7 +118,8 @@ export interface JamOsRuntimeV2 {
   computer: ComputerRuntime;
   system: { getInfo(): Promise<SystemInfo> };
   fs: FileSystemRuntime;
-  playground: PlaygroundRuntime;
+  /** Legacy Stage-0 surface; absent from production Stage-1 runtimes. */
+  playground?: PlaygroundRuntime;
   services: ServiceRuntime;
   work: WorkRuntime;
   network: NetworkRuntime;

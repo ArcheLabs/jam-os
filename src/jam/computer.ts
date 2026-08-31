@@ -43,7 +43,8 @@ export class ComputerService {
     if (!deployed.finalized || deployed.codeHash.toLowerCase() !== actualHash.toLowerCase()) throw new JamProtocolError("Stage-1 deployment did not return the requested finalized code hash", "STAGE1_DEPLOYMENT_VERIFICATION_FAILED");
     return deployed.serviceId;
   }
-  fs(serviceId: string) { return new JamFileSystem(this.client, serviceId); }
+  /** Legacy filesystem facade retained for preview fixtures; live Stage-1 uses runtime.fs. */
+  fs(serviceId: string) { if (!this.client.isMock) throw new JamProtocolError("Legacy filesystem facade is preview-only", "LEGACY_FILESYSTEM_UNAVAILABLE"); return new JamFileSystem(this.client, serviceId); }
   async inspect(serviceId: string): Promise<ComputerInspection> { return decodeServiceBytes(await this.client.readService(serviceId, jsonBytes({ op: "service:inspect" }))); }
   async initialize(serviceId: string) {
     const current = await this.account.current();

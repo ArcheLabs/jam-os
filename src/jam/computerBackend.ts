@@ -79,6 +79,14 @@ export class JamScriptComputerBackend {
     return (await this.client.queryLatest(queryName, key)).value;
   }
 
+  async action(actionName: string, input: Record<string, CodecValue>, account: AccountInfo): Promise<void> {
+    const submitted = await this.client.submitAction(actionName, input, this.signer(account));
+    const completed = await this.client.waitForAction(submitted.packageHash, submitted.actionHash);
+    if (completed.actionReceipt.status !== "applied") {
+      throw new JamServiceError(`Computer Service ${actionName} action was rejected`, "COMPUTER_ACTION_FAILED", { errorCode: completed.actionReceipt.errorCode });
+    }
+  }
+
   private signer(account: AccountInfo): JamSigner {
     if (!this.account.sign) throw new JamAuthorizationError("The selected account cannot sign Computer actions");
     const sign = this.account.sign;

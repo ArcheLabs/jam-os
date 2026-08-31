@@ -2,9 +2,8 @@ import { BrowserAccountAdapter } from "../../jam/account";
 import { ComputerService, type DeploymentClient } from "../../jam/computer";
 import { RealJamClient } from "../../jam/JamClient";
 import { JamNameService } from "../../jam/names";
-import { RealPlaygroundAdapter } from "../../jam/playground";
 import { MiniJamTransport } from "../../jam/transport";
-import type { AccountInfo, AccountAdapter, JamClient, PlaygroundAdapter } from "../../jam/types";
+import type { AccountInfo, AccountAdapter, JamClient } from "../../jam/types";
 import type { ComputerRuntime, DoomRuntime, EventRuntime, FileSystemRuntime, JamOsRuntimeV2, NameRuntime, NetworkRuntime, PlaygroundRuntime, ServiceRuntime, WorkRuntime } from "../types";
 import { MiniJamApiClient } from "./MiniJamApiClient";
 import { LiveFileSystemRuntime } from "./LiveFileSystemRuntime";
@@ -31,7 +30,6 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   private readonly transport = new MiniJamTransport();
   private readonly client: JamClient = new RealJamClient(this.transport, this.account);
   private readonly api = new MiniJamApiClient(this.transport);
-  private readonly playgroundAdapter: PlaygroundAdapter = new RealPlaygroundAdapter(this.transport, this.account);
   private readonly deploymentAdapter: DeploymentClient = {
     createService: async (input) => {
       const account = await this.account.current();
@@ -50,12 +48,13 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   private readonly namesAdapter = new JamNameService(this.client, this.account);
   private readonly liveEvents = new LiveEvents();
   readonly computer: ComputerRuntime = { current: () => this.computerAdapter.current(), provision: (onProgress) => this.computerAdapter.provision(onProgress), inspect: (id) => this.computerAdapter.inspect(id) };
-  readonly playground: PlaygroundRuntime = this.playgroundAdapter;
   readonly events: EventRuntime = this.liveEvents;
+  /** Compatibility shim for Stage-0 UI; live Stage-1 never reaches a Playground endpoint. */
+  readonly playground: PlaygroundRuntime = { compile: async () => { throw new Error("Playground is available only in preview mode"); }, deploy: async () => { throw new Error("Playground is available only in preview mode"); }, interact: async () => { throw new Error("Playground is available only in preview mode"); } };
   readonly work: WorkRuntime = new LiveWorkRuntime(this.api, this.account, this.events);
-  readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work);
+  readonly content = import.meta.env.VITE_CONTENT_PROVIDER_URL ? new HttpContentProvider(import.meta.env.VITE_CONTENT_PROVIDER_URL, Number(import.meta.env.VITE_CONTENT_MAX_BYTES || 5 * 1024 * 1024)) : undefined;
+  readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work, this.account, undefined, this.content);
   readonly doom: DoomRuntime = new MiniJamDoomRuntime({ api: this.api, work: this.work, account: this.account, serviceId: import.meta.env.VITE_DOOM_SERVICE_ID, gatewayUrl: import.meta.env.VITE_DOOM_GATEWAY_URL });
-  readonly content = import.meta.env.VITE_CONTENT_PROVIDER_URL ? new HttpContentProvider(import.meta.env.VITE_CONTENT_PROVIDER_URL, Number(import.meta.env.VITE_CONTENT_MAX_BYTES || 5 * 1024 * 1024), import.meta.env.VITE_CONTENT_UPLOAD_TOKEN || "") : undefined;
   readonly system: JamOsRuntimeV2["system"] = { getInfo: async () => { const network = await this.network.getInfo(); return { osVersion: "0.1", networkName: network.name, status: network.healthy ? "online" as const : "offline" as const }; } };
   readonly network: NetworkRuntime = { getInfo: async () => { try { const network = await this.client.network(); const info = { ...network, source: "real" as const }; this.liveEvents.emit("network:online", info); return info; } catch { const info = { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: this.transport.base || "unconfigured", healthy: false, source: "unavailable" as const }; this.liveEvents.emit("network:offline", info); return info; } } };
   readonly services: ServiceRuntime = { list: async () => { try { const current = await this.computerAdapter.current(); return [{ id: "computer", name: "Computer Service", status: current ? "running" as const : "stopped" as const, source: current ? "real" as const : "unavailable" as const }]; } catch { return [{ id: "computer", name: "Computer Service", status: "stopped" as const, source: "unavailable" as const }]; } }, inspect: (id: string) => this.computerAdapter.inspect(id), call: async (id: string, payload: Uint8Array, account?: AccountInfo | null) => (await this.client.invokeService(id, payload, { account })).output };

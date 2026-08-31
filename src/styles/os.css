@@ -129,6 +129,11 @@
 .public-brand span { color: #61c7ff; font-size: 17px; }
 .public-readonly { gap: 6px; color: #82d4ae; }
 .public-desktop-card { max-width: 1180px; min-height: 360px; margin: 0 auto; padding: clamp(28px, 5vw, 70px); display: flex; align-items: center; gap: clamp(22px, 5vw, 72px); border: 1px solid rgba(143, 186, 224, .22); border-radius: 28px; background: linear-gradient(120deg, rgba(27, 60, 90, .85), rgba(16, 32, 50, .72)); box-shadow: 0 28px 90px rgba(0,0,0,.28); }
+.public-desktop-icons { position: relative; max-width: 1180px; min-height: 210px; margin: 18px auto 0; border: 1px solid rgba(143, 186, 224, .18); border-radius: 22px; background: rgba(5, 13, 24, .28); overflow: hidden; }
+.public-desktop-icon { position: absolute; width: 92px; min-height: 76px; padding: 6px; display: grid; justify-items: center; gap: 5px; color: #e8eef7; text-decoration: none; font-size: 11px; text-align: center; border-radius: 10px; }
+.public-desktop-icon:hover { background: rgba(120, 184, 244, .18); }
+.public-icon-art { width: 38px; height: 38px; display: grid; place-items: center; color: #9fd4ff; font-size: 28px; }
+.public-icon-art img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
 .public-avatar { width: 104px; height: 104px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 28px; background: linear-gradient(145deg, #54c9f5, #4477ed); color: #061324; font-size: 42px; font-weight: 800; box-shadow: 0 14px 35px rgba(52, 175, 236, .28); }
 .public-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .public-profile-copy { min-width: 0; }

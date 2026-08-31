@@ -330,13 +330,6 @@
           }
         },
         {
-          "name": "root",
-          "type": {
-            "kind": "bytes",
-            "max": 256
-          }
-        },
-        {
           "name": "index",
           "type": {
             "kind": "bytes",
@@ -344,23 +337,10 @@
           }
         },
         {
-          "name": "mime",
+          "name": "entries",
           "type": {
             "kind": "bytes",
-            "max": 96
-          }
-        },
-        {
-          "name": "size",
-          "type": {
-            "kind": "u32"
-          }
-        },
-        {
-          "name": "contentRoot",
-          "type": {
-            "kind": "bytes",
-            "max": 32
+            "max": 4096
           }
         },
         {
@@ -384,6 +364,37 @@
           "type": {
             "kind": "bytes",
             "max": 1
+          }
+        },
+        {
+          "name": "entries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "setDirectoryIndex",
+      "selector": "0xc468726e148410ba",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
           }
         },
         {
@@ -651,13 +662,6 @@
           "kind": "record",
           "fields": [
             {
-              "name": "root",
-              "type": {
-                "kind": "bytes",
-                "max": 256
-              }
-            },
-            {
               "name": "index",
               "type": {
                 "kind": "bytes",
@@ -665,23 +669,10 @@
               }
             },
             {
-              "name": "mime",
+              "name": "entries",
               "type": {
                 "kind": "bytes",
-                "max": 96
-              }
-            },
-            {
-              "name": "size",
-              "type": {
-                "kind": "u32"
-              }
-            },
-            {
-              "name": "contentRoot",
-              "type": {
-                "kind": "bytes",
-                "max": 32
+                "max": 4096
               }
             },
             {
@@ -708,6 +699,30 @@
       "keyType": {
         "kind": "bytes",
         "max": 1
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "entries",
+              "type": {
+                "kind": "bytes",
+                "max": 4096
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getDirectoryIndex",
+      "kind": "state_get",
+      "state": "directoryIndexes",
+      "keyType": {
+        "kind": "bytes",
+        "max": 256
       },
       "output": {
         "type": {
@@ -794,6 +809,41 @@
             "type": {
               "kind": "bytes",
               "max": 4096
+            }
+          }
+        ]
+      }
+    },
+    "Record<index:Bytes<256>,entries:Bytes<4096>,publishedAt:u32,published:bool>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "index",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          },
+          {
+            "name": "publishedAt",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "published",
+            "type": {
+              "kind": "bool"
             }
           }
         ]
@@ -964,61 +1014,6 @@
             "name": "updatedAt",
             "type": {
               "kind": "u32"
-            }
-          }
-        ]
-      }
-    },
-    "Record<root:Bytes<256>,index:Bytes<256>,mime:Bytes<96>,size:u32,contentRoot:Bytes<32>,publishedAt:u32,published:bool>": {
-      "kind": "record",
-      "max": null,
-      "descriptor": {
-        "kind": "record",
-        "fields": [
-          {
-            "name": "root",
-            "type": {
-              "kind": "bytes",
-              "max": 256
-            }
-          },
-          {
-            "name": "index",
-            "type": {
-              "kind": "bytes",
-              "max": 256
-            }
-          },
-          {
-            "name": "mime",
-            "type": {
-              "kind": "bytes",
-              "max": 96
-            }
-          },
-          {
-            "name": "size",
-            "type": {
-              "kind": "u32"
-            }
-          },
-          {
-            "name": "contentRoot",
-            "type": {
-              "kind": "bytes",
-              "max": 32
-            }
-          },
-          {
-            "name": "publishedAt",
-            "type": {
-              "kind": "u32"
-            }
-          },
-          {
-            "name": "published",
-            "type": {
-              "kind": "bool"
             }
           }
         ]
@@ -1328,13 +1323,6 @@
         "kind": "record",
         "fields": [
           {
-            "name": "root",
-            "type": {
-              "kind": "bytes",
-              "max": 256
-            }
-          },
-          {
             "name": "index",
             "type": {
               "kind": "bytes",
@@ -1342,23 +1330,10 @@
             }
           },
           {
-            "name": "mime",
+            "name": "entries",
             "type": {
               "kind": "bytes",
-              "max": 96
-            }
-          },
-          {
-            "name": "size",
-            "type": {
-              "kind": "u32"
-            }
-          },
-          {
-            "name": "contentRoot",
-            "type": {
-              "kind": "bytes",
-              "max": 32
+              "max": 4096
             }
           },
           {
@@ -1383,6 +1358,27 @@
       "keyType": {
         "kind": "bytes",
         "max": 1
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "directoryIndexes",
+      "schema": "computer.directory-index/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 256
       },
       "valueType": {
         "kind": "record",
