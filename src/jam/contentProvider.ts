@@ -50,12 +50,14 @@ export class MemoryContentProvider implements ContentProvider {
 }
 
 export class HttpContentProvider implements ContentProvider {
-  constructor(private readonly endpoint: string, private readonly maxBytes = DEFAULT_CONTENT_MAX_BYTES) {}
+  constructor(private readonly endpoint: string, private readonly maxBytes = DEFAULT_CONTENT_MAX_BYTES, private readonly uploadToken = "") {}
   private url(root: string) { return `${this.endpoint.replace(/\/$/, "")}/content/${root.replace(/^0x/, "")}`; }
   async put(bytes: Uint8Array): Promise<ContentRefV1> {
     if (bytes.length > this.maxBytes) throw new Error(`CONTENT_TOO_LARGE: maximum is ${this.maxBytes} bytes`);
     const ref = { version: 1 as const, root: contentRoot(bytes), size: bytes.length };
-    const response = await fetch(this.url(ref.root), { method: "PUT", headers: { "content-type": "application/octet-stream", "x-content-size": String(ref.size) }, body: new Uint8Array(bytes).buffer as ArrayBuffer });
+    const headers: Record<string, string> = { "content-type": "application/octet-stream", "x-content-size": String(ref.size) };
+    if (this.uploadToken) headers.authorization = `Bearer ${this.uploadToken}`;
+    const response = await fetch(this.url(ref.root), { method: "PUT", headers, body: new Uint8Array(bytes).buffer as ArrayBuffer });
     if (!response.ok) throw new Error(`CONTENT_UPLOAD_FAILED: ${response.status}`);
     const returned = await response.json().catch(() => ({})) as { root?: string; size?: number };
     if (returned.root && returned.root.toLowerCase() !== ref.root) throw new Error("CONTENT_INTEGRITY_ERROR: provider returned a different root");

@@ -130,6 +130,7 @@
 .public-readonly { gap: 6px; color: #82d4ae; }
 .public-desktop-card { max-width: 1180px; min-height: 360px; margin: 0 auto; padding: clamp(28px, 5vw, 70px); display: flex; align-items: center; gap: clamp(22px, 5vw, 72px); border: 1px solid rgba(143, 186, 224, .22); border-radius: 28px; background: linear-gradient(120deg, rgba(27, 60, 90, .85), rgba(16, 32, 50, .72)); box-shadow: 0 28px 90px rgba(0,0,0,.28); }
 .public-avatar { width: 104px; height: 104px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 28px; background: linear-gradient(145deg, #54c9f5, #4477ed); color: #061324; font-size: 42px; font-weight: 800; box-shadow: 0 14px 35px rgba(52, 175, 236, .28); }
+.public-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .public-profile-copy { min-width: 0; }
 .public-eyebrow { margin: 0 0 10px; color: #76c8ed; font: 600 11px/1.2 "DM Mono", monospace; letter-spacing: .18em; }
 .public-profile-copy h1 { margin: 0; font-size: clamp(32px, 6vw, 68px); letter-spacing: -.045em; }

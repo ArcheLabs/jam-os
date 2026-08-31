@@ -11,6 +11,7 @@ import { LiveFileSystemRuntime } from "./LiveFileSystemRuntime";
 import { LiveWorkRuntime } from "./LiveWorkRuntime";
 import { MiniJamDoomRuntime } from "../doom/MiniJamDoomRuntime";
 import { bytesToBase64 } from "../../jam/encoding";
+import { HttpContentProvider } from "../../jam/contentProvider";
 
 class LiveEvents implements EventRuntime {
   private listeners = new Map<string, Set<(payload: unknown) => void>>();
@@ -54,6 +55,7 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   readonly work: WorkRuntime = new LiveWorkRuntime(this.api, this.account, this.events);
   readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work);
   readonly doom: DoomRuntime = new MiniJamDoomRuntime({ api: this.api, work: this.work, account: this.account, serviceId: import.meta.env.VITE_DOOM_SERVICE_ID, gatewayUrl: import.meta.env.VITE_DOOM_GATEWAY_URL });
+  readonly content = import.meta.env.VITE_CONTENT_PROVIDER_URL ? new HttpContentProvider(import.meta.env.VITE_CONTENT_PROVIDER_URL, Number(import.meta.env.VITE_CONTENT_MAX_BYTES || 5 * 1024 * 1024), import.meta.env.VITE_CONTENT_UPLOAD_TOKEN || "") : undefined;
   readonly system: JamOsRuntimeV2["system"] = { getInfo: async () => { const network = await this.network.getInfo(); return { osVersion: "0.1", networkName: network.name, status: network.healthy ? "online" as const : "offline" as const }; } };
   readonly network: NetworkRuntime = { getInfo: async () => { try { const network = await this.client.network(); const info = { ...network, source: "real" as const }; this.liveEvents.emit("network:online", info); return info; } catch { const info = { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: this.transport.base || "unconfigured", healthy: false, source: "unavailable" as const }; this.liveEvents.emit("network:offline", info); return info; } } };
   readonly services: ServiceRuntime = { list: async () => { try { const current = await this.computerAdapter.current(); return [{ id: "computer", name: "Computer Service", status: current ? "running" as const : "stopped" as const, source: current ? "real" as const : "unavailable" as const }]; } catch { return [{ id: "computer", name: "Computer Service", status: "stopped" as const, source: "unavailable" as const }]; } }, inspect: (id: string) => this.computerAdapter.inspect(id), call: async (id: string, payload: Uint8Array, account?: AccountInfo | null) => (await this.client.invokeService(id, payload, { account })).output };

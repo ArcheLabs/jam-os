@@ -1,6 +1,7 @@
 import type { AccountInfo, AccountAdapter, CompileInput, CompileOutput, DeployInput, DeployOutput, InteractInput, InteractOutput } from "../jam/types";
 import type { ProvisionProgress, ProvisionedComputer } from "../jam/computer";
 import type { DoomRuntime } from "./doom/types";
+import type { ContentProvider } from "../jam/contentProvider";
 
 export type RuntimeMode = "mock" | "live";
 export type RuntimeSource = "real" | "mock" | "unavailable";
@@ -124,6 +125,7 @@ export interface JamOsRuntimeV2 {
   names: NameRuntime;
   doom: DoomRuntime;
   events: EventRuntime;
+  content?: ContentProvider;
 }
 
 export type AccountRuntime = JamOsRuntimeV2["account"];
