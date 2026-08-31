@@ -39,7 +39,7 @@ async function verifyWalletPermit(request, root, size) {
   const expires = Number(request.headers["x-jam-expires"]);
   if (!Number.isSafeInteger(expires) || expires < Math.floor(Date.now() / 1000)) return false;
   const signature = decodeHex(request.headers["x-jam-signature"], 64, "signature");
-  cryptoVerifier ||= import("@polkadot/util-crypto").then((module) => module.sr25519Verify);
+  cryptoVerifier ||= import("@polkadot/util-crypto").then(async (module) => { await module.cryptoWaitReady(); return module.sr25519Verify; });
   const sr25519Verify = await cryptoVerifier;
   return sr25519Verify(permitDigest(account, root, size, expires), signature, account);
 }
