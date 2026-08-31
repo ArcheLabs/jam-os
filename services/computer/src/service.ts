@@ -280,7 +280,7 @@ export const writeFile = action({
     requireSender(input.key, ctx.sender);
     if (input.path.length === 0 || input.path[0] !== 47 || input.path.length === 1) abort(8);
     const parent = nodes.get(input.parent);
-    if (!parent || parent.removed || parent.kind.length !== 8) abort(9);
+    if (!parent || parent.removed || parent.kind.length !== 9) abort(9);
     nodes.set(input.path, { path: input.path, kind: new Uint8Array([102, 105, 108, 101]), parent: input.parent, mime: input.mime, size: input.size, contentRoot: input.contentRoot, removed: false, updatedAt: input.updatedAt });
     directoryIndexes.set(input.parent, { entries: input.parentEntries });
   },
@@ -293,7 +293,7 @@ export const mkdir = action({
     requireSender(input.key, ctx.sender);
     if (input.path.length === 0 || input.path[0] !== 47 || input.path.length === 1) abort(8);
     const parent = nodes.get(input.parent);
-    if (!parent || parent.removed || parent.kind.length !== 8) abort(9);
+    if (!parent || parent.removed || parent.kind.length !== 9) abort(9);
     nodes.set(input.path, { path: input.path, kind: new Uint8Array([100, 105, 114, 101, 99, 116, 111, 114, 121]), parent: input.parent, mime: new Uint8Array([105, 110, 111, 100, 101, 47, 100, 105, 114, 101, 99, 116, 111, 114, 121]), size: 0, contentRoot: new Uint8Array(32), removed: false, updatedAt: input.updatedAt });
     directoryIndexes.set(input.path, { entries: new Uint8Array(0) });
     directoryIndexes.set(input.parent, { entries: input.parentEntries });
@@ -321,7 +321,7 @@ export const renameFile = action({
     const current = nodes.get(input.from);
     if (!current || current.removed || current.kind.length !== 4 || !sameBytes(current.parent, input.fromParent)) abort(6);
     const targetParent = nodes.get(input.toParent);
-    if (!targetParent || targetParent.removed || targetParent.kind.length !== 8) abort(9);
+    if (!targetParent || targetParent.removed || targetParent.kind.length !== 9) abort(9);
     nodes.set(input.to, { path: input.to, kind: current.kind, parent: input.toParent, mime: current.mime, size: current.size, contentRoot: current.contentRoot, removed: false, updatedAt: input.updatedAt });
     nodes.set(input.from, { path: current.path, kind: current.kind, parent: current.parent, mime: current.mime, size: current.size, contentRoot: current.contentRoot, removed: true, updatedAt: input.updatedAt });
     directoryIndexes.set(input.fromParent, { entries: input.fromEntries });
