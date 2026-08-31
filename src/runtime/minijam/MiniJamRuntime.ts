@@ -1,5 +1,5 @@
 import { BrowserAccountAdapter } from "../../jam/account";
-import { ComputerService } from "../../jam/computer";
+import { ComputerService, type DeploymentClient } from "../../jam/computer";
 import { RealJamClient } from "../../jam/JamClient";
 import { JamNameService } from "../../jam/names";
 import { RealPlaygroundAdapter } from "../../jam/playground";
@@ -10,6 +10,7 @@ import { MiniJamApiClient } from "./MiniJamApiClient";
 import { LiveFileSystemRuntime } from "./LiveFileSystemRuntime";
 import { LiveWorkRuntime } from "./LiveWorkRuntime";
 import { MiniJamDoomRuntime } from "../doom/MiniJamDoomRuntime";
+import { bytesToBase64 } from "../../jam/encoding";
 
 class LiveEvents implements EventRuntime {
   private listeners = new Map<string, Set<(payload: unknown) => void>>();
@@ -30,7 +31,21 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   private readonly client: JamClient = new RealJamClient(this.transport, this.account);
   private readonly api = new MiniJamApiClient(this.transport);
   private readonly playgroundAdapter: PlaygroundAdapter = new RealPlaygroundAdapter(this.transport, this.account);
-  private readonly computerAdapter = new ComputerService(this.client, this.account, this.playgroundAdapter);
+  private readonly deploymentAdapter: DeploymentClient = {
+    createService: async (input) => {
+      const account = await this.account.current();
+      if (!account) throw new Error("Connect an account before deploying a Computer Service");
+      const operation = await this.api.createService({
+        input: { blobBase64: bytesToBase64(input.blob), codeHash: input.codeHash, minItemGas: input.minItemGas, minMemoGas: input.minMemoGas, account },
+        account,
+        signer: this.account,
+      });
+      const serviceId = operation.result?.serviceId;
+      if (serviceId === undefined) throw new Error("Stage-1 deployment returned no Service ID");
+      return { serviceId: String(serviceId), codeHash: input.codeHash, finalized: operation.status === "succeeded" };
+    },
+  };
+  private readonly computerAdapter = new ComputerService(this.client, this.account, this.deploymentAdapter);
   private readonly namesAdapter = new JamNameService(this.client, this.account);
   private readonly liveEvents = new LiveEvents();
   readonly computer: ComputerRuntime = { current: () => this.computerAdapter.current(), provision: (onProgress) => this.computerAdapter.provision(onProgress), inspect: (id) => this.computerAdapter.inspect(id) };

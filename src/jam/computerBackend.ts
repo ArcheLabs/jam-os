@@ -10,17 +10,9 @@ import {
 import computerAbi from "../../services/computer/abi/service.abi.json";
 import { JamAuthorizationError, JamProtocolError, JamServiceError } from "./errors";
 import type { AccountAdapter, AccountInfo } from "./types";
+import { accountId32 } from "./accountId";
 
 const COMPUTER_SERVICE_KEY = "0xb5de71cbd87b48abf62a4289172a5c1506c4638869a00f95e4f9b22ef279aba8";
-
-function accountBytes(address: string): Uint8Array {
-  if (/^0x[0-9a-fA-F]{64}$/.test(address)) return parseHex(address, 32);
-  const encoded = new TextEncoder().encode(address);
-  if (encoded.length > 32) throw new JamAuthorizationError("Account address is not a 32-byte identity");
-  const output = new Uint8Array(32);
-  output.set(encoded);
-  return output;
-}
 
 function boundedBytes(value: string, max: number): Uint8Array {
   const encoded = new TextEncoder().encode(value);
@@ -65,7 +57,7 @@ export class JamScriptComputerBackend {
   async initialize(account: AccountInfo): Promise<void> {
     const existing = await this.client.queryLatest("getProfile", new Uint8Array([0]));
     if (existing.value !== null) {
-      if (!isRecord(existing.value) || !(existing.value.owner instanceof Uint8Array) || !sameBytes(existing.value.owner, accountBytes(account.address))) {
+      if (!isRecord(existing.value) || !(existing.value.owner instanceof Uint8Array) || !sameBytes(existing.value.owner, accountId32(account.address))) {
         throw new JamAuthorizationError("The Computer Service belongs to another account");
       }
       return;
@@ -91,7 +83,7 @@ export class JamScriptComputerBackend {
     if (!this.account.sign) throw new JamAuthorizationError("The selected account cannot sign Computer actions");
     const sign = this.account.sign;
     return {
-      publicKey: accountBytes(account.address),
+      publicKey: accountId32(account.address),
       signRaw: async (message) => parseHex(await sign.call(this.account, toHex(message), { action: "work" })),
     };
   }
