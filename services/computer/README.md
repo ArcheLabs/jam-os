@@ -1,13 +1,17 @@
 # Computer Service
 
-This directory documents the canonical Computer Service boundary used by JAM Computer. The browser client sends the logical operations described in `JAM_OS_IMPLEMENTATION_SPEC.md` through `JamClient`; it does not contain a server or database.
+This directory contains the canonical Computer Service boundary used by JAM Computer. Production metadata is implemented in `src/service.ts` with the pinned JamScript 0.2 toolchain. The browser client sends typed actions through `JamClient`; it does not contain a server or database.
 
-The live adapter freezes the V0.2 storage layout used by the canonical artifact: `meta:protocol`, `fs:node:<path>`, `fs:dir:<path>`, `fs:blob:<content-hash>`, and `site:manifest`. Public reads use finalized service storage; mutations use the existing controller-authorized Playground Work path. The artifact must be built from the MiniJAM SDK and supplied through `VITE_COMPUTER_SERVICE_ARTIFACT_URL` plus its verified Blake2-256 `VITE_COMPUTER_SERVICE_CODE_HASH`.
+The JamScript state schema is split into `computer.profile/v1`, `computer.appearance/v1`, `computer.desktop-icons/v1`, `computer.nodes/v1`, and `computer.site-manifest/v1`. Only bounded metadata and content references are stored on-chain. Public reads use finalized service state; mutations are wallet-authorized and always compare `ctx.sender` with the immutable owner recorded by `initialize`. File bytes and artwork are supplied by the content-addressed provider in `src/jam/contentProvider.ts`.
 
 For local artifact validation from a checkout that also contains `minijam-client`:
 
 ```bash
-../minijam-client/scripts/compile-service c services/computer/src/service.c /tmp/jam-computer O0
+../JamScript/target/debug/jamscript check services/computer
+../JamScript/target/debug/jamscript build services/computer --output artifacts/computer/stage1/scriptc
 ```
 
-The source uses the SDK's allocation-free JSON request envelope and content-addressed file keys. Keep the generated blob out of source control unless it is intentionally promoted as the reviewed canonical artifact.
+`src/service.c` is retained as a historical protocol fixture only; it is not the production Computer implementation. Keep generated blobs out of source control unless they are intentionally promoted as reviewed canonical artifacts.
+
+The reviewed Stage-1 ScriptC artifact is promoted under `artifacts/computer/stage1/scriptc/` with code hash
+`0xb8ae2888af4b0a73b93016580202e8fa2abdb4b971e17f9b40460994468198b9`.

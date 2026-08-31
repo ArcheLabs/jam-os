@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "algorithm": "blake2b-256",
+  "files": {
+    "builder.json": "0xa06db0dc5d39e1a550394f8bfabebc92c45b9fda218726a723efeabb1532ca02",
+    "generated_builder_application.rs": "0x1d7ec4229c7174bc01479ead7e80806357af75bfc535601c75357b0c58193fc2",
+    "generated_service.rs": "0x516ac4a7d0a6bd4da8619115fad4f9ff1080321933b119312271f343843170ac",
+    "protocol-v0.json": "0x2729d9bc6c02a607cb9b0d1a19dc7ecddc9210bfacf1541d27e8789b94ad48a6",
+    "scriptc/scriptc_runtime.ts": "0x649adc8124c6543dd79bd27968ed0abf534845e282bc2869948870bc6ff37c37",
+    "scriptc/scriptc_service.json": "0x505696e970ef9f5778a3a18cc604488c0e0a518c6ea0c98791dca5efb174def8",
+    "scriptc/scriptc_service.lib.c": "0x0087fd13a9c90b53e2f496138b35645b8808176259feb855533bec1eb421d053",
+    "scriptc/scriptc_service.profile.json": "0x336b196fa46583f29d371fe449d70bac274d8b502e602f2ae064d41d1394a5cb",
+    "scriptc/scriptc_service.transformed.ts": "0x72258904ba90d76c91eaea3e9cfdc3830814260c99db43ada8375fa998900fee",
+    "scriptc/scriptc_service.ts": "0xfd62d31f30a30eb60b903346737780b123f59025b13e278ed8f909527132e2ac",
+    "scriptc/scriptc_service_adapter.c": "0x887ff65acac30b76b496bb19fba6e3aad15edcddb120ed881df4f11e68133d83",
+    "service.abi.json": "0x4beb54e0dac32ae15a6457f5a5dab06e916039a93d42ca5082237e430de086d9",
+    "service.blob": "0xb8ae2888af4b0a73b93016580202e8fa2abdb4b971e17f9b40460994468198b9",
+    "service.elf": "0x46cd952638c2661049d7471b040312461c98b203ea1d614712cadcc331857e2c",
+    "service.polkavm": "0x5883192c448f49fc22cc9015c1bb8122d828ce435db6ad54f55010fafa57ea8b",
+    "service.pvm": "0x5883192c448f49fc22cc9015c1bb8122d828ce435db6ad54f55010fafa57ea8b"
+  }
+}
