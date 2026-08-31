@@ -1,7 +1,8 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { join, resolve } from "node:path";
+import { blake2b } from "@noble/hashes/blake2b.js";
 
 const host = process.env.CONTENT_HOST || "0.0.0.0";
 const port = Number(process.env.CONTENT_PORT || 8787);
@@ -13,7 +14,7 @@ const providerDomain = (process.env.CONTENT_PROVIDER_DOMAIN || "").replace(/^0x/
 const uploadDomain = Buffer.from("JAM_CONTENT_UPLOAD_V1");
 let cryptoVerifier;
 
-function digest(bytes) { return createHash("blake2b512").update(bytes).digest().subarray(0, 32).toString("hex"); }
+function digest(bytes) { return Buffer.from(blake2b(bytes, { dkLen: 32 })).toString("hex"); }
 function objectPath(root) { return join(rootDir, root.slice(0, 2), root.slice(2)); }
 function validRoot(root) { return /^[0-9a-f]{64}$/i.test(root); }
 function decodeHex(value, bytes, name) { const normalized = String(value || "").replace(/^0x/i, ""); if (!new RegExp(`^[0-9a-f]{${bytes * 2}}$`, "i").test(normalized)) throw new Error(`invalid ${name}`); return Buffer.from(normalized, "hex"); }
@@ -25,7 +26,7 @@ function permitDigest(account, root, size, expires) {
   root.copy(body, 65);
   body.writeBigUInt64LE(BigInt(size), 97);
   body.writeBigUInt64LE(BigInt(expires), 105);
-  return createHash("blake2b512").update(Buffer.concat([uploadDomain, body])).digest().subarray(0, 32);
+  return blake2b(Buffer.concat([uploadDomain, body]), { dkLen: 32 });
 }
 async function verifyWalletPermit(request, root, size) {
   if (authMode !== "wallet-signature") return false;

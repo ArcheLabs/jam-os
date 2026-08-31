@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@polkadot/util-crypto": "^13.5.6"
+    "@noble/hashes": "^1.8.0",
+    "@polkadot/util-crypto": "^14.0.1"
   }
 }

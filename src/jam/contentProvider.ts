@@ -1,6 +1,7 @@
 import { blake2AsHex } from "@polkadot/util-crypto";
 import { blake2AsU8a } from "@polkadot/util-crypto";
 import type { AccountAdapter } from "./types";
+import { accountId32 } from "./accountId";
 
 export type ContentRefV1 = {
   version: 1;
@@ -69,7 +70,7 @@ export class HttpContentProvider implements ContentProvider {
       if (!account) throw new Error("CONTENT_UPLOAD_REQUIRES_WALLET");
       const expires = Math.floor(Date.now() / 1000) + (this.upload.expiresInSeconds ?? 300);
       const providerDomain = hexBytes(this.upload.providerDomain, "providerDomain");
-      const accountBytes = hexBytes(account.address, "account");
+      const accountBytes = accountId32(account.address);
       if (providerDomain.length !== 32 || accountBytes.length !== 32) throw new Error("CONTENT_UPLOAD_INVALID_IDENTITY");
       const digest = contentUploadPermitDigest(providerDomain, accountBytes, hexBytes(ref.root, "contentRoot"), ref.size, expires);
       if (!this.upload.account.sign) throw new Error("CONTENT_UPLOAD_WALLET_CANNOT_SIGN");
