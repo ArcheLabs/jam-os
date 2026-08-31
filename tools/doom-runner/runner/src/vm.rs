@@ -141,4 +141,14 @@ impl DoomVm {
             (key as u32, is_pressed as u32),
         )
     }
+
+    pub fn run_status(&mut self) -> Result<u32, CallError<Error>> {
+        self.instance
+            .call_typed_and_get_result(&mut self.state, "ext_run_status", ())
+    }
+
+    pub fn run_tics(&mut self) -> Result<u32, CallError<Error>> {
+        self.instance
+            .call_typed_and_get_result(&mut self.state, "ext_run_tics", ())
+    }
 }

@@ -1,0 +1,14 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get -o Acquire::Retries=5 update \
+    && for attempt in 1 2 3 4 5; do apt-get -o Acquire::Retries=5 install -y --fix-missing --no-install-recommends ca-certificates clang-18 lld-18 git cargo rustc python3 && break; done \
+    && ln -sf /usr/bin/clang-18 /usr/local/bin/clang \
+    && ln -sf /usr/bin/clang++-18 /usr/local/bin/clang++ \
+    && ln -sf /usr/bin/ld.lld-18 /usr/local/bin/ld.lld \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+COPY tools/doom-runner /workspace/tools/doom-runner
+COPY artifacts/doom/stage1 /workspace/artifacts/doom/stage1
+RUN tools/doom-runner/guest/build.sh

@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const productionFiles = [
   "src/runtime/minijam/MiniJamRuntime.ts",
+  "src/runtime/doom/RealDoomRunnerRuntime.ts",
   "src/runtime/minijam/LiveFileSystemRuntime.ts",
   "src/jam/computer.ts",
   "src/public/PublicComputerPage.tsx",

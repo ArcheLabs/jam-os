@@ -24,3 +24,7 @@ has no blockchain session state.
 The later patched guest and WebSocket service are deliberately out of scope for
 this bootstrap. Until this smoke test is green, live DOOM remains unavailable;
 the browser does not fall back to the simulation runtime.
+
+The M2 reproducible guest build is documented in [`guest/README.md`](guest/README.md).
+It is intentionally separate from the immutable M1 artifact and is exercised
+with `scripts/run-patched-smoke.sh` after a successful guest build.

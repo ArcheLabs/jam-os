@@ -1,0 +1,21 @@
+{
+  "format": "jam-doom-guest-build/v1",
+  "polkavmCommit": "5ee3a8444feb3738cbbbfc59f31ab1a7d5609909",
+  "polkatoolCommit": "5ee3a8444feb3738cbbbfc59f31ab1a7d5609909",
+  "polkadoomCommit": "cc68c85c172fd3d30a5561250f027640ac4e099e",
+  "patchHash": "26c07445f2a7ca5ca5fac84bd13d2023785ae59464b9d6baa889d747397236f5",
+  "guestHash": "a850fcc7bbc32f8777465ab20ac30d180835bb82b38528ebfdd96a55b85ec7f1",
+  "wadHash": "b1efef593aae01511b5e5359263a4d6fc0f7b5bb8248e17ec090fef11d9fbe68",
+  "ruleset": {
+    "episode": 1,
+    "map": 1,
+    "skill": 3
+  },
+  "rulesetHash": "2abdf9a76a2631eedbff77702b8d78b42d1aa1cebebeefc352c392412ffdd32e",
+  "compiler": {
+    "clang": "Ubuntu clang version 20.1.8 (++20250708083436+6fb913d3e2ec-1~exp1~20250708203453.133)",
+    "target": "riscv32-unknown-none-elf/rv32emac/ilp32e",
+    "rust": "rustc 1.93.0 (254b59607 2026-01-19)",
+    "polkatool": "polkatool 0.37.0"
+  }
+}
