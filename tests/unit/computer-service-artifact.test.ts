@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
+import { blake2AsHex } from "@polkadot/util-crypto";
 
 const abi = JSON.parse(fs.readFileSync(
   new URL("../../services/computer/abi/service.abi.json", import.meta.url),
@@ -14,6 +15,9 @@ const abi = JSON.parse(fs.readFileSync(
 const source = fs.readFileSync(
   new URL("../../services/computer/src/service.ts", import.meta.url),
   "utf8",
+);
+const blob = fs.readFileSync(
+  new URL("../../artifacts/computer/stage1/scriptc/service.blob", import.meta.url),
 );
 
 describe("canonical Computer JamScript artifact", () => {
@@ -52,5 +56,9 @@ describe("canonical Computer JamScript artifact", () => {
     expect(source).not.toContain("input.owner");
     expect(source).not.toContain("storage_write");
     expect(source).toContain("const ContentRoot = bytes(32)");
+  });
+
+  it("matches the promoted content-addressed production blob", () => {
+    expect(blake2AsHex(blob, 256)).toBe("0xb8ae2888af4b0a73b93016580202e8fa2abdb4b971e17f9b40460994468198b9");
   });
 });
