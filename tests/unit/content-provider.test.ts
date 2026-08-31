@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MemoryContentProvider, contentRoot, contentRefFromJson } from "../../src/jam/contentProvider";
+import { MemoryContentProvider, contentRoot, contentRefFromJson, contentUploadPermitDigest } from "../../src/jam/contentProvider";
 
 describe("content-addressed provider", () => {
   it("stores and verifies content by Blake2-256 root", async () => {
@@ -21,5 +21,14 @@ describe("content-addressed provider", () => {
   it("validates provider-neutral references", () => {
     expect(contentRefFromJson({ version: 1, root: `0x${"ab".repeat(32)}`, size: 4 })).toEqual({ version: 1, root: `0x${"ab".repeat(32)}`, size: 4 });
     expect(() => contentRefFromJson({ version: 2, root: "https://bucket/object", size: 4 })).toThrow("INVALID_CONTENT_REF");
+  });
+
+  it("builds a domain-separated wallet upload permit digest", () => {
+    const domain = new Uint8Array(32).fill(1);
+    const account = new Uint8Array(32).fill(2);
+    const root = new Uint8Array(32).fill(3);
+    const first = contentUploadPermitDigest(domain, account, root, 9, 100);
+    expect(first).toHaveLength(32);
+    expect(contentUploadPermitDigest(domain, account, root, 9, 101)).not.toEqual(first);
   });
 });
