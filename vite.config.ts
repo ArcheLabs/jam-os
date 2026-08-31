@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1": {
-        target: "https://playground.minijam.xyz",
+        target: process.env.VITE_MINIJAM_NODE_RPC_URL || "http://127.0.0.1:9944",
         changeOrigin: true,
         secure: true,
       },

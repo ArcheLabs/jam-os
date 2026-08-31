@@ -7,16 +7,16 @@ describe("MiniJAM transport", () => {
     const transport = new MiniJamTransport("");
     await expect(transport.network()).rejects.toBeInstanceOf(JamNetworkError);
   });
-  it("does not trigger a JSON preflight header for GET requests", async () => {
+  it("uses the neutral node JSON-RPC for network context", async () => {
     const originalFetch = globalThis.fetch;
     let headers: Headers | undefined;
     globalThis.fetch = async (_input, init) => {
       headers = new Headers(init?.headers);
-      return new Response(JSON.stringify({ networkName: "MiniJAM", genesisHash: "0x01" }), { status: 200, headers: { "content-type": "application/json" } });
+      return new Response(JSON.stringify({ result: { blockHash: "0x01", blockNumber: 1, stateRoot: "0x02", slot: 1 } }), { status: 200, headers: { "content-type": "application/json" } });
     };
     try {
-      await new MiniJamTransport("https://example.test/api/v1").network();
-      expect(headers?.has("content-type")).toBe(false);
+      await expect(new MiniJamTransport("https://node.example.test").network()).resolves.toMatchObject({ block: "0x01" });
+      expect(headers?.get("content-type")).toBe("application/json");
     } finally {
       globalThis.fetch = originalFetch;
     }

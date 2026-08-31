@@ -24,13 +24,14 @@ function fakeLive() {
     async wait(id) { return { id, output: new Uint8Array(), completedAt: 2, serviceId: "7", workId: `work-${id}`, receiptHash: "0xreceipt" }; },
   };
   const api = { getService: async () => ({ serviceId: 7, controller: "5Alice", codeHash: "0xcode", codeLength: 1, preimageReady: true, finalizedBlock: "0xblock", finalizedBlockNumber: 1 }), getStorage: async (serviceId: string, key: string) => serviceId === "7" ? storage.get(key) || null : null };
-  return { api, work };
+  const account = { current: async () => ({ address: "0xalice", name: "Alice" }), connect: async () => ({ address: "0xalice", name: "Alice" }), disconnect: async () => {} };
+  return { api, work, account };
 }
 
 describe("MiniJAM DOOM runtime adapter", () => {
   it("runs create, input, execute, state, and finish through Work", async () => {
     const fake = fakeLive();
-    const runtime = new MiniJamDoomRuntime({ api: fake.api as never, work: fake.work, serviceId: "7" });
+    const runtime = new MiniJamDoomRuntime({ api: fake.api as never, work: fake.work, account: fake.account, serviceId: "7" });
     const session = await runtime.createSession({ sessionId: "recovery-session" });
     await runtime.submitInput(session.id, { fromTick: 1, inputs: [{ tick: 1, actions: ["fire"] }] });
     const execution = await runtime.executeTicks(session.id, 100);
@@ -44,15 +45,15 @@ describe("MiniJAM DOOM runtime adapter", () => {
 
   it("recovers state from service storage without browser state", async () => {
     const fake = fakeLive();
-    const first = new MiniJamDoomRuntime({ api: fake.api as never, work: fake.work, serviceId: "7" });
+    const first = new MiniJamDoomRuntime({ api: fake.api as never, work: fake.work, account: fake.account, serviceId: "7" });
     await first.createSession({ sessionId: "persisted-session" });
-    const reopened = new MiniJamDoomRuntime({ api: fake.api as never, work: fake.work, serviceId: "7" });
+    const reopened = new MiniJamDoomRuntime({ api: fake.api as never, work: fake.work, account: fake.account, serviceId: "7" });
     await expect(reopened.getState("persisted-session")).resolves.toMatchObject({ tick: 0 });
   });
 
   it("maps missing service state and Work timeout to stable runtime errors", async () => {
     const fake = fakeLive();
-    const runtime = new MiniJamDoomRuntime({ api: fake.api as never, work: { submit: fake.work.submit, wait: async () => { throw new MiniJamApiError("WORK_TIMEOUT", "timeout"); } }, serviceId: "7" });
+    const runtime = new MiniJamDoomRuntime({ api: fake.api as never, work: { submit: fake.work.submit, wait: async () => { throw new MiniJamApiError("WORK_TIMEOUT", "timeout"); } }, account: fake.account, serviceId: "7" });
     await expect(runtime.getState("missing")).rejects.toMatchObject({ code: "SESSION_NOT_FOUND" });
     await expect(runtime.createSession({ sessionId: "timeout" })).rejects.toMatchObject({ code: "WORK_TIMEOUT" });
   });
@@ -63,6 +64,7 @@ describe("MiniJAM DOOM runtime adapter", () => {
     const runtime = new MiniJamDoomRuntime({
       api: fake.api as never,
       work: { submit: async (request) => { submitted = true; return fake.work.submit(request); }, wait: fake.work.wait },
+      account: fake.account,
       serviceId: "7",
     });
     await expect(runtime.submitInput("missing", { fromTick: 0, inputs: [{ tick: 0, actions: ["teleport" as never] }] })).rejects.toMatchObject({ code: "INVALID_INPUT" });
