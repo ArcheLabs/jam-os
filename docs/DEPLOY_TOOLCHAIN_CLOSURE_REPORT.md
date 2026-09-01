@@ -7,7 +7,7 @@
 - JamScript revision: `927a6307f04bf5098a0546c7032ad5e026278658`
 - MiniJAM client: `https://github.com/ArcheLabs/minijam-client`
 - MiniJAM client revision: `18de55e175abb1cb40679be2e538644e2387655f`
-- Node: `22.x` for Deploy Pages (`24.x` remains the CI toolchain)
+- Node: `22.x` for Deploy Pages; CI pins ScriptC M2 to `24.15.0`
 
 Both workflow checkouts now use the same lock files through the shared
 `.github/actions/bootstrap-toolchains` action. Local development can use
