@@ -37,7 +37,8 @@ jobs:
       - name: Build minimal Polkadoom native link
         working-directory: .toolchain/JamScript
         env:
-          JAMSCRIPT_MINIJAM_SDK: ${{ github.workspace }}/.toolchain/minijam-client/service-toolchain/sdk
+          # JamScript appends service-toolchain/{sdk,compiler} to this checkout root.
+          JAMSCRIPT_MINIJAM_SDK: ${{ github.workspace }}/.toolchain/minijam-client
         run: cargo run --quiet --locked --bin jamscript -- build "$GITHUB_WORKSPACE/services/doom" --output "$RUNNER_TEMP/jam-doom-native-link"
       - name: Check full Doom compile frontier
         shell: bash

@@ -14,6 +14,10 @@ Both workflow checkouts now use the same lock files through the shared
 `npm run toolchain:bootstrap`, while `--verify-only` checks an already prepared
 workspace without changing it.
 
+The CI native build passes the MiniJAM client checkout root to
+`JAMSCRIPT_MINIJAM_SDK`; the pinned JamScript target appends its
+`service-toolchain/sdk` and converter paths itself.
+
 ## Local validation
 
 The canonical layout and pin checks pass, followed by a clean-toolchain client
