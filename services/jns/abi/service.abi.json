@@ -25,7 +25,9 @@
           }
         }
       ],
-      "executeOutput": "unit"
+      "executeOutput": {
+        "kind": "unit"
+      }
     },
     {
       "name": "bind",
@@ -46,7 +48,9 @@
           }
         }
       ],
-      "executeOutput": "unit"
+      "executeOutput": {
+        "kind": "unit"
+      }
     }
   ],
   "queries": [
