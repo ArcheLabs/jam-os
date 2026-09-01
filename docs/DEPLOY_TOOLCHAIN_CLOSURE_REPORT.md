@@ -18,6 +18,10 @@ The CI native build passes the MiniJAM client checkout root to
 `JAMSCRIPT_MINIJAM_SDK`; the pinned JamScript target appends its
 `service-toolchain/sdk` and converter paths itself.
 
+CI also installs the pinned ScriptC M2 npm toolchain before the native gate and
+checks Node, SDK, ScriptC runtime, and LLVM 20 explicitly so a missing native
+dependency reports a direct prerequisite failure.
+
 ## Local validation
 
 The canonical layout and pin checks pass, followed by a clean-toolchain client
