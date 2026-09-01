@@ -42,15 +42,14 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
+      - name: Validate composite action manifest
+        run: scripts/check-action-manifest.sh
+
+      - name: Bootstrap canonical toolchains
+        uses: ./.github/actions/bootstrap-toolchains
+
       - name: Install dependencies
         run: npm ci
-
-      - name: Checkout pinned MiniJAM toolchain
-        uses: actions/checkout@v4
-        with:
-          repository: ArcheLabs/minijam-client
-          ref: 18de55e175abb1cb40679be2e538644e2387655f
-          path: .toolchain/minijam-client
 
       - name: Test
         run: npm test
@@ -73,7 +72,7 @@ jobs:
             echo "Artifact: \`computer-service.bin\`"
           } >> "${GITHUB_STEP_SUMMARY}"
 
-      - name: Build canonical DOOM Service artifact
+      - name: Build legacy DOOM simulation artifact
         shell: bash
         run: |
           set -euo pipefail
@@ -82,10 +81,11 @@ jobs:
           test -s public/doom-service.bin
           doom_code_hash="$(node -e "const fs=require('fs');const {blake2AsHex}=require('@polkadot/util-crypto');process.stdout.write(blake2AsHex(fs.readFileSync('public/doom-service.bin'),256))")"
           {
-            echo "## Canonical DOOM Service"
+            echo "## Legacy DOOM Simulation Service"
             echo
             echo "Code hash: \`${doom_code_hash}\`"
             echo "Artifact: \`doom-service.bin\`"
+            echo "Artifact kind: \`legacy-doom-simulation\`"
             echo "Configured service ID: \`${VITE_DOOM_SERVICE_ID:-not configured}\`"
           } >> "${GITHUB_STEP_SUMMARY}"
 

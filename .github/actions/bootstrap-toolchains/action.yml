@@ -1,0 +1,50 @@
+name: Bootstrap canonical toolchains
+description: Checkout and verify the JamScript and MiniJAM client revisions from toolchain locks.
+runs:
+  using: composite
+  steps:
+    - name: Read canonical toolchain pins
+      id: pins
+      shell: bash
+      run: node "$GITHUB_WORKSPACE/scripts/read-toolchain-pins.mjs" >> "$GITHUB_OUTPUT"
+
+    - name: Checkout pinned JamScript
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ steps.pins.outputs.JAMSCRIPT_CHECKOUT_REPOSITORY }}
+        ref: ${{ steps.pins.outputs.JAMSCRIPT_REVISION }}
+        path: .toolchain/JamScript
+
+    - name: Verify JamScript pin
+      shell: bash
+      run: |
+        "$GITHUB_WORKSPACE/scripts/check-jamscript-pin.sh" .toolchain/JamScript
+
+    - name: Checkout pinned MiniJAM client
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ steps.pins.outputs.MINIJAM_CLIENT_CHECKOUT_REPOSITORY }}
+        ref: ${{ steps.pins.outputs.MINIJAM_CLIENT_REVISION }}
+        path: .toolchain/minijam-client
+
+    - name: Verify MiniJAM client pin
+      shell: bash
+      run: |
+        "$GITHUB_WORKSPACE/scripts/check-minijam-client-pin.sh" .toolchain/minijam-client
+
+    - name: Verify toolchain layout
+      shell: bash
+      run: |
+        "$GITHUB_WORKSPACE/scripts/check-toolchain-layout.sh"
+
+    - name: Summarize canonical toolchains
+      shell: bash
+      run: |
+        {
+          echo "## Canonical toolchains"
+          echo
+          echo "JamScript: \`${{ steps.pins.outputs.JAMSCRIPT_REVISION }}\`"
+          echo "MiniJAM client: \`${{ steps.pins.outputs.MINIJAM_CLIENT_REVISION }}\`"
+          echo "Node: \`$(node --version)\`"
+          echo "npm: \`$(npm --version)\`"
+        } >> "$GITHUB_STEP_SUMMARY"

@@ -6,10 +6,6 @@ CHECKOUT="${JAMSCRIPT_CHECKOUT:-$ROOT_DIR/.toolchain/JamScript}"
 OUTPUT="$ROOT_DIR/services/jns/abi/service.abi.json"
 
 revision="$($ROOT_DIR/scripts/check-jamscript-pin.sh "$CHECKOUT")"
-test "$revision" = "927a6307f04bf5098a0546c7032ad5e026278658" || {
-  echo "unexpected canonical JamScript revision: $revision" >&2
-  exit 1
-}
 
 mkdir -p "$(dirname "$OUTPUT")"
 (cd "$CHECKOUT" && cargo run --quiet --locked --bin jamscript -- abi "$ROOT_DIR/services/jns") > "$OUTPUT"
