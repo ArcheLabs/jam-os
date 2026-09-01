@@ -41,8 +41,8 @@ jobs:
       - name: Verify canonical JNS ABI
         working-directory: .toolchain/JamScript
         run: |
-          cargo run --quiet --locked --bin jamscript -- abi ../services/jns > /tmp/jns-service.abi.json
-          diff --unified ../services/jns/abi/service.abi.json /tmp/jns-service.abi.json
+          cargo run --quiet --locked --bin jamscript -- abi "$GITHUB_WORKSPACE/services/jns" > /tmp/jns-service.abi.json
+          diff --unified "$GITHUB_WORKSPACE/services/jns/abi/service.abi.json" /tmp/jns-service.abi.json
       - name: Install application dependencies
         run: npm ci
       - run: npm test
