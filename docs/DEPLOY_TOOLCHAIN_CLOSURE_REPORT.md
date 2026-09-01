@@ -22,6 +22,10 @@ CI also installs the pinned ScriptC M2 npm toolchain before the native gate and
 checks Node, SDK, ScriptC runtime, and LLVM 20 explicitly so a missing native
 dependency reports a direct prerequisite failure.
 
+Before the PolkaVM guest link, CI installs `rust-src` for the pinned nightly and
+prefetches the Rust sysroot dependency graph. The guest build itself remains
+offline and locked, but no longer depends on an empty runner-side Cargo cache.
+
 ## Local validation
 
 The canonical layout and pin checks pass, followed by a clean-toolchain client

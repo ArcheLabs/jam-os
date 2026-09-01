@@ -30,5 +30,10 @@ test -x "${JAMSCRIPT_LLVM_AR:-/usr/lib/llvm-20/bin/llvm-ar}" || {
   echo "NATIVE_PREREQUISITES_FAILED: llvm-ar 20 is not executable" >&2
   exit 1
 }
+rust_sysroot="$(rustc +nightly-2026-05-02 --print sysroot)"
+test -f "$rust_sysroot/lib/rustlib/src/rust/library/sysroot/Cargo.toml" || {
+  echo "NATIVE_PREREQUISITES_FAILED: rust-src is not installed for nightly-2026-05-02" >&2
+  exit 1
+}
 
 echo "NATIVE_PREREQUISITES=PASS"
