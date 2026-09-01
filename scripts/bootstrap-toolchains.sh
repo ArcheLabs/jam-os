@@ -35,8 +35,8 @@ ensure_checkout() {
   git -C "$directory" checkout --detach --force "$revision" >/dev/null
 }
 
-ensure_checkout "JamScript" "${PINS[JAMSCRIPT_REPOSITORY]}" "${PINS[JAMSCRIPT_REVISION]}" "$ROOT_DIR/.toolchain/JamScript"
-ensure_checkout "MiniJAM client" "${PINS[MINIJAM_CLIENT_REPOSITORY]}" "${PINS[MINIJAM_CLIENT_REVISION]}" "$ROOT_DIR/.toolchain/minijam-client"
+ensure_checkout "JamScript" "${PINS[JAMSCRIPT_REPOSITORY_URL]}" "${PINS[JAMSCRIPT_REVISION]}" "$ROOT_DIR/.toolchain/JamScript"
+ensure_checkout "MiniJAM client" "${PINS[MINIJAM_CLIENT_REPOSITORY_URL]}" "${PINS[MINIJAM_CLIENT_REVISION]}" "$ROOT_DIR/.toolchain/minijam-client"
 "$ROOT_DIR/scripts/check-toolchain-layout.sh"
 echo "Node: $(node --version)"
 echo "npm: $(npm --version)"

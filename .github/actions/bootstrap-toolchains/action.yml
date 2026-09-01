@@ -11,28 +11,31 @@ runs:
     - name: Checkout pinned JamScript
       uses: actions/checkout@v4
       with:
-        repository: ${{ steps.pins.outputs.JAMSCRIPT_REPOSITORY }}
+        repository: ${{ steps.pins.outputs.JAMSCRIPT_CHECKOUT_REPOSITORY }}
         ref: ${{ steps.pins.outputs.JAMSCRIPT_REVISION }}
         path: .toolchain/JamScript
 
     - name: Verify JamScript pin
       shell: bash
-      run: "$GITHUB_WORKSPACE/scripts/check-jamscript-pin.sh" .toolchain/JamScript
+      run: |
+        "$GITHUB_WORKSPACE/scripts/check-jamscript-pin.sh" .toolchain/JamScript
 
     - name: Checkout pinned MiniJAM client
       uses: actions/checkout@v4
       with:
-        repository: ${{ steps.pins.outputs.MINIJAM_CLIENT_REPOSITORY }}
+        repository: ${{ steps.pins.outputs.MINIJAM_CLIENT_CHECKOUT_REPOSITORY }}
         ref: ${{ steps.pins.outputs.MINIJAM_CLIENT_REVISION }}
         path: .toolchain/minijam-client
 
     - name: Verify MiniJAM client pin
       shell: bash
-      run: "$GITHUB_WORKSPACE/scripts/check-minijam-client-pin.sh" .toolchain/minijam-client
+      run: |
+        "$GITHUB_WORKSPACE/scripts/check-minijam-client-pin.sh" .toolchain/minijam-client
 
     - name: Verify toolchain layout
       shell: bash
-      run: "$GITHUB_WORKSPACE/scripts/check-toolchain-layout.sh"
+      run: |
+        "$GITHUB_WORKSPACE/scripts/check-toolchain-layout.sh"
 
     - name: Summarize canonical toolchains
       shell: bash
