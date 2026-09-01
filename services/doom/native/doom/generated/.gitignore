@@ -1,0 +1,4 @@
+*
+!.gitignore
+!build-input.json
+!wad.h

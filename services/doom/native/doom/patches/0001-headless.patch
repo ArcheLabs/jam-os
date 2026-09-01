@@ -1,0 +1,64 @@
+diff --git a/src/impl.c b/src/impl.c
+index 8dd9cc7..0000000 100644
+--- a/src/impl.c
++++ b/src/impl.c
+@@ -367,18 +367,49 @@
+ 
+ 
+ #include "../libs/doomgeneric/doomgeneric/doomgeneric.h"
++#include "../libs/doomgeneric/doomgeneric/doomstat.h"
+ 
+ // EXPORTS
+ 
+ // NOTE: This *must* be static because Doom accesses these args not only during initialization.
+-static char * ARGV[3] = {"./doom", "-iwad", "doom1.wad"};
++static char * ARGV[8] = {
++    "./doom", "-iwad", "doom1.wad", "-skill", "3", "-warp", "1", "1"
++};
++
++static uint32_t RUN_STATUS = 0;
++static uint32_t RUN_TICS = 0;
+ 
+ void ext_initialize() {
+-    doomgeneric_Create(3, ARGV);
++    RUN_STATUS = 0;
++    RUN_TICS = 0;
++    doomgeneric_Create(8, ARGV);
+ }
+ 
+ void ext_tick(void) {
+     doomgeneric_Tick();
++
++    if (RUN_STATUS != 0) {
++        return;
++    }
++
++    if (gamestate == GS_INTERMISSION) {
++        RUN_STATUS = 1;
++        RUN_TICS = (uint32_t) leveltime;
++        return;
++    }
++
++    if (players[consoleplayer].playerstate == PST_DEAD) {
++        RUN_STATUS = 2;
++        RUN_TICS = (uint32_t) leveltime;
++    }
++}
++
++uint32_t ext_run_status(void) {
++    return RUN_STATUS;
++}
++
++uint32_t ext_run_tics(void) {
++    return RUN_STATUS != 0 ? RUN_TICS : (uint32_t) leveltime;
+ }
+ 
+ static unsigned char _KEYS[256] = {};
+@@ -407,5 +438,7 @@
+ POLKAVM_EXPORT(void, ext_initialize);
+ POLKAVM_EXPORT(void, ext_tick);
+ POLKAVM_EXPORT(void, ext_on_keychange, uint8_t, uint8_t);
++POLKAVM_EXPORT(uint32_t, ext_run_status);
++POLKAVM_EXPORT(uint32_t, ext_run_tics);
+ 
+ #endif

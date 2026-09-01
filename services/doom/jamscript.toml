@@ -1,0 +1,29 @@
+[package]
+name = "jam-doom"
+version = "0.1.0"
+entry = "src/service.ts"
+language = "0.2"
+
+[compiler]
+backend = "scriptc"
+
+[target.minijam]
+genesis_hash = "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+[native.doom]
+language = "c"
+sources = [
+    "native/doom/verifier.c",
+    "native/doom/generated/polkadoom/libs/doomgeneric/doomgeneric/m_fixed.c"
+]
+include_dirs = [
+    "native/doom",
+    "native/doom/generated/polkadoom/src/include",
+    "native/doom/generated/polkadoom/libs/doomgeneric/doomgeneric",
+    "native/doom/generated/polkadoom/libs/musl-1.2.4/src/include",
+    "native/doom/generated/polkadoom/libs/musl-1.2.4/include",
+    "native/doom/generated/polkadoom/libs/musl-1.2.4/src/internal",
+    "native/doom/generated/polkadoom/libs/musl-1.2.4/src/multibyte",
+    "native/doom/generated/polkadoom/libs/musl-1.2.4/arch/generic",
+    "native/doom/generated/polkadoom/libs/musl-1.2.4/arch/riscv64"
+]

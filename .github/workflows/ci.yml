@@ -9,9 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - name: Read JamScript toolchain pin
         id: jamscript-pin
@@ -24,15 +26,42 @@ jobs:
         with:
           repository: ArcheLabs/JamScript
           ref: ${{ steps.jamscript-pin.outputs.revision }}
-          path: .jamscript-toolchain
+          path: .toolchain/JamScript
+      - name: Verify JamScript checkout pin
+        run: scripts/check-jamscript-pin.sh .toolchain/JamScript
+      - uses: actions/checkout@v4
+        with:
+          repository: ArcheLabs/minijam-client
+          path: .toolchain/minijam-client
+          token: ${{ secrets.JAMSCRIPT_REPO_TOKEN }}
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-05-02
       - name: Verify canonical JNS ABI
-        working-directory: .jamscript-toolchain
+        working-directory: .toolchain/JamScript
         run: |
-          cargo run --quiet --locked --bin jamscript -- abi ../services/jns > /tmp/jns-service.abi.json
-          diff --unified ../services/jns/abi/service.abi.json /tmp/jns-service.abi.json
-      - run: npm ci
+          cargo run --quiet --locked --bin jamscript -- abi "$GITHUB_WORKSPACE/services/jns" > /tmp/jns-service.abi.json
+          diff --unified "$GITHUB_WORKSPACE/services/jns/abi/service.abi.json" /tmp/jns-service.abi.json
+      - name: Install application dependencies
+        run: npm ci
       - run: npm test
       - run: npm run build
+      - run: npm run stage1:guard
+      - name: Prepare pinned Doom inputs
+        run: services/doom/scripts/prepare-native-doom.sh
+      - name: Build minimal Polkadoom native link
+        working-directory: .toolchain/JamScript
+        env:
+          JAMSCRIPT_MINIJAM_SDK: ${{ github.workspace }}/.toolchain/minijam-client/service-toolchain/sdk
+        run: cargo run --quiet --locked --bin jamscript -- build "$GITHUB_WORKSPACE/services/doom" --output "$RUNNER_TEMP/jam-doom-native-link"
+      - name: Check full Doom compile frontier
+        shell: bash
+        run: |
+          set +e
+          services/doom/scripts/build-native-doom-full.sh >"$RUNNER_TEMP/doom-full.log" 2>&1
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/doom-full.log"
+          test "$status" -ne 0
+          grep -F 'd_iwad.c' "$RUNNER_TEMP/doom-full.log"
+          grep -F 'call to undeclared function '\''strdup'\''' "$RUNNER_TEMP/doom-full.log"

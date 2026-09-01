@@ -4,3 +4,9 @@ dist/
 .env
 *.tsbuildinfo
 .agent/
+.toolchain/
+
+# Generated binaries from the DOOM runner build; official bootstrap inputs are
+# tracked under tools/doom-runner/upstream/roms.
+tools/doom-runner/runner/target/
+artifacts/doom/official/

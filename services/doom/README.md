@@ -1,4 +1,6 @@
-# DOOM-inspired Simulation Service
+# DOOM services
+
+## Legacy DOOM-inspired Simulation Service
 
 This is a deterministic, DOOM-inspired protocol simulation implemented as an
 ordinary MiniJAM Service. It is not the original DOOM game: it does not embed a
@@ -27,9 +29,17 @@ is not proof of identity.
 Build it with the MiniJAM compiler API:
 
 ```bash
-../minijam-client/scripts/compile-service c services/doom/src/service.c /tmp/jam-doom O0
+.toolchain/minijam-client/scripts/compile-service c services/doom/src/service.c /tmp/jam-doom O0
 ```
 
 The generated blob and code hash are deployment artifacts. Configure the
 deployed service ID as `VITE_DOOM_SERVICE_ID`; DOOM state is never stored in
 browser local storage.
+
+## Native Doom Replay Verifier (Phase A.1)
+
+The native integration inputs are the pinned Polkadoom submodule under
+`native/doom/upstream/polkadoom` and the deterministic generated tree under
+`native/doom/generated/polkadoom`. The current native gate links a real
+Polkadoom fixed-point symbol; the full headless verifier remains blocked at the
+strict-C compile frontier documented in `DOOM_PHASE_A1_CLOSURE_REPORT.md`.

@@ -1,0 +1,3 @@
+[submodule "services/doom/native/doom/upstream/polkadoom"]
+	path = services/doom/native/doom/upstream/polkadoom
+	url = https://github.com/koute/polkadoom.git

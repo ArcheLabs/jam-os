@@ -7,7 +7,23 @@ export interface BrowserResolvedDocument { canonicalUrl: string; scheme: Browser
 export interface BrowserResolutionContext { localFs: FileSystemRuntime | null; names: NameRuntime; siteForService: (serviceId: string) => Pick<FileSystemRuntime, "readPublished" | "manifest">; }
 export async function resolveBrowserUrl(rawUrl: string, context: BrowserResolutionContext): Promise<BrowserResolvedDocument> {
   const canonicalUrl = canonicalizeUrl(rawUrl); const scheme = schemeOf(canonicalUrl);
-  if (scheme === "http" || scheme === "https") return { canonicalUrl, scheme, mode: "remote-frame", frameUrl: canonicalUrl, title: new URL(canonicalUrl).hostname };
+  if (scheme === "http" || scheme === "https") {
+    const url = new URL(canonicalUrl);
+    const profileMatch = url.hostname.toLowerCase() === "computer.minijam.xyz" && /^\/@[a-z0-9-]+$/i.test(url.pathname);
+    if (profileMatch) {
+      const name = decodeURIComponent(url.pathname.slice(2)).toLowerCase();
+      const record = await context.names.resolve(name);
+      return {
+        canonicalUrl,
+        scheme,
+        mode: "internal",
+        title: `${name}'s JAM Computer`,
+        jam: { name, serviceId: record.serviceId, path: "/" },
+        srcdoc: `<main class="guest-computer"><div class="guest-window"><div class="guest-titlebar"><span>JAM COMPUTER</span><small>READ-ONLY GUEST VIEW</small></div><div class="guest-body"><div class="guest-mark">◆</div><h1>${escapeHtml(name)}'s JAM Computer</h1><p>Public profile resolved through JNS · Service #${escapeHtml(record.serviceId)}</p><p class="guest-note">This view is read-only. Open the published site from the browser address bar with <code>jam://${escapeHtml(name)}</code>.</p></div></div></main>`,
+      };
+    }
+    return { canonicalUrl, scheme, mode: "remote-frame", frameUrl: canonicalUrl, title: url.hostname };
+  }
   if (scheme === "about") return { canonicalUrl, scheme, mode: "internal", srcdoc: `<main class="browser-internal"><h1>JAM Browser</h1><p>${canonicalUrl === "about:blank" ? "Enter a JAM name, file path, or Web address." : canonicalUrl}</p></main>` };
   if (scheme === "file") { const fs = context.localFs; if (!fs) throw new Error("Connect or create a Computer Service before opening JAM FS content"); const url = new URL(canonicalUrl); const path = normalizePath(decodeURIComponent(url.pathname)); const stat = await fs.stat(path); if (!stat) throw new Error(`File not found: ${path}`); if (stat.type === "directory") { const children = await fs.list(path); return { canonicalUrl, scheme, mode: "srcdoc", title: path, srcdoc: `<main class="directory-index"><h1>${path}</h1><ul>${children.map((n) => `<li>${n.type === "directory" ? "📁" : "📄"} ${escapeHtml(n.path.split("/").pop() || "")}</li>`).join("")}</ul></main>`, jam: { path } }; } const content = await fs.read(path); return { canonicalUrl, scheme, mode: "srcdoc", title: path.split("/").pop(), srcdoc: renderFile(content, path, false), jam: { path } }; }
   const parsed = parseJamUri(canonicalUrl); const record = parsed.serviceId ? { serviceId: parsed.serviceId } : await context.names.resolve(parsed.name!); const targetFs = context.siteForService(record.serviceId); const requestedPath = parsed.path === "/" ? "/index.html" : parsed.path.endsWith("/") ? `${parsed.path}index.html` : parsed.path; let content; try { content = await targetFs.readPublished(requestedPath); } catch (error) { const manifest = await targetFs.manifest(); const files = manifest?.files ? Array.isArray(manifest.files) ? manifest.files.map((item) => item.path) : Object.keys(manifest.files) : []; const prefix = parsed.path.endsWith("/") ? parsed.path : `${parsed.path}/`; const children = files.filter((path) => path.startsWith(prefix)).map((path) => path.slice(prefix.length).split("/")[0]).filter((value, index, all) => value && all.indexOf(value) === index); if (!children.length) throw error; return { canonicalUrl, scheme, mode: "srcdoc", title: parsed.path, srcdoc: `<main class="directory-index"><h1>${escapeHtml(parsed.path)}</h1><ul>${children.map((child) => `<li>${escapeHtml(child)}</li>`).join("")}</ul></main>`, jam: { serviceId: record.serviceId, name: parsed.name, path: parsed.path } }; } return { canonicalUrl, scheme, mode: "srcdoc", title: parsed.path === "/" ? parsed.name || parsed.serviceId : parsed.path.split("/").filter(Boolean).pop(), srcdoc: renderFile(content.bytes, requestedPath, true, record.serviceId), jam: { serviceId: record.serviceId, name: parsed.name, path: requestedPath } };

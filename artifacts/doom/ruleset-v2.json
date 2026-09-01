@@ -1,0 +1,19 @@
+{
+  "format": "DoomRulesetV2",
+  "encoding": "UTF8(\"JAM_DOOM_RULESET_V2\") || u8(version) || engineCommit[32] (12 zero bytes + 20-byte git SHA) || wadHash[32] || u8(episode) || u8(map) || u8(skill) || u8(replayVersion) || u8(ticcmdVersion) || u16LE(ticRate) || u8(GS_INTERMISSION) || u8(leveltime) || u8(PST_DEAD) || u32LE(maxTics)",
+  "version": 2,
+  "engine": "Polkadoom",
+  "engineCommit": "cc68c85c172fd3d30a5561250f027640ac4e099e4",
+  "wadHash": "b1efef593aae01511b5e5359263a4d6fc0f7b5bb8248e17ec090fef11d9fbe68",
+  "episode": 1,
+  "map": 1,
+  "skill": 3,
+  "replayVersion": 1,
+  "ticcmdVersion": 1,
+  "ticRate": 35,
+  "completionState": "GS_INTERMISSION",
+  "completionMetric": "leveltime",
+  "deathState": "PST_DEAD",
+  "maxTics": 21000,
+  "rulesetHash": "0x49d65a8cb7ebbd05b9b1d0ef11095a6d924863f45e3afc1488e89b108652d97f"
+}

@@ -1,0 +1,12 @@
+{
+  "format": "DoomRulesetV1",
+  "encoding": "JAM_DOOM_RULESET_V1 || guestHash[32] || wadHash[32] || u8(episode) || u8(map) || u8(skill) || u32LE(inputProtocolVersion) || u32LE(replayProtocolVersion)",
+  "guestHash": "a850fcc7bbc32f8777465ab20ac30d180835bb82b38528ebfdd96a55b85ec7f1",
+  "wadHash": "b1efef593aae01511b5e5359263a4d6fc0f7b5bb8248e17ec090fef11d9fbe68",
+  "episode": 1,
+  "map": 1,
+  "skill": 3,
+  "inputProtocolVersion": 1,
+  "replayProtocolVersion": 1,
+  "rulesetHash": "2abdf9a76a2631eedbff77702b8d78b42d1aa1cebebeefc352c392412ffdd32e"
+}

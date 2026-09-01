@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "@polkadot/util-crypto": "^14.0.1"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "format": "jam-doom-native-input/v1",
+  "polkadoomCommit": "cc68c85c172fd3d30a5561250f027640ac4e099e",
+  "patches": [
+    {
+      "name": "0001-headless.patch",
+      "blake2b256": "0x26c07445f2a7ca5ca5fac84bd13d2023785ae59464b9d6baa889d747397236f5"
+    },
+    {
+      "name": "0002-doomgeneric-strict-c-compat.patch",
+      "blake2b256": "0xfe4ebd647e1c4e4ecde5bce8bb648f8e12a2fb9523b2cf3e8d0d6849dd064ad2"
+    }
+  ],
+  "wadHash": "0xb1efef593aae01511b5e5359263a4d6fc0f7b5bb8248e17ec090fef11d9fbe68",
+  "rulesetHash": "0x49d65a8cb7ebbd05b9b1d0ef11095a6d924863f45e3afc1488e89b108652d97f"
+}

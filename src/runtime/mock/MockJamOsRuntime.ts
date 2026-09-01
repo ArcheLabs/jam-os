@@ -45,7 +45,7 @@ export class MockJamOsRuntime implements JamOsRuntimeV2 {
   private readonly client: JamClient = new MockJamClient();
   readonly account: AccountAdapter = new MockAccountAdapter(this.client);
   private readonly playgroundAdapter: PlaygroundAdapter = new MockPlaygroundAdapter();
-  private readonly computerAdapter = new ComputerService(this.client, this.account, this.playgroundAdapter);
+  private readonly computerAdapter = new ComputerService(this.client, this.account);
   private readonly namesAdapter = new JamNameService(this.client, this.account);
   readonly events = new MockEvents();
   readonly doom = new MockDoomRuntime(this.account, this.events);

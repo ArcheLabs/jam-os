@@ -23,7 +23,7 @@ function isBinary(message: DoomTransportMessage): message is Uint8Array { return
 export class WebSocketDoomTransport implements DoomTransport {
   private socket: WebSocket | null = null;
   private listeners = new Set<(message: DoomTransportMessage) => void>();
-  constructor(private readonly url: string) {}
+  constructor(private readonly url: string, private readonly permit?: unknown) {}
 
   connect(sessionId: string): Promise<void> {
     if (typeof WebSocket === "undefined") return Promise.reject(new DoomRuntimeError("SERVICE_UNAVAILABLE", "WebSocket is unavailable in this browser"));
@@ -31,7 +31,7 @@ export class WebSocketDoomTransport implements DoomTransport {
       const socket = new WebSocket(this.url);
       socket.binaryType = "arraybuffer";
       this.socket = socket;
-      socket.onopen = () => { this.send(controlMessage({ type: "connect", sessionId })); resolve(); };
+      socket.onopen = () => { this.send(controlMessage(this.permit ? { type: "run", runId: sessionId, ...this.permit as object } : { type: "connect", sessionId })); resolve(); };
       socket.onerror = () => reject(new DoomRuntimeError("SERVICE_UNAVAILABLE", "DOOM gateway connection failed"));
       socket.onclose = () => this.listeners.forEach((listener) => listener(JSON.stringify({ version: 1, type: "status", status: "disconnected" })));
       socket.onmessage = (event) => {

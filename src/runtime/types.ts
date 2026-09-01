@@ -1,6 +1,7 @@
 import type { AccountInfo, AccountAdapter, CompileInput, CompileOutput, DeployInput, DeployOutput, InteractInput, InteractOutput } from "../jam/types";
 import type { ProvisionProgress, ProvisionedComputer } from "../jam/computer";
 import type { DoomRuntime } from "./doom/types";
+import type { ContentProvider } from "../jam/contentProvider";
 
 export type RuntimeMode = "mock" | "live";
 export type RuntimeSource = "real" | "mock" | "unavailable";
@@ -29,7 +30,7 @@ export interface FileEntry {
   updatedAt?: number;
   mime?: string;
 }
-export interface FileManifest { files: Record<string, { path?: string }> | Array<{ path: string }>; }
+export interface FileManifest { version?: 1; indexPath?: string; files: Record<string, { path?: string; mime?: string; size?: number; contentRoot?: string }> | Array<{ path: string; mime?: string; size?: number; contentRoot?: string }>; }
 
 export interface FileSystemRuntime {
   list(path: string): Promise<FileEntry[]>;
@@ -88,6 +89,8 @@ export interface NetworkRuntime {
 export interface WorkRequest {
   serviceId: string;
   payload: Uint8Array;
+  /** Unsigned Work extrinsics supplied as deterministic external data. */
+  extrinsics?: Uint8Array[];
 }
 
 export interface WorkHandle { id: string; submittedAt: number; }
@@ -117,13 +120,15 @@ export interface JamOsRuntimeV2 {
   computer: ComputerRuntime;
   system: { getInfo(): Promise<SystemInfo> };
   fs: FileSystemRuntime;
-  playground: PlaygroundRuntime;
+  /** Legacy Stage-0 surface; absent from production Stage-1 runtimes. */
+  playground?: PlaygroundRuntime;
   services: ServiceRuntime;
   work: WorkRuntime;
   network: NetworkRuntime;
   names: NameRuntime;
   doom: DoomRuntime;
   events: EventRuntime;
+  content?: ContentProvider;
 }
 
 export type AccountRuntime = JamOsRuntimeV2["account"];

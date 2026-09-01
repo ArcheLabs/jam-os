@@ -13,17 +13,19 @@ function eventsFor(received: string[]) : EventRuntime { return { subscribe: () =
 describe("live Work runtime", () => {
   it("submits, polls, and returns finalized operation output", async () => {
     let reads = 0;
+    let submittedExtrinsics: Uint8Array[] | undefined;
     const api = {
-      submitWork: async () => ({ operationId: "op-1", status: "submitted", request: { serviceId: "183" } }),
+      submitWork: async (request: { extrinsics?: Uint8Array[] }) => { submittedExtrinsics = request.extrinsics; return { operationId: "op-1", status: "submitted", request: { serviceId: "183" } }; },
       getOperation: async () => { reads += 1; return reads === 1 ? { operationId: "op-1", status: "tracking_work", request: { serviceId: "183" } } : { operationId: "op-1", status: "succeeded", request: { serviceId: "183" }, result: { workId: 22, outputBase64: bytesToBase64(new Uint8Array([1, 2])), executionReceipt: "0xreceipt" } }; },
     };
     const received: string[] = [];
     const runtime = new LiveWorkRuntime(api as never, signer, eventsFor(received));
-    const handle = await runtime.submit({ serviceId: "183", payload: new Uint8Array([9]) });
+    const handle = await runtime.submit({ serviceId: "183", payload: new Uint8Array([9]), extrinsics: [new Uint8Array([7, 8])] });
     const result = await runtime.wait(handle.id, { timeoutMs: 5_000 });
     expect(handle.id).toBe("op-1");
     expect(result).toMatchObject({ operationId: "op-1", workId: "22", serviceId: "183", receiptHash: "0xreceipt" });
     expect([...result.output]).toEqual([1, 2]);
+    expect(submittedExtrinsics).toEqual([new Uint8Array([7, 8])]);
     expect(received).toEqual(["work:submitted", "work:running", "work:completed"]);
   });
 

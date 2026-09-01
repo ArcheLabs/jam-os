@@ -9,6 +9,7 @@ import {
   JamProtocolError,
 } from "./errors";
 import type { AccountAdapter, JamClient } from "./types";
+import { accountId32, mockAccountId32 } from "./accountId";
 import {
   FetchRpcTransport,
   JamScriptClient,
@@ -70,20 +71,13 @@ function saveMockEntries(entries: Map<string, JnsEntry>): void {
 }
 
 function accountBytes(address: string): Uint8Array {
-  if (/^0x[0-9a-fA-F]{64}$/.test(address)) {
-    return Uint8Array.from(address.slice(2).match(/../g) ?? [], (pair) => Number.parseInt(pair, 16));
-  }
-  const encoded = new TextEncoder().encode(address);
-  if (encoded.length > 32) throw new JamAuthorizationError("Account address is not a 32-byte identity");
-  const output = new Uint8Array(32);
-  output.set(encoded);
-  return output;
+  return accountId32(address);
 }
 
 async function currentOwner(account: AccountAdapter): Promise<Uint8Array> {
   const current = await account.current();
   if (!current) throw new JamAuthorizationError("Connect an account first");
-  return accountBytes(current.address);
+  return mockAccountId32(current.address);
 }
 
 export class MockJnsBackend implements JnsBackend {
