@@ -7,10 +7,15 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
+    "pretest": "npm run toolchain:client:build && node scripts/check-test-boundary.mjs",
     "test:watch": "vitest",
+    "prebuild": "npm run toolchain:client:build",
     "preview": "vite preview",
-    "smoke:live": "node scripts/smoke-live.mjs"
-    ,"stage1:guard": "node scripts/stage1-guards.mjs"
+    "smoke:live": "node scripts/smoke-live.mjs",
+    "stage1:guard": "node scripts/stage1-guards.mjs",
+    "jns:abi": "scripts/generate-jns-abi.sh",
+    "jns:abi:check": "scripts/check-jns-abi.sh",
+    "toolchain:client:build": "npm --prefix .toolchain/JamScript/packages/client run build"
   },
   "dependencies": {
     "@jamscript/minijam-client": "file:.toolchain/JamScript/packages/client",
