@@ -63,8 +63,8 @@ claimed.
 
 ## CI
 
-GitHub Actions now checks out the canonical JamScript revision and MiniJAM SDK
-under `.toolchain/` using the `JAMSCRIPT_REPO_TOKEN` secret, verifies the pin,
+GitHub Actions now checks out the public canonical JamScript revision and the
+MiniJAM SDK under `.toolchain/`, verifies the pin,
 runs the test/build/guard gates, prepares Doom inputs, builds the minimal native
 link, and asserts the stable full-engine frontier diagnostic. A hosted CI run
 is not available from this workspace, so its status remains pending until the
