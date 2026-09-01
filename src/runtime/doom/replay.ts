@@ -88,5 +88,6 @@ export function decodeDoomReplay(bytes: Uint8Array, expectedRulesetHash?: Uint8A
   return { version: 1, rulesetHash, ticcmds };
 }
 
-export function doomReplayRoot(bytes: Uint8Array): string { return blake2AsHex(bytes, 256).toLowerCase(); }
-export function doomReplayRootBytes(bytes: Uint8Array): Uint8Array { return blake2AsU8a(bytes, 256); }
+/** The sole replay identifier: BLAKE2b-256(canonical DoomReplayV1 bytes). */
+export function doomRunId(bytes: Uint8Array): string { return blake2AsHex(bytes, 256).toLowerCase(); }
+export function doomRunIdBytes(bytes: Uint8Array): Uint8Array { return blake2AsU8a(bytes, 256); }

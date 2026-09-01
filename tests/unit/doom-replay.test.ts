@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeDoomReplay, doomReplayRoot, encodeDoomReplay } from "../../src/runtime/doom/replay";
+import { decodeDoomReplay, doomRunId, encodeDoomReplay } from "../../src/runtime/doom/replay";
 
 const ruleset = new Uint8Array(32).fill(7);
 const commands = [{ forwardMove: 50, sideMove: -2, angleTurn: -1234, buttons: 3 }, { forwardMove: 0, sideMove: 4, angleTurn: 12, buttons: 0 }];
@@ -10,7 +10,7 @@ describe("DoomReplayV1", () => {
     expect(encoded.length).toBe(41 + commands.length * 5);
     expect(Array.from(encoded.slice(0, 5))).toEqual([74, 68, 82, 49, 1]);
     expect(decodeDoomReplay(encoded, ruleset)).toEqual({ version: 1, rulesetHash: ruleset, ticcmds: commands });
-    expect(doomReplayRoot(encoded)).toMatch(/^0x[0-9a-f]{64}$/);
+    expect(doomRunId(encoded)).toMatch(/^0x[0-9a-f]{64}$/);
   });
   it.each(["magic", "version", "ruleset", "trailing"]) ("rejects invalid %s data", (kind) => {
     let encoded = encodeDoomReplay({ version: 1, rulesetHash: ruleset, ticcmds: commands });
