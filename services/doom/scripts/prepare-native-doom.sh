@@ -14,7 +14,8 @@ test "$(git -C "$UPSTREAM" rev-parse HEAD)" = "$EXPECTED_POLKADOOM" || { echo "u
 test -z "$(git -C "$UPSTREAM" status --porcelain)" || { echo "pinned Polkadoom tree is dirty" >&2; exit 1; }
 test "$(python3 -c 'import hashlib,sys; print(hashlib.blake2b(open(sys.argv[1],"rb").read(),digest_size=32).hexdigest())' "$WAD")" = "$EXPECTED_WAD" || { echo "unexpected doom1.wad hash" >&2; exit 1; }
 
-rm -rf "$GENERATED"
+mkdir -p "$GENERATED"
+find "$GENERATED" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
 mkdir -p "$GENERATED/polkadoom"
 git -C "$UPSTREAM" archive "$EXPECTED_POLKADOOM" | tar -x -C "$GENERATED/polkadoom"
 while IFS= read -r patch; do
