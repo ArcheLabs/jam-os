@@ -2,7 +2,6 @@ export * from "./DoomRuntime";
 export * from "./MiniJamDoomRuntime";
 export * from "./MockDoomRuntime";
 export * from "./replay";
-export * from "./claim";
 export * from "./frame";
 export * from "./realtime";
 export * from "./realtime-local";
