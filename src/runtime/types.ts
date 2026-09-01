@@ -89,6 +89,8 @@ export interface NetworkRuntime {
 export interface WorkRequest {
   serviceId: string;
   payload: Uint8Array;
+  /** Unsigned Work extrinsics supplied as deterministic external data. */
+  extrinsics?: Uint8Array[];
 }
 
 export interface WorkHandle { id: string; submittedAt: number; }

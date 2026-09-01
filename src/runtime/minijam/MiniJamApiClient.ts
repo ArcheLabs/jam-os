@@ -4,7 +4,7 @@ import { MiniJamTransport, type Operation, type ServiceView } from "../../jam/tr
 
 export interface NetworkConfig { name?: string; networkName?: string; genesisHash?: string; finalizedBlock?: string; finalizedBlockNumber?: number; actionDomain?: string; }
 export interface PrepareActionRequest { account: AccountInfo; action: "create_service" | "work"; params: Record<string, unknown>; signer: AccountAdapter; }
-export interface SubmitWorkRequest { serviceId: string; payload: Uint8Array; account: AccountInfo; signer: AccountAdapter; }
+export interface SubmitWorkRequest { serviceId: string; payload: Uint8Array; extrinsics?: Uint8Array[]; account: AccountInfo; signer: AccountAdapter; }
 
 export class MiniJamApiError extends Error {
   constructor(public readonly code: string, message: string, public readonly status?: number, public readonly retryable = false) { super(message); this.name = "MiniJamApiError"; }
@@ -29,7 +29,7 @@ export class MiniJamApiClient {
   async getService(serviceId: string): Promise<ServiceView> { try { return await this.transport.getService(serviceId); } catch (error) { throw normalizeError(error); } }
   async getStorage(serviceId: string, key: string): Promise<Uint8Array | null> { try { return await this.transport.storage(serviceId, key); } catch (error) { throw normalizeError(error); } }
   async prepareAction(request: PrepareActionRequest) { try { return await this.transport.prepareAction(request.account, request.action, request.params, request.signer); } catch (error) { throw normalizeError(error); } }
-  async submitWork(request: SubmitWorkRequest): Promise<Operation> { try { return await this.transport.submitWorkOperation(request.serviceId, request.payload, request.account, request.signer); } catch (error) { throw normalizeError(error); } }
+  async submitWork(request: SubmitWorkRequest): Promise<Operation> { try { return await this.transport.submitWorkOperation(request.serviceId, request.payload, request.account, request.signer, request.extrinsics); } catch (error) { throw normalizeError(error); } }
   async getOperation(operationId: string): Promise<Operation> { try { return await this.transport.getOperation(operationId); } catch (error) { throw normalizeError(error); } }
   async createService(request: { input: DeployInput; account: AccountInfo; signer: AccountAdapter }): Promise<Operation> { try { const result = await this.transport.createService(request.input, request.account, request.signer); return { operationId: result.operationId || result.serviceId, status: "succeeded", kind: "create", result: { serviceId: Number(result.serviceId) } }; } catch (error) { throw normalizeError(error); } }
 }
