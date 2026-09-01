@@ -1,0 +1,59 @@
+# Deploy Toolchain Closure Report
+
+## Canonical inputs
+
+- jam-os branch: `preview/jam-os-desktop`
+- JamScript: `https://github.com/ArcheLabs/JamScript`
+- JamScript revision: `927a6307f04bf5098a0546c7032ad5e026278658`
+- MiniJAM client: `https://github.com/ArcheLabs/minijam-client`
+- MiniJAM client revision: `18de55e175abb1cb40679be2e538644e2387655f`
+- Node: `22.x` for Deploy Pages (`24.x` remains the CI toolchain)
+
+Both workflow checkouts now use the same lock files through the shared
+`.github/actions/bootstrap-toolchains` action. Local development can use
+`npm run toolchain:bootstrap`, while `--verify-only` checks an already prepared
+workspace without changing it.
+
+## Local validation
+
+The canonical layout and pin checks pass, followed by a clean-toolchain client
+build, the 24-file/76-test canonical suite, production build, and Stage-1 guard.
+The Deploy workflow installs dependencies only after both file dependencies are
+present, eliminating the previous JamScript client `ENOENT` failure.
+
+```text
+TOOLCHAIN_LAYOUT=PASS
+JAMSCRIPT_PIN=PASS
+MINIJAM_CLIENT_PIN=PASS
+TOOLCHAIN_CLIENT_BUILD=PASS
+TEST_BOUNDARY=PASS
+NPM_TEST=PASS (24 files / 76 tests)
+NPM_BUILD=PASS
+STAGE1_GUARD=PASS
+```
+
+## Hosted workflow status
+
+The next push will run both hosted gates. Their URLs/run IDs are intentionally
+recorded after GitHub reports them; no hosted result is claimed by this local
+closure report.
+
+```text
+CI_RUN=PENDING_HOSTED_RUN
+DEPLOY_RUN=PENDING_HOSTED_RUN
+CI_TOOLCHAIN_BOOTSTRAP=READY
+DEPLOY_TOOLCHAIN_BOOTSTRAP=READY
+```
+
+## DOOM deployment naming
+
+The Pages workflow still emits `doom-service.bin` for frontend compatibility,
+but it is now explicitly labeled:
+
+```text
+before: Canonical DOOM Service
+after:  Legacy DOOM Simulation Service
+artifactKind: legacy-doom-simulation
+```
+
+This task does not change the native DOOM frontier or claim a real verifier.

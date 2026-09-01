@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "smoke:live": "node scripts/smoke-live.mjs",
     "stage1:guard": "node scripts/stage1-guards.mjs",
+    "toolchain:bootstrap": "scripts/bootstrap-toolchains.sh",
     "jns:abi": "scripts/generate-jns-abi.sh",
     "jns:abi:check": "scripts/check-jns-abi.sh",
     "toolchain:client:build": "npm --prefix .toolchain/JamScript/packages/client run build"

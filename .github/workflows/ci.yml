@@ -18,24 +18,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - name: Read JamScript toolchain pin
-        id: jamscript-pin
-        shell: bash
-        run: |
-          revision="$(sed -n 's/^revision = "\([0-9a-f]*\)"$/\1/p' toolchains/jamscript.lock)"
-          test "${#revision}" -eq 40
-          echo "revision=${revision}" >> "${GITHUB_OUTPUT}"
-      - uses: actions/checkout@v4
-        with:
-          repository: ArcheLabs/JamScript
-          ref: ${{ steps.jamscript-pin.outputs.revision }}
-          path: .toolchain/JamScript
-      - name: Verify JamScript checkout pin
-        run: scripts/check-jamscript-pin.sh .toolchain/JamScript
-      - uses: actions/checkout@v4
-        with:
-          repository: ArcheLabs/minijam-client
-          path: .toolchain/minijam-client
+      - name: Bootstrap canonical toolchains
+        uses: ./.github/actions/bootstrap-toolchains
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-05-02
