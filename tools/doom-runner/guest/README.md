@@ -20,6 +20,6 @@ provided Ubuntu 24.04 / Clang 18 image:
 docker build -f tools/doom-runner/guest/Dockerfile.build -t jam-os-doom-m2-builder .
 ```
 
-The build writes `artifacts/doom/stage1/doom.polkavm`, `build.json`, and
+The build writes `artifacts/doom/legacy-rv32/doom.polkavm`, `build.json`, and
 `checksums.json` plus a deterministic `ruleset.json`. It uses the immutable M1 WAD and never overwrites the
 official artifact under `tools/doom-runner/upstream/roms`.

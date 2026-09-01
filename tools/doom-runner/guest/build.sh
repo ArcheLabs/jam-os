@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "$ROOT_DIR/../.." && pwd)"
 LOCK_FILE="$ROOT_DIR/upstream.lock"
 PATCH_FILE="$ROOT_DIR/guest/polkadoom-run-v1.patch"
 WAD_FILE="$ROOT_DIR/upstream/roms/doom1.wad"
-OUTPUT_DIR="$REPO_ROOT/artifacts/doom/stage1"
+OUTPUT_DIR="$REPO_ROOT/artifacts/doom/legacy-rv32"
 
 read_lock() { sed -n "s/^$1=//p" "$LOCK_FILE" | head -n1; }
 POLKAVM_REPOSITORY="$(read_lock POLKAVM_REPOSITORY)"

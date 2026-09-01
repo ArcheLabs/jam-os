@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ARTIFACT="$ROOT_DIR/../../artifacts/doom/stage1/doom.polkavm"
-METADATA="$ROOT_DIR/../../artifacts/doom/stage1/build.json"
-RULESET="$ROOT_DIR/../../artifacts/doom/stage1/ruleset.json"
+ARTIFACT="$ROOT_DIR/../../artifacts/doom/legacy-rv32/doom.polkavm"
+METADATA="$ROOT_DIR/../../artifacts/doom/legacy-rv32/build.json"
+RULESET="$ROOT_DIR/../../artifacts/doom/legacy-rv32/ruleset.json"
 UPSTREAM="$ROOT_DIR/upstream/roms/doom.polkavm"
 POLKATOOL_BIN="${POLKATOOL_BIN:-polkatool}"
 

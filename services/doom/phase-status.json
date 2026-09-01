@@ -1,0 +1,21 @@
+{
+  "format": "jam-doom-phase-status/v1",
+  "sourceProvenance": "PASS",
+  "preparePipeline": "PASS",
+  "wadHashGate": "PASS",
+  "canonicalToolchainPin": "PASS",
+  "githubCi": "PENDING",
+  "scriptcNativeFfi": "PASS",
+  "nativeWorkExtrinsic": "PASS",
+  "pinnedPolkadoomNativeLink": "PASS",
+  "fullDoomCompileReproducer": "PASS",
+  "fullDoomEngineLink": "BLOCKED",
+  "canonicalDoomReplay": "PENDING",
+  "localReplayDeterminism": "PENDING",
+  "doomRefineVerifier": "BLOCKED",
+  "rv32Rv64DoomParity": "PENDING",
+  "doomAccumulateLeaderboard": "PENDING",
+  "contentReplayStorage": "PENDING",
+  "replayRootRecovery": "PENDING",
+  "doomEndToEnd": "BLOCKED"
+}

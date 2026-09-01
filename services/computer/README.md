@@ -7,8 +7,8 @@ The JamScript state schema is split into `computer.profile/v1`, `computer.appear
 For local artifact validation from a checkout that also contains `minijam-client`:
 
 ```bash
-../JamScript/target/debug/jamscript check services/computer
-../JamScript/target/debug/jamscript build services/computer --output artifacts/computer/stage1/scriptc
+.toolchain/JamScript/target/debug/jamscript check services/computer
+.toolchain/JamScript/target/debug/jamscript build services/computer --output artifacts/computer/stage1/scriptc
 ```
 
 `src/service.c` is retained as a historical protocol fixture only; it is not the production Computer implementation. Keep generated blobs out of source control unless they are intentionally promoted as reviewed canonical artifacts.

@@ -10,5 +10,5 @@ RUN apt-get -o Acquire::Retries=5 update \
 
 WORKDIR /workspace
 COPY tools/doom-runner /workspace/tools/doom-runner
-COPY artifacts/doom/stage1 /workspace/artifacts/doom/stage1
+COPY artifacts/doom/legacy-rv32 /workspace/artifacts/doom/legacy-rv32
 RUN tools/doom-runner/guest/build.sh

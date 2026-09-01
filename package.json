@@ -13,7 +13,7 @@
     ,"stage1:guard": "node scripts/stage1-guards.mjs"
   },
   "dependencies": {
-    "@jamscript/minijam-client": "file:../JamScript/packages/client",
+    "@jamscript/minijam-client": "file:.toolchain/JamScript/packages/client",
     "@monaco-editor/react": "^4.7.0",
     "@polkadot/extension-dapp": "^0.62.6",
     "@polkadot/util": "^14.0.1",
