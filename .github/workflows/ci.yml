@@ -22,6 +22,10 @@ jobs:
           revision="$(sed -n 's/^revision = "\([0-9a-f]*\)"$/\1/p' toolchains/jamscript.lock)"
           test "${#revision}" -eq 40
           echo "revision=${revision}" >> "${GITHUB_OUTPUT}"
+      - name: Require private JamScript checkout token
+        env:
+          JAMSCRIPT_REPO_TOKEN: ${{ secrets.JAMSCRIPT_REPO_TOKEN }}
+        run: test -n "$JAMSCRIPT_REPO_TOKEN"
       - uses: actions/checkout@v4
         with:
           repository: ArcheLabs/JamScript
