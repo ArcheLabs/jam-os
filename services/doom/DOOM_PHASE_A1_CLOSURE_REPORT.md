@@ -4,7 +4,7 @@
 
 - JamScript canonical lock: `927a6307f04bf5098a0546c7032ad5e026278658`
 - JamScript checkout: `927a6307f04bf5098a0546c7032ad5e026278658`
-- jam-os: `abc031b` (local and remote)
+- jam-os: `773dc1d` (local and remote)
 - Jambda: `368584d452e4e5d0eef5a304b9f481bdc8ce2c50`
 
 ## Polkadoom inputs
