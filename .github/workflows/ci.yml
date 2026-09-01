@@ -22,9 +22,32 @@ jobs:
         run: scripts/check-action-manifest.sh
       - name: Bootstrap canonical toolchains
         uses: ./.github/actions/bootstrap-toolchains
+      - name: Install pinned ScriptC M2 dependencies
+        working-directory: .toolchain/JamScript/toolchains/scriptc
+        run: npm ci --no-audit --no-fund
+      - name: Ensure LLVM 20 is available
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -x /usr/lib/llvm-20/bin/clang || ! -x /usr/lib/llvm-20/bin/llvm-ar ]]; then
+            sudo apt-get update
+            sudo apt-get install -y clang-20 llvm-20 lld-20
+          fi
+          test -x /usr/lib/llvm-20/bin/clang
+          test -x /usr/lib/llvm-20/bin/llvm-ar
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-05-02
+          components: rust-src
+      - name: Prefetch build-std dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          rust_toolchain=nightly-2026-05-02
+          rust_sysroot="$(rustc +"$rust_toolchain" --print sysroot)"
+          rust_src="$rust_sysroot/lib/rustlib/src/rust"
+          test -f "$rust_src/library/sysroot/Cargo.toml"
+          cargo +"$rust_toolchain" fetch --manifest-path "$rust_src/library/sysroot/Cargo.toml" --locked
       - name: Verify canonical JNS ABI
         run: scripts/check-jns-abi.sh
       - name: Install application dependencies
@@ -39,7 +62,9 @@ jobs:
         env:
           # JamScript appends service-toolchain/{sdk,compiler} to this checkout root.
           JAMSCRIPT_MINIJAM_SDK: ${{ github.workspace }}/.toolchain/minijam-client
-        run: cargo run --quiet --locked --bin jamscript -- build "$GITHUB_WORKSPACE/services/doom" --output "$RUNNER_TEMP/jam-doom-native-link"
+        run: |
+          "$GITHUB_WORKSPACE/scripts/check-doom-native-prerequisites.sh"
+          cargo run --quiet --locked --bin jamscript -- build "$GITHUB_WORKSPACE/services/doom" --output "$RUNNER_TEMP/jam-doom-native-link"
       - name: Check full Doom compile frontier
         shell: bash
         run: |
