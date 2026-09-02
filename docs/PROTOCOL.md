@@ -30,4 +30,8 @@ not DNS and has no pricing, expiry, auction, or subdomain semantics.
 
 ## Playground
 
-The live adapter maps to the existing MiniJAM Playground API: `/build`, `/services`, and `/work`. Signing details and the current Service ABI stay behind adapters so apps never call raw endpoints.
+The live adapter uses the neutral MiniJAM node RPC, Formal Work RPC, and
+deployment ingress. The production Computer artifact is built by the pinned
+JamScript toolchain before release; the browser never calls a compiler or a
+Playground build endpoint. Signing details and the Service ABI stay behind
+typed adapters so apps never call raw endpoints.

@@ -1,0 +1,99 @@
+# JAM Computer Stage-1 Public Preview — Release Closure
+
+This report is deliberately fail-closed. It records repository evidence and
+does not claim hosted or production results that were not observed.
+
+## Release
+
+| field | value |
+| --- | --- |
+| Release | JAM Computer Stage-1 Public Preview |
+| Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
+| Final SHA | `PENDING_FINAL_COMMIT` |
+| Branch | `codex/jam-computer-stage1-release-closure` |
+| JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
+| MiniJAM client | `https://github.com/ArcheLabs/minijam-client` @ `18de55e175abb1cb40679be2e538644e2387655f` |
+| Node | `24.15.0` for canonical ScriptC builds |
+
+## Computer artifact
+
+The only canonical production source is
+`services/computer/src/service.ts`. The C file beside it is a historical
+protocol fixture and is not in the deployment path.
+
+| field | value |
+| --- | --- |
+| Service key | `0xb5de71cbd87b48abf62a4289172a5c1506c4638869a00f95e4f9b22ef279aba8` |
+| Service instance ID | `0xe26f31f5386ac558846da8bb32925a11e8d76c3386aaf784e572eb50053002a4` |
+| Management mode | `immutable` |
+| Promoted path | `artifacts/computer/stage1/scriptc/service.blob` |
+| Code hash | `0xcf86cc5320d0ea6ba090554c752ac87694716accbb87e2ba505efad5b0bfec44` |
+
+CI rebuilds the service twice and compares every generated file before
+promoting it. Pages performs no service compilation; it verifies and copies
+the promoted `service.blob`.
+
+## Gates
+
+```text
+LOCAL_CANONICAL_TOOLCHAINS=PASS
+CANONICAL_COMPUTER_SOURCE=PASS
+COMPUTER_ARTIFACT_REPRODUCIBILITY=PASS (local canonical rebuild)
+COMPUTER_ARTIFACT_PROMOTED=PASS (local canonical rebuild)
+NPM_TEST=PASS (24 files / 76 tests)
+NPM_BUILD=PASS
+STAGE1_GUARD=PASS
+RELEASE_GUARD=PASS
+MAIN_CI=PENDING_HOSTED_RUN
+PAGES_BUILD=PENDING_HOSTED_RUN
+PAGES_DEPLOY=PENDING_HOSTED_RUN
+```
+
+## Production and smoke
+
+The live endpoints and a dedicated canary signer were not available in this
+workspace. No service deployment, read smoke, mutation smoke, finalized-state
+verification, or browser smoke is claimed.
+
+```text
+PRODUCTION_ENV_CONFIGURATION=BLOCKED_EXTERNAL
+Required public variables:
+  MINIJAM_NODE_RPC_URL
+  MINIJAM_WORK_RPC_URL
+  MINIJAM_DEPLOYMENT_RPC_URL
+  MINIJAM_GENESIS_HASH
+
+COMPUTER_DEPLOYMENT=BLOCKED
+LIVE_READ_SMOKE=BLOCKED
+LIVE_MUTATION_SMOKE=BLOCKED
+BROWSER_SMOKE=BLOCKED
+PAGES_URL=NOT_OBSERVED
+CI_RUN=NOT_OBSERVED
+DEPLOY_RUN=NOT_OBSERVED
+```
+
+The mutation smoke is implemented in `scripts/smoke-live.mjs` and uses the
+formal JamScript Work client. It requires a dedicated authorized canary signer
+through `SMOKE_ACCOUNT_PUBLIC_KEY` and `SMOKE_SIGNER_COMMAND`; it never bypasses
+service ownership checks.
+
+## Doom
+
+```text
+DOOM_PRODUCT_STATUS=DEFERRED_UPSTREAM_COREVM
+DOOM_RELEASE_DEPENDENCY=REMOVED
+COREVM_DUPLICATE_IMPLEMENTATION=NOT_PLANNED
+```
+
+Research assets remain available under `services/doom` and
+`tools/doom-runner`. They run only from the manually dispatched `DOOM Research`
+workflow.
+
+## Release decision
+
+```text
+JAM_COMPUTER_RELEASE_READY=BLOCKED
+```
+
+The release remains blocked until hosted Pages deployment and real MiniJAM
+canary read, mutation, finality, and browser checks are recorded.

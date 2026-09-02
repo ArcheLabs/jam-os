@@ -22,8 +22,7 @@ env:
   VITE_MINIJAM_NODE_RPC_URL: ${{ vars.MINIJAM_NODE_RPC_URL }}
   VITE_MINIJAM_WORK_RPC_URL: ${{ vars.MINIJAM_WORK_RPC_URL }}
   VITE_MINIJAM_DEPLOYMENT_RPC_URL: ${{ vars.MINIJAM_DEPLOYMENT_RPC_URL }}
-  VITE_DOOM_SERVICE_ID: ${{ vars.MINIJAM_DOOM_SERVICE_ID }}
-  VITE_DOOM_GATEWAY_URL: ${{ vars.MINIJAM_DOOM_GATEWAY_URL }}
+  VITE_MINIJAM_GENESIS_HASH: ${{ vars.MINIJAM_GENESIS_HASH }}
   VITE_COMPUTER_SERVICE_ARTIFACT_URL: ./computer-service.bin
   VITE_COMPUTER_SERVICE_MIN_ITEM_GAS: "10000000"
   VITE_COMPUTER_SERVICE_MIN_MEMO_GAS: "1"
@@ -54,15 +53,17 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build canonical Computer Service artifact
+      - name: Verify promoted Computer Service artifact
         shell: bash
         run: |
           set -euo pipefail
+          npm run computer:artifact:verify
           mkdir -p public
-          .toolchain/minijam-client/scripts/compile-service c services/computer/src/service.c /tmp/computer-service O0
-          cp /tmp/computer-service/service.blob public/computer-service.bin
+          cp artifacts/computer/stage1/scriptc/service.blob public/computer-service.bin
           test -s public/computer-service.bin
-          code_hash="$(node -e "const fs=require('fs');const {blake2AsHex}=require('@polkadot/util-crypto');process.stdout.write(blake2AsHex(fs.readFileSync('public/computer-service.bin'),256))")"
+          expected_hash="$(node -e "const fs=require('fs');process.stdout.write(JSON.parse(fs.readFileSync('artifacts/computer/stage1/scriptc/build.json')).code_hash)")"
+          code_hash="$(node --input-type=module -e "import fs from 'node:fs';import {blake2AsHex} from '@polkadot/util-crypto';process.stdout.write(blake2AsHex(fs.readFileSync('public/computer-service.bin'),256))")"
+          test "${code_hash,,}" = "${expected_hash,,}"
           echo "VITE_COMPUTER_SERVICE_CODE_HASH=${code_hash}" >> "${GITHUB_ENV}"
 
           {
@@ -72,22 +73,8 @@ jobs:
             echo "Artifact: \`computer-service.bin\`"
           } >> "${GITHUB_STEP_SUMMARY}"
 
-      - name: Build legacy DOOM simulation artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          .toolchain/minijam-client/scripts/compile-service c services/doom/src/service.c /tmp/doom-service O0
-          cp /tmp/doom-service/service.blob public/doom-service.bin
-          test -s public/doom-service.bin
-          doom_code_hash="$(node -e "const fs=require('fs');const {blake2AsHex}=require('@polkadot/util-crypto');process.stdout.write(blake2AsHex(fs.readFileSync('public/doom-service.bin'),256))")"
-          {
-            echo "## Legacy DOOM Simulation Service"
-            echo
-            echo "Code hash: \`${doom_code_hash}\`"
-            echo "Artifact: \`doom-service.bin\`"
-            echo "Artifact kind: \`legacy-doom-simulation\`"
-            echo "Configured service ID: \`${VITE_DOOM_SERVICE_ID:-not configured}\`"
-          } >> "${GITHUB_STEP_SUMMARY}"
+      - name: Validate production environment
+        run: npm run production:env:check
 
       - name: Build
         run: npm run build
@@ -98,8 +85,11 @@ jobs:
           set -euo pipefail
           test -f dist/index.html
           test -s dist/computer-service.bin
-          test -s dist/doom-service.bin
           grep -R --fixed-strings "${VITE_COMPUTER_SERVICE_CODE_HASH}" dist >/dev/null
+          if find dist -iname '*doom*' -type f -print -quit | grep -q .; then
+            echo "Doom executable artifact is present in the production Pages bundle" >&2
+            exit 1
+          fi
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

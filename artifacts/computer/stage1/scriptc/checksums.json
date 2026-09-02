@@ -6,17 +6,18 @@
     "generated_builder_application.rs": "0x47d218f20389646e26aa73e508dcd6c8f76a9b705f381c43fa028e1181db61dd",
     "generated_service.rs": "0x3eb087a396090e1372c906339d25463c23b031d9ebd528c00f529330c4e06741",
     "protocol-v0.json": "0x2729d9bc6c02a607cb9b0d1a19dc7ecddc9210bfacf1541d27e8789b94ad48a6",
+    "scriptc/scriptc_native_ffi.json": "0x3bab89d35fcf7c18d1752f857473d71a20f7c4833890d0cb06abb329632db713",
     "scriptc/scriptc_runtime.ts": "0x649adc8124c6543dd79bd27968ed0abf534845e282bc2869948870bc6ff37c37",
-    "scriptc/scriptc_service.json": "0xc30f6802c99e41d1675c9ce8f69c6f56bfc30fb30b3abb575b1019a5c9dd5437",
-    "scriptc/scriptc_service.lib.c": "0xf1bf104aa0d251d9c87b3fd09c8f0853a5e53e6f3559e00b8beba55fa6fd03f2",
-    "scriptc/scriptc_service.profile.json": "0xef154e70b1b4ee40bce2b0cfac13964ceb42de4207dbb35ed017d459a91e4b50",
-    "scriptc/scriptc_service.transformed.ts": "0x4ec009de97baccfc83aea9535130bf0a402371a248f73d6f39df893e64a2f92a",
+    "scriptc/scriptc_service.json": "0x3b18b6b53df26be1aabdd9b474ecad2c8476a51b8b84caf71e41bc8116d9b73d",
+    "scriptc/scriptc_service.lib.c": "0xb3e21fb528f28b248d8e9a259efabe0ebc0fac042d69ee77b35f614fcb972d8d",
+    "scriptc/scriptc_service.profile.json": "0x949dbf4714ca75152aee3d55d1f2fc9017a68245f7b80bf28401813825ae20e2",
+    "scriptc/scriptc_service.transformed.ts": "0x42c635958d1af911891c2385ff55a082bc1b752e067e9490d860759d34c7a625",
     "scriptc/scriptc_service.ts": "0x2efb8879e1a145c39c8c28dbe3d598b1f0e5c782b18ef16c5caccd9160ceca16",
-    "scriptc/scriptc_service_adapter.c": "0x887ff65acac30b76b496bb19fba6e3aad15edcddb120ed881df4f11e68133d83",
+    "scriptc/scriptc_service_adapter.c": "0x8e72a18bfa784a1d8687d2aa730dbb2e582bad0a39e6050471c4f88a9cf866e1",
     "service.abi.json": "0xffa85759e25f30914277ae84d8860f42726588462cdb42786a516ef657fd5f6a",
-    "service.blob": "0x09d6afa902b7f7efe9fb8099f4cd93013815eb22d941a6e58652108fe9301672",
-    "service.elf": "0x419f8baf6b0afcfd0a148e7f615d7a506f46cdaa53c9ad0cf1b99bc248bd547c",
-    "service.polkavm": "0xacbe5b8775af7b56ca06714af12cd3c00593931473dbee3e2c712c0ab7c5e0f1",
-    "service.pvm": "0xacbe5b8775af7b56ca06714af12cd3c00593931473dbee3e2c712c0ab7c5e0f1"
+    "service.blob": "0xcf86cc5320d0ea6ba090554c752ac87694716accbb87e2ba505efad5b0bfec44",
+    "service.elf": "0xd8e4af27548fbb96d17ab3ba23d9780c8e275e393fe04a52b9ff1a3fb66c547a",
+    "service.polkavm": "0x10fc2f80428dc11fbfbd5e23505e3e6cc46508eda418fbc95fd750ea4b0887f3",
+    "service.pvm": "0x10fc2f80428dc11fbfbd5e23505e3e6cc46508eda418fbc95fd750ea4b0887f3"
   }
 }

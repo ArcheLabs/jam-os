@@ -1,0 +1,55 @@
+name: DOOM Research
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+      - name: Bootstrap canonical toolchains
+        uses: ./.github/actions/bootstrap-toolchains
+      - name: Install pinned ScriptC M2 dependencies
+        working-directory: .toolchain/JamScript/toolchains/scriptc
+        run: npm ci --no-audit --no-fund
+      - name: Ensure LLVM 20 is available
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -x /usr/lib/llvm-20/bin/clang || ! -x /usr/lib/llvm-20/bin/llvm-ar ]]; then
+            sudo apt-get update
+            sudo apt-get install -y clang-20 llvm-20 lld-20
+          fi
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-02
+          components: rust-src
+      - name: Prepare pinned Doom inputs
+        run: services/doom/scripts/prepare-native-doom.sh
+      - name: Build minimal Polkadoom native link
+        working-directory: .toolchain/JamScript
+        env:
+          JAMSCRIPT_MINIJAM_SDK: ${{ github.workspace }}/.toolchain/minijam-client
+        run: |
+          "$GITHUB_WORKSPACE/scripts/check-doom-native-prerequisites.sh"
+          cargo run --quiet --locked --bin jamscript -- build "$GITHUB_WORKSPACE/services/doom" --output "$RUNNER_TEMP/jam-doom-native-link"
+      - name: Check full Doom compile frontier
+        shell: bash
+        run: |
+          set +e
+          services/doom/scripts/build-native-doom-full.sh >"$RUNNER_TEMP/doom-full.log" 2>&1
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/doom-full.log"
+          test "$status" -ne 0
+          grep -F 'd_iwad.c' "$RUNNER_TEMP/doom-full.log"
+          grep -F 'call to undeclared function '\''strdup'\''' "$RUNNER_TEMP/doom-full.log"

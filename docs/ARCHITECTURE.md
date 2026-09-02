@@ -32,4 +32,10 @@ fail-closed unless the canonical JNS deployment identity and RPC endpoint are
 configured. Provider infrastructure is runtime configuration, not part of the
 JNS Service identity.
 
-The six V0 apps are registered in `src/App.tsx`. The Browser owns one shared history and routes `jam://`, `file://`, `http://`, `https://`, and `about:` through handlers. JAM/file HTML is sanitized and rendered in a sandboxed iframe; page-authored JavaScript is removed and only the small Browser-owned JAM link bridge is injected.
+Stage-1 registers only the supported Computer, Files, Browser, Terminal,
+Playground, Settings, Help, and Trash applications. DOOM research code is
+kept out of the production registry pending the official JAM CoreVM. The
+Browser owns one shared history and routes `jam://`, `file://`, `http://`,
+`https://`, and `about:` through handlers. JAM/file HTML is sanitized and
+rendered in a sandboxed iframe; page-authored JavaScript is removed and only
+the small Browser-owned JAM link bridge is injected.

@@ -1,0 +1,19 @@
+{
+  "format": "jam-computer-release-status/v1",
+  "release": "stage1-public-preview",
+  "scopeFrozen": "PASS",
+  "doomDeferred": "PASS",
+  "canonicalToolchains": "PASS",
+  "canonicalComputerSource": "PASS",
+  "computerArtifactReproducibility": "PASS",
+  "computerArtifactPromoted": "PASS",
+  "mainCi": "PENDING",
+  "pagesBuild": "PENDING",
+  "pagesDeploy": "PENDING",
+  "productionEnvironment": "BLOCKED_EXTERNAL",
+  "computerDeployment": "BLOCKED",
+  "liveReadSmoke": "BLOCKED",
+  "liveMutationSmoke": "BLOCKED",
+  "browserSmoke": "BLOCKED",
+  "releaseReady": "BLOCKED"
+}
