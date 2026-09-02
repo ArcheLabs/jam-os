@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 24.15.0
@@ -25,16 +23,8 @@ jobs:
       - name: Install pinned ScriptC M2 dependencies
         working-directory: .toolchain/JamScript/toolchains/scriptc
         run: npm ci --no-audit --no-fund
-      - name: Ensure LLVM 20 is available
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ ! -x /usr/lib/llvm-20/bin/clang || ! -x /usr/lib/llvm-20/bin/llvm-ar ]]; then
-            sudo apt-get update
-            sudo apt-get install -y clang-20 llvm-20 lld-20
-          fi
-          test -x /usr/lib/llvm-20/bin/clang
-          test -x /usr/lib/llvm-20/bin/llvm-ar
+      - name: Install exact LLVM toolchain
+        run: scripts/bootstrap-llvm.sh
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-05-02

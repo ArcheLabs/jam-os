@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "24.15.0"
   VITE_JAM_MODE: live
   VITE_MINIJAM_NETWORK_NAME: MiniJAM
   VITE_MINIJAM_NODE_RPC_URL: ${{ vars.MINIJAM_NODE_RPC_URL }}

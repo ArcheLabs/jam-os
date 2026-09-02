@@ -47,30 +47,47 @@ function decodeServiceInfo(encoded) {
 
 async function probe(endpoint, label) {
   requireValue(endpoint, `VITE_MINIJAM_${label.toUpperCase()}_RPC_URL`);
-  try { await rpc(endpoint, "chain_getHeader", []); return "PASS"; }
-  catch (error) { fail(`${label.toUpperCase()}_RPC_UNAVAILABLE`, `${label} RPC is unavailable`, { detail: error.message }); }
+  try {
+    const response = await fetch(`${endpoint}/health/ready`, { headers: { accept: "application/json" } });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return { endpoint: `${endpoint}/health/ready`, result: "PASS" };
+  } catch (error) {
+    fail(`${label.toUpperCase()}_RPC_UNAVAILABLE`, `${label} health endpoint is unavailable`, { detail: error instanceof Error ? error.message : String(error) });
+  }
+}
+
+async function probeNode() {
+  requireValue(nodeUrl, "VITE_MINIJAM_NODE_RPC_URL");
+  try {
+    const context = await rpc(nodeUrl, "minijam_getFinalizedContext");
+    if (!context?.blockHash || !context?.stateRoot) throw new Error("finalized context is incomplete");
+    return context;
+  } catch (error) {
+    fail("NODE_RPC_UNAVAILABLE", "Node RPC did not return a finalized context", { detail: error.message });
+  }
 }
 
 async function readSmoke() {
   requireValue(serviceId, "VITE_SMOKE_COMPUTER_SERVICE_ID");
   requireValue(nodeUrl, "VITE_MINIJAM_NODE_RPC_URL");
   requireValue(expectedCodeHash, "VITE_COMPUTER_SERVICE_CODE_HASH");
-  const [node, work, deployment] = await Promise.all([probe(nodeUrl, "node"), probe(workUrl, "work"), probe(deploymentUrl, "deployment")]);
-  const context = await rpc(nodeUrl, "minijam_getFinalizedContext").catch((error) => fail("NODE_RPC_UNAVAILABLE", "Node RPC did not return a finalized context", { detail: error.message }));
+  const [context, work, deployment] = await Promise.all([probeNode(), probe(workUrl, "work"), probe(deploymentUrl, "deployment")]);
   const encoded = await rpc(nodeUrl, "minijam_getServiceInfoAt", [context.blockHash, Number(serviceId)]).catch((error) => fail("SERVICE_READ_FAILED", "Computer Service could not be read at finalized state", { detail: error.message }));
   if (!encoded) fail("SERVICE_NOT_FOUND", `Computer Service ${serviceId} does not exist at finalized state`);
   const service = decodeServiceInfo(encoded);
   if (service.codeHash.toLowerCase() !== expectedCodeHash.toLowerCase()) fail("STATE_MISMATCH", "Finalized Computer Service code hash does not match the promoted artifact", { expectedCodeHash, actualCodeHash: service.codeHash });
-  console.log(JSON.stringify({ smoke: "read", result: "PASS", network: process.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM", nodeRpc: node, workRpc: work, deploymentRpc: deployment, serviceId, codeHash: service.codeHash, codeLength: service.codeLength, finalizedBlock: context.blockHash }, null, 2));
+  console.log(JSON.stringify({ smoke: "read", result: "PASS", network: process.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM", nodeRpc: { result: "PASS", method: "minijam_getFinalizedContext" }, workRpc: work, deploymentRpc: deployment, serviceId, codeHash: service.codeHash, codeLength: service.codeLength, finalizedBlock: context.blockHash }, null, 2));
 }
 
 async function mutationSmoke() {
   requireValue(serviceId, "VITE_SMOKE_COMPUTER_SERVICE_ID");
+  requireValue(nodeUrl, "VITE_MINIJAM_NODE_RPC_URL");
+  const [nodeContext, workHealth, deploymentHealth] = await Promise.all([probeNode(), probe(workUrl, "work"), probe(deploymentUrl, "deployment")]);
   requireValue(expectedCodeHash, "VITE_COMPUTER_SERVICE_CODE_HASH");
   requireValue(process.env.VITE_MINIJAM_GENESIS_HASH, "VITE_MINIJAM_GENESIS_HASH");
   const publicKey = requireValue(process.env.SMOKE_ACCOUNT_PUBLIC_KEY, "SMOKE_ACCOUNT_PUBLIC_KEY");
   const signerCommand = requireValue(process.env.SMOKE_SIGNER_COMMAND, "SMOKE_SIGNER_COMMAND");
-  const { JamScriptClient, FetchRpcTransport, parseHex, toHex } = await import("@jamscript/minijam-client");
+  const { JamScriptClient, FetchRpcTransport, SplitRpcTransport, parseHex, toHex } = await import("@jamscript/minijam-client");
   const { blake2AsU8a } = await import("@polkadot/util-crypto");
   const abi = JSON.parse(fs.readFileSync(path.join(root, "services/computer/abi/service.abi.json"), "utf8"));
   const build = JSON.parse(fs.readFileSync(path.join(root, "artifacts/computer/stage1/scriptc/build.json"), "utf8"));
@@ -83,7 +100,10 @@ async function mutationSmoke() {
       return parseHex(result.stdout.trim(), 64);
     },
   };
-  const client = new JamScriptClient(deployment, new FetchRpcTransport(nodeUrl));
+  const nodeTransport = new FetchRpcTransport(nodeUrl);
+  const workTransport = new FetchRpcTransport(workUrl);
+  const transport = new SplitRpcTransport(nodeTransport, workTransport, nodeTransport);
+  const client = new JamScriptClient(deployment, transport);
   const encode = (value) => new TextEncoder().encode(value);
   const key = new Uint8Array([0]);
   const smokeDir = "/home/user/.release-smoke";
@@ -119,7 +139,7 @@ async function mutationSmoke() {
   await submit("removeNode", { key, path: encode(smokeDir), updatedAt: now + 2, parentEntries: encode(rootEntries) });
   const removed = (await client.queryLatest("getNodeMetadata", encode(smokePath))).value;
   if (!removed || !removed.removed) fail("STATE_NOT_FINALIZED", "Finalized cleanup state was not readable", { path: smokePath });
-  console.log(JSON.stringify({ smoke: "mutation", result: "PASS", serviceId, path: smokePath, content, operations: results, finalVerification: "PASS" }, null, 2));
+  console.log(JSON.stringify({ smoke: "mutation", result: "PASS", serviceId, path: smokePath, content, rpc: { node: nodeContext.blockHash, work: workHealth, deployment: deploymentHealth }, operations: results, finalVerification: "PASS" }, null, 2));
 }
 
 if (mode === "read") await readSmoke().catch((error) => fail("READ_FAILED", error.message));
