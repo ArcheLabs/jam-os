@@ -25,9 +25,14 @@ try {
     if (!lock[key]) throw new Error(`builder.lock is missing ${key}`);
   }
   if (lock.architecture !== "amd64") throw new Error("canonical builder architecture must be amd64");
+  if (lock.node_version !== "24.15.0") throw new Error("canonical builder Node version must be 24.15.0");
+  if (lock.rust_toolchain !== "nightly-2026-05-02") throw new Error("canonical builder Rust toolchain must be nightly-2026-05-02");
   if (!/^sha256:[0-9a-f]{64}$/.test(lock.base_image_digest)) throw new Error("base_image_digest must be an exact SHA256 digest");
   if (!/^sha256:[0-9a-f]{64}$/.test(lock.digest)) throw new Error("builder image digest is not published and pinned");
   const dockerfile = path.join(root, lock.dockerfile);
+  const dockerfileSource = fs.readFileSync(dockerfile, "utf8");
+  if (!dockerfileSource.includes(`FROM ${lock.base_image}@${lock.base_image_digest}`)) throw new Error("builder Dockerfile base does not match builder.lock");
+  if (!fs.existsSync(path.join(root, lock.llvm_lock))) throw new Error(`LLVM lock is missing: ${lock.llvm_lock}`);
   if (sha256(dockerfile) !== lock.dockerfile_sha256) throw new Error("builder Dockerfile checksum does not match builder.lock");
   console.log("CANONICAL_BUILDER_LOCK=PASS");
   console.log("CANONICAL_BUILDER_DIGEST=PASS");
