@@ -9,7 +9,7 @@ does not claim hosted or production results that were not observed.
 | --- | --- |
 | Release | JAM Computer Stage-1 Public Preview |
 | Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
-| Final SHA | `PENDING_FINAL_COMMIT` |
+| Final SHA | `54605ccba221526924010fdc9fbde5ccebb82c5b` (closure implementation commit) |
 | Branch | `codex/jam-computer-stage1-release-closure` |
 | JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
 | MiniJAM client | `https://github.com/ArcheLabs/minijam-client` @ `18de55e175abb1cb40679be2e538644e2387655f` |
