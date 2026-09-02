@@ -4,6 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCK_FILE="$ROOT_DIR/toolchains/llvm.lock"
 
+on_exit() {
+  local status=$?
+  if [[ "$status" -ne 0 ]]; then echo "LLVM_BOOTSTRAP=FAIL" >&2; fi
+}
+trap on_exit EXIT
+
 as_root() {
   if [[ "$(id -u)" == "0" ]]; then
     "$@"
@@ -54,6 +60,7 @@ check_exact_candidate() {
 
 if node "$ROOT_DIR/scripts/check-llvm-lock.mjs"; then
   check_exact_candidate "$libllvm20_package"
+  echo "LLVM_BOOTSTRAP=PASS"
   echo "LLVM_TOOLCHAIN=PASS"
   exit 0
 fi
@@ -116,4 +123,5 @@ check_package_hash "$llvm_dev20_package" "$llvm_dev20_package_sha256"
 check_package_hash "$libclang1_20_package" "$libclang1_20_package_sha256"
 
 node "$ROOT_DIR/scripts/check-llvm-lock.mjs"
+echo "LLVM_BOOTSTRAP=PASS"
 echo "LLVM_TOOLCHAIN=PASS"
