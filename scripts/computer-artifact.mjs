@@ -27,7 +27,15 @@ function readCompilerLock() {
     const match = line.match(/^([a-z_][a-z0-9_]*) = "([^"]+)"$/);
     if (match) values[match[1]] = match[2];
   }
-  for (const key of ["clang_path", "llvm_ar_path", "lld_path", "clang_version", "clang_sha256", "llvm_ar_sha256", "lld_sha256", "target"]) {
+  for (const key of [
+    "package_version", "clang_package", "llvm_package", "lld_package",
+    "libllvm20_package", "libclang_cpp20_package", "libclang_common20_package",
+    "llvm_runtime20_package", "llvm_linker_tools20_package", "llvm_dev20_package",
+    "libclang1_20_package", "clang_path", "llvm_ar_path", "lld_path",
+    "clang_version", "clang_sha256", "llvm_ar_sha256", "lld_sha256",
+    "llvm_shared_library_path", "llvm_shared_library_sha256",
+    "clang_shared_library_path", "clang_shared_library_sha256", "target",
+  ]) {
     if (!values[key]) throw new Error(`llvm.lock is missing ${key}`);
   }
   return values;
@@ -99,10 +107,12 @@ function assertCanonicalCheckouts() {
 
 function assertCanonicalCompiler() {
   const compiler = readCompilerLock();
+  const lockCheck = spawnSync(process.execPath, [path.join(root, "scripts/check-llvm-lock.mjs")], { encoding: "utf8" });
+  if (lockCheck.status !== 0) throw new Error(lockCheck.stderr.trim() || "LLVM lock verification failed");
   const binaries = [
-    ["clang", process.env.JAMSCRIPT_CLANG || compiler.clang_path, compiler.clang_path, compiler.clang_sha256],
-    ["llvm-ar", process.env.JAMSCRIPT_LLVM_AR || compiler.llvm_ar_path, compiler.llvm_ar_path, compiler.llvm_ar_sha256],
-    ["ld.lld", process.env.JAMSCRIPT_LLVM_LD || compiler.lld_path, compiler.lld_path, compiler.lld_sha256],
+    ["clang", compiler.clang_path, compiler.clang_path, compiler.clang_sha256],
+    ["llvm-ar", compiler.llvm_ar_path, compiler.llvm_ar_path, compiler.llvm_ar_sha256],
+    ["ld.lld", compiler.lld_path, compiler.lld_path, compiler.lld_sha256],
   ];
   for (const [name, file, canonicalPath, expected] of binaries) {
     if (!fs.existsSync(file) || !fs.statSync(file).isFile()) throw new Error(`Canonical ${name} is missing at ${file}; run scripts/bootstrap-llvm.sh`);
@@ -110,7 +120,7 @@ function assertCanonicalCompiler() {
     if (actual !== expected) throw new Error(`Canonical ${name} at ${file} has checksum ${actual}; expected ${expected} from llvm.lock`);
     if (file !== canonicalPath && name === "clang") console.warn(`Using verified ${name} from ${file}; canonical path is ${canonicalPath}`);
   }
-  const version = spawnSync(process.env.JAMSCRIPT_CLANG || compiler.clang_path, ["--version"], { encoding: "utf8" });
+  const version = spawnSync(compiler.clang_path, ["--version"], { encoding: "utf8" });
   if (version.status !== 0 || version.stdout.split(/\r?\n/, 1)[0] !== compiler.clang_version) {
     throw new Error(`Canonical clang version does not match llvm.lock ${compiler.clang_version}`);
   }
@@ -164,9 +174,9 @@ function build(output) {
     stdio: "inherit",
     env: {
       ...process.env,
-      JAMSCRIPT_CLANG: process.env.JAMSCRIPT_CLANG || compiler.clang_path,
-      JAMSCRIPT_LLVM_AR: process.env.JAMSCRIPT_LLVM_AR || compiler.llvm_ar_path,
-      JAMSCRIPT_LLVM_LD: process.env.JAMSCRIPT_LLVM_LD || compiler.lld_path,
+      JAMSCRIPT_CLANG: compiler.clang_path,
+      JAMSCRIPT_LLVM_AR: compiler.llvm_ar_path,
+      JAMSCRIPT_LLVM_LD: compiler.lld_path,
       SCRIPTC_NODE: process.execPath,
       JAMSCRIPT_MINIJAM_SDK: path.join(root, ".toolchain/minijam-client"),
     },

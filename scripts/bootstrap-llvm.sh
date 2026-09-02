@@ -27,8 +27,33 @@ lld_package="$(read_lock lld_package)"
 clang_package_sha256="$(read_lock clang_package_sha256)"
 llvm_package_sha256="$(read_lock llvm_package_sha256)"
 lld_package_sha256="$(read_lock lld_package_sha256)"
+libllvm20_package="$(read_lock libllvm20_package)"
+libllvm20_package_sha256="$(read_lock libllvm20_package_sha256)"
+libclang_cpp20_package="$(read_lock libclang_cpp20_package)"
+libclang_cpp20_package_sha256="$(read_lock libclang_cpp20_package_sha256)"
+libclang_common20_package="$(read_lock libclang_common20_package)"
+libclang_common20_package_sha256="$(read_lock libclang_common20_package_sha256)"
+llvm_runtime20_package="$(read_lock llvm_runtime20_package)"
+llvm_runtime20_package_sha256="$(read_lock llvm_runtime20_package_sha256)"
+llvm_linker_tools20_package="$(read_lock llvm_linker_tools20_package)"
+llvm_linker_tools20_package_sha256="$(read_lock llvm_linker_tools20_package_sha256)"
+llvm_dev20_package="$(read_lock llvm_dev20_package)"
+llvm_dev20_package_sha256="$(read_lock llvm_dev20_package_sha256)"
+libclang1_20_package="$(read_lock libclang1_20_package)"
+libclang1_20_package_sha256="$(read_lock libclang1_20_package_sha256)"
+
+check_exact_candidate() {
+  local package="$1" candidate
+  candidate="$(apt-cache policy "$package" | sed -n 's/^  Candidate: //p')"
+  printf 'apt-cache policy %s: candidate=%s\n' "$package" "${candidate:-missing}"
+  [[ "$candidate" == "$package_version" ]] || {
+    echo "$package exact candidate ${package_version} is unavailable; refusing fallback" >&2
+    exit 1
+  }
+}
 
 if node "$ROOT_DIR/scripts/check-llvm-lock.mjs"; then
+  check_exact_candidate "$libllvm20_package"
   echo "LLVM_TOOLCHAIN=PASS"
   exit 0
 fi
@@ -46,12 +71,23 @@ grep -Rqs "${suite}" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null |
 }
 
 as_root apt-get update
+check_exact_candidate "$libllvm20_package"
 as_root apt-get install -y --no-install-recommends \
+  "${libllvm20_package}=${package_version}" \
+  "${libclang_cpp20_package}=${package_version}" \
+  "${libclang_common20_package}=${package_version}" \
+  "${llvm_runtime20_package}=${package_version}" \
+  "${llvm_linker_tools20_package}=${package_version}" \
+  "${llvm_dev20_package}=${package_version}" \
+  "${libclang1_20_package}=${package_version}" \
   "${clang_package}=${package_version}" \
   "${llvm_package}=${package_version}" \
   "${lld_package}=${package_version}"
 
-for package in "$clang_package" "$llvm_package" "$lld_package"; do
+for package in \
+  "$libllvm20_package" "$libclang_cpp20_package" "$libclang_common20_package" \
+  "$llvm_runtime20_package" "$llvm_linker_tools20_package" "$llvm_dev20_package" \
+  "$libclang1_20_package" "$clang_package" "$llvm_package" "$lld_package"; do
   installed="$(dpkg-query -W -f='${Version}' "$package")"
   [[ "$installed" == "$package_version" ]] || {
     echo "$package is ${installed}; expected ${package_version}" >&2
@@ -71,6 +107,13 @@ check_package_hash() {
 check_package_hash "$clang_package" "$clang_package_sha256"
 check_package_hash "$llvm_package" "$llvm_package_sha256"
 check_package_hash "$lld_package" "$lld_package_sha256"
+check_package_hash "$libllvm20_package" "$libllvm20_package_sha256"
+check_package_hash "$libclang_cpp20_package" "$libclang_cpp20_package_sha256"
+check_package_hash "$libclang_common20_package" "$libclang_common20_package_sha256"
+check_package_hash "$llvm_runtime20_package" "$llvm_runtime20_package_sha256"
+check_package_hash "$llvm_linker_tools20_package" "$llvm_linker_tools20_package_sha256"
+check_package_hash "$llvm_dev20_package" "$llvm_dev20_package_sha256"
+check_package_hash "$libclang1_20_package" "$libclang1_20_package_sha256"
 
 node "$ROOT_DIR/scripts/check-llvm-lock.mjs"
 echo "LLVM_TOOLCHAIN=PASS"
