@@ -7,7 +7,7 @@
   "canonicalNativeCompiler": "PASS",
   "canonicalBuilder": "BLOCKED_EXTERNAL",
   "canonicalBuilderDigest": "PENDING_PUBLISH",
-  "canonicalBuilderEnv": "BLOCKED_EXTERNAL",
+  "canonicalBuilderEnv": "PASS",
   "canonicalComputerSource": "PASS",
   "computerArtifactReproducibility": "PASS",
   "computerArtifactPromoted": "PASS",

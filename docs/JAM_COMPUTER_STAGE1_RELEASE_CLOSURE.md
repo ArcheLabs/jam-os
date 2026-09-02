@@ -9,8 +9,8 @@ does not claim hosted or production results that were not observed.
 | --- | --- |
 | Release | JAM Computer Stage-1 Public Preview |
 | Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
-| Closure implementation SHA | `d67711dddbbdc437d33429dab3547220ba56e88c` |
-| Release candidate SHA | `d67711dddbbdc437d33429dab3547220ba56e88c` (current candidate before this report-only commit) |
+| Closure implementation SHA | `558e577f29e7bf8b226b5912169193b961b0dc01` |
+| Release candidate SHA | `558e577f29e7bf8b226b5912169193b961b0dc01` (current candidate before this report-only commit) |
 | Merge SHA | `PENDING` |
 | Branch | `codex/jam-computer-stage1-release-closure` |
 | JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
@@ -41,16 +41,18 @@ The host apt reconstruction model is retired. The repository now defines a
 Linux/amd64 builder in `toolchains/builder/Dockerfile`, pins the Ubuntu base
 digest in `toolchains/builder.lock`, and requires the published GHCR image to
 be consumed by immutable digest through `scripts/run-canonical-builder.sh`.
-The GHCR image has not been published from this workspace because Docker and
-registry publication were unavailable; the lock therefore remains
-fail-closed with `digest = "PENDING_PUBLISH"`.
+Local Docker is now available and a local image containing the exact Node,
+Rust, and LLVM closure passed the canonical builder environment check. The
+GHCR image has not been published from this workspace because no registry
+credentials are available; the lock therefore remains fail-closed with
+`digest = "PENDING_PUBLISH"`.
 
 | builder field | value |
 | --- | --- |
 | Image | `ghcr.io/archelabs/jam-computer-builder` |
 | Builder digest | `PENDING_PUBLISH` |
 | Base image | `ubuntu:20.04@sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a` |
-| Dockerfile SHA256 | `dcc01e7442ecf5671430cd9cead4618d7ad01ca0dcd8b56ed70f5442d033d99f` |
+| Dockerfile SHA256 | `65567a61d922562c8e469bae5b396ddf29f8c569ec948a163954a56407e951c5` |
 
 ## Gates
 
@@ -62,8 +64,8 @@ LLVM_HOST_APT_MODEL=RETIRED
 LLVM_INTERNAL_IDENTITY=PASS (local locked binaries and shared libraries)
 CANONICAL_BUILDER_IMAGE=BLOCKED_EXTERNAL
 CANONICAL_BUILDER_DIGEST=BLOCKED_EXTERNAL
-CANONICAL_BUILDER_ENV=BLOCKED_EXTERNAL
-LOCAL_CONTAINER_BUILD=BLOCKED_DOCKER_RUNTIME
+CANONICAL_BUILDER_ENV=PASS (local Docker image validation; published digest still pending)
+LOCAL_CONTAINER_BUILD=BLOCKED_BUILDER_DIGEST (Docker runtime available; published digest still pending)
 CANONICAL_COMPUTER_SOURCE=PASS
 COMPUTER_ARTIFACT_REPRODUCIBILITY=PASS (local canonical rebuild)
 COMPUTER_ARTIFACT_PROMOTED=PASS (local canonical rebuild)
