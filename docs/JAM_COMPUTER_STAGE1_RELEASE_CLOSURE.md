@@ -9,7 +9,9 @@ does not claim hosted or production results that were not observed.
 | --- | --- |
 | Release | JAM Computer Stage-1 Public Preview |
 | Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
-| Final SHA | `697572e1211a215623fb9e1a83ad6c556b1eba0d` (closure implementation commit; this report records the final implementation SHA) |
+| Closure implementation SHA | `2b3808d80ba9f82224ab1a1af9572b16c48414ce` |
+| Release candidate SHA | `2b3808d80ba9f82224ab1a1af9572b16c48414ce` (current candidate before this report-only commit) |
+| Merge SHA | `PENDING` |
 | Branch | `codex/jam-computer-stage1-release-closure` |
 | JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
 | MiniJAM client | `https://github.com/ArcheLabs/minijam-client` @ `18de55e175abb1cb40679be2e538644e2387655f` |
@@ -37,6 +39,7 @@ the promoted `service.blob`.
 
 ```text
 LOCAL_CANONICAL_TOOLCHAINS=PASS
+EXACT_LLVM_TOOLCHAIN=PASS (Ubuntu clang 20.1.8; package and binary checksums locked)
 CANONICAL_COMPUTER_SOURCE=PASS
 COMPUTER_ARTIFACT_REPRODUCIBILITY=PASS (local canonical rebuild)
 COMPUTER_ARTIFACT_PROMOTED=PASS (local canonical rebuild)
@@ -48,6 +51,8 @@ MAIN_CI=PENDING_HOSTED_RUN
 PAGES_BUILD=PENDING_HOSTED_RUN
 PAGES_DEPLOY=PENDING_HOSTED_RUN
 CLEAN_ROOM_BOOTSTRAP=BLOCKED_EXTERNAL (GitHub clone timed out in this workspace)
+DOOM_MAIN_CI_DEPENDENCY=PASS (recursive checkout guard; hosted rerun pending)
+HOSTED_ARTIFACT_REPRODUCIBILITY=PENDING_REVALIDATION
 ```
 
 ## Production and smoke
@@ -74,7 +79,9 @@ DEPLOY_RUN=NOT_OBSERVED
 ```
 
 The mutation smoke is implemented in `scripts/smoke-live.mjs` and uses the
-formal JamScript Work client. It requires a dedicated authorized canary signer
+formal JamScript Work client with `SplitRpcTransport`: Node/state queries use
+the Node endpoint while `minijam_submitWorkV1` and
+`minijam_getWorkStatusV1` use the independent Work endpoint. It requires a dedicated authorized canary signer
 through `SMOKE_ACCOUNT_PUBLIC_KEY` and `SMOKE_SIGNER_COMMAND`; it never bypasses
 service ownership checks.
 
