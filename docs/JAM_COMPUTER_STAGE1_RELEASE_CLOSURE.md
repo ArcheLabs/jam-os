@@ -9,8 +9,8 @@ does not claim hosted or production results that were not observed.
 | --- | --- |
 | Release | JAM Computer Stage-1 Public Preview |
 | Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
-| Closure implementation SHA | `d60108113304b692ac6c40461b37e52628db8826` |
-| Release candidate SHA | `d60108113304b692ac6c40461b37e52628db8826` (current candidate before this report-only commit) |
+| Closure implementation SHA | `d67711dddbbdc437d33429dab3547220ba56e88c` |
+| Release candidate SHA | `d67711dddbbdc437d33429dab3547220ba56e88c` (current candidate before this report-only commit) |
 | Merge SHA | `PENDING` |
 | Branch | `codex/jam-computer-stage1-release-closure` |
 | JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
