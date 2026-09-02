@@ -10,8 +10,10 @@ try {
   if (process.env.JAM_CANONICAL_BUILDER !== "1" || process.env.JAM_CANONICAL_BUILDER_VERSION !== "1") throw new Error("canonical builder marker is missing");
   if (process.platform !== "linux" || process.arch !== "x64") throw new Error("canonical builder must be linux/amd64");
   if (process.version !== expectedNode) throw new Error(`Node ${process.version} does not match ${expectedNode}`);
+  const toolchains = execFileSync("rustup", ["toolchain", "list"], { encoding: "utf8" });
+  if (!toolchains.split("\n").some((line) => line.startsWith(`${expectedRust}-x86_64-unknown-linux-gnu`))) throw new Error(`Rust toolchain ${expectedRust} is not installed`);
   const rust = execFileSync("rustc", ["+" + expectedRust, "--version"], { encoding: "utf8" });
-  if (!rust.includes(expectedRust)) throw new Error(`Rust toolchain does not match ${expectedRust}`);
+  if (!rust.includes("nightly")) throw new Error(`Rust toolchain ${expectedRust} is not nightly`);
   const components = execFileSync("rustup", ["component", "list", "--toolchain", expectedRust], { encoding: "utf8" });
   if (!/^rust-src.*\(installed\)$/m.test(components)) throw new Error("rust-src is not installed in the canonical builder");
   execFileSync(process.execPath, [path.join(root, "scripts/check-llvm-lock.mjs")], { stdio: "inherit" });

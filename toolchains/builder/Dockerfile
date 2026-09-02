@@ -20,13 +20,17 @@ ENV TZ=UTC \
     RUST_TOOLCHAIN=nightly-2026-05-02 \
     PATH=/usr/local/node/bin:/root/.cargo/bin:$PATH
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl gnupg git build-essential pkg-config python3 xz-utils \
+RUN sed -i \
+      -e 's|http://archive.ubuntu.com/ubuntu|http://mirrors.kernel.org/ubuntu|g' \
+      -e 's|http://security.ubuntu.com/ubuntu|http://mirrors.kernel.org/ubuntu|g' \
+      /etc/apt/sources.list \
+    && apt-get -o Acquire::Retries=10 update \
+    && apt-get -o Acquire::Retries=10 install -y --no-install-recommends ca-certificates curl gnupg git build-essential pkg-config python3 xz-utils \
     && curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key -o /tmp/llvm-snapshot.gpg.key \
     && gpg --dearmor --output /usr/share/keyrings/llvm-snapshot.gpg /tmp/llvm-snapshot.gpg.key \
     && echo 'deb [signed-by=/usr/share/keyrings/llvm-snapshot.gpg] https://apt.llvm.org/focal/ llvm-toolchain-focal-20 main' > /etc/apt/sources.list.d/llvm.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get -o Acquire::Retries=5 update \
+    && apt-get -o Acquire::Retries=10 install -y --no-install-recommends \
       libllvm20=${LLVM_VERSION} \
       libclang-cpp20=${LLVM_VERSION} \
       libclang-common-20-dev=${LLVM_VERSION} \
@@ -46,8 +50,11 @@ RUN apt-get update \
     && /tmp/rustup-init -y --default-toolchain none --profile minimal \
     && rustup toolchain install ${RUST_TOOLCHAIN} --profile minimal --component rust-src \
     && rustup default ${RUST_TOOLCHAIN} \
+    && chmod 0755 /root /root/.cargo /root/.cargo/bin /root/.rustup \
+    && chmod -R a+rX /root/.cargo /root/.rustup \
     && node --version | grep -Fx "v${NODE_VERSION}" \
-    && rustc +${RUST_TOOLCHAIN} --version | grep -F "${RUST_TOOLCHAIN}" \
+    && rustup toolchain list | grep -F "${RUST_TOOLCHAIN}-x86_64-unknown-linux-gnu" \
+    && rustc +${RUST_TOOLCHAIN} --version | grep -F 'nightly' \
     && /usr/lib/llvm-20/bin/clang --version | grep -F 'Ubuntu clang version 20.1.8' \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 

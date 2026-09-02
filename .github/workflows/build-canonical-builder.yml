@@ -19,7 +19,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build canonical builder
-        run: docker build --platform linux/amd64 --file toolchains/builder/Dockerfile --tag ghcr.io/archelabs/jam-computer-builder:${GITHUB_SHA} .
+        run: docker build --platform linux/amd64 --file toolchains/builder/Dockerfile --tag ghcr.io/archelabs/jam-computer-builder:${GITHUB_SHA} toolchains/builder
       - name: Validate canonical builder environment
         run: docker run --rm --platform linux/amd64 --env JAM_CANONICAL_BUILDER=1 --env JAM_CANONICAL_BUILDER_VERSION=1 --volume "$PWD:/workspace" --workdir /workspace ghcr.io/archelabs/jam-computer-builder:${GITHUB_SHA} node scripts/check-builder-env.mjs
       - name: Publish canonical builder and report digest
