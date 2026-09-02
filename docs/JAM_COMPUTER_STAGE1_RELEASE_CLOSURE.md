@@ -9,8 +9,8 @@ does not claim hosted or production results that were not observed.
 | --- | --- |
 | Release | JAM Computer Stage-1 Public Preview |
 | Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
-| Closure implementation SHA | `2b3808d80ba9f82224ab1a1af9572b16c48414ce` |
-| Release candidate SHA | `2b3808d80ba9f82224ab1a1af9572b16c48414ce` (current candidate before this report-only commit) |
+| Closure implementation SHA | `bc4f7211937856a8de79bd88b2faad8dad313d43` |
+| Release candidate SHA | `bc4f7211937856a8de79bd88b2faad8dad313d43` (current candidate before this report-only commit) |
 | Merge SHA | `PENDING` |
 | Branch | `codex/jam-computer-stage1-release-closure` |
 | JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
@@ -40,6 +40,7 @@ the promoted `service.blob`.
 ```text
 LOCAL_CANONICAL_TOOLCHAINS=PASS
 EXACT_LLVM_TOOLCHAIN=PASS (Ubuntu clang 20.1.8; package and binary checksums locked)
+LLVM_DEPENDENCY_CLOSURE=PASS (local Focal closure; hosted compatibility still requires revalidation)
 CANONICAL_COMPUTER_SOURCE=PASS
 COMPUTER_ARTIFACT_REPRODUCIBILITY=PASS (local canonical rebuild)
 COMPUTER_ARTIFACT_PROMOTED=PASS (local canonical rebuild)
@@ -47,12 +48,14 @@ NPM_TEST=PASS (24 files / 76 tests)
 NPM_BUILD=PASS
 STAGE1_GUARD=PASS
 RELEASE_GUARD=PASS
-MAIN_CI=PENDING_HOSTED_RUN
+MAIN_CI=FAIL
+CI_RUN=33584087932
+CI_BLOCKER=LLVM_DEPENDENCY_CLOSURE
 PAGES_BUILD=PENDING_HOSTED_RUN
 PAGES_DEPLOY=PENDING_HOSTED_RUN
 CLEAN_ROOM_BOOTSTRAP=BLOCKED_EXTERNAL (GitHub clone timed out in this workspace)
 DOOM_MAIN_CI_DEPENDENCY=PASS (recursive checkout guard; hosted rerun pending)
-HOSTED_ARTIFACT_REPRODUCIBILITY=PENDING_REVALIDATION
+HOSTED_ARTIFACT_REPRODUCIBILITY=NOT_REACHED
 ```
 
 ## Production and smoke
@@ -74,7 +77,7 @@ LIVE_READ_SMOKE=BLOCKED
 LIVE_MUTATION_SMOKE=BLOCKED
 BROWSER_SMOKE=BLOCKED
 PAGES_URL=NOT_OBSERVED
-CI_RUN=NOT_OBSERVED
+CI_RUN=33584087932
 DEPLOY_RUN=NOT_OBSERVED
 ```
 
