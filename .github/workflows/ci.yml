@@ -23,8 +23,6 @@ jobs:
       - name: Install pinned ScriptC M2 dependencies
         working-directory: .toolchain/JamScript/toolchains/scriptc
         run: npm ci --no-audit --no-fund
-      - name: Install exact LLVM toolchain
-        run: scripts/bootstrap-llvm.sh
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-05-02
@@ -45,6 +43,8 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run stage1:guard
+      - name: Verify canonical builder lock
+        run: npm run builder:check
       - name: Verify canonical Computer ScriptC artifact
         run: npm run computer:artifact:check
       - name: Verify release guards

@@ -41,6 +41,11 @@ function readCompilerLock() {
   return values;
 }
 
+function readBuilderDigest() {
+  const source = fs.readFileSync(path.join(root, "toolchains/builder.lock"), "utf8");
+  return source.match(/^digest = "([^"]+)"$/m)?.[1] || "";
+}
+
 function hashFile(file) {
   return blake2AsHex(fs.readFileSync(file), 256);
 }
@@ -198,6 +203,14 @@ function compare(left, right) {
 
 function main() {
   if (!["build", "check", "verify", "promote"].includes(command)) throw new Error("usage: computer-artifact.mjs build|check|verify|promote [output]");
+  if (["build", "check", "promote"].includes(command) && process.env.JAM_CANONICAL_BUILDER !== "1") {
+    console.error("CANONICAL_BUILDER_REQUIRED=FAIL");
+    process.exit(1);
+  }
+  if (["build", "check", "promote"].includes(command) && process.env.JAM_CANONICAL_BUILDER_DIGEST !== readBuilderDigest()) {
+    console.error("CANONICAL_BUILDER_DIGEST=FAIL");
+    process.exit(1);
+  }
   if (command === "verify") {
     const pins = assertCanonicalCheckouts();
     const result = verifyArtifact(promoted, pins);
