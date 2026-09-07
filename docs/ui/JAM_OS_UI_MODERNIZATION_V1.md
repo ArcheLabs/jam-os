@@ -92,6 +92,18 @@ Intentionally deferred for a follow-up pass:
 - A larger Settings information architecture and editable appearance preferences.
 - Live RPC/wallet smoke testing, which requires the user's live environment and credentials.
 
+## v2 visual correction
+
+The first pass was too close to the legacy developer-workbench composition. The follow-up correction explicitly replaces that composition:
+
+- `SYSTEM`, `JAM SERVICES`, and `LOGS` are no longer mounted on the default desktop. Their useful JAM-native status remains available in Control Center.
+- The desktop now exposes only Computer and Trash as optional desktop icons; core apps are pinned in a centered Dock.
+- The top capsule is replaced by a thin menu bar with small Preview/Live status treatment.
+- `JamAppIcon` uses Phosphor Duotone glyphs inside a JAM-specific 64px layered icon container. Lucide remains for utility controls.
+- The default desktop no longer renders a developer diagnostics column or a full-width taskbar layout.
+
+The previous broad report remains valid for the shell behavior; this v2 correction changes composition and icon identity without changing runtime boundaries.
+
 ## Machine-readable status
 
 ```text
