@@ -1,8 +1,8 @@
-import { Minus, Square, X } from "lucide-react";
+import { DismissRegular, SquareRegular, SubtractRegular } from "@fluentui/react-icons";
 import type { ReactNode } from "react";
 import { useRef } from "react";
 import { getAppManifest } from "../os/appRegistry";
-import { JamAppIcon } from "../ui/brand/JamAppIcon";
+import { JamAppIcon } from "../ui/icons";
 import type { WindowInstance } from "./types";
 
 export function Window({ window: item, active = false, onFocus, onMove, onResize, onMinimize, onMaximize, onClose, children }: { window: WindowInstance; active?: boolean; onFocus: () => void; onMove: (x: number, y: number) => void; onResize: (width: number, height: number) => void; onMinimize: () => void; onMaximize: () => void; onClose: () => void; children: ReactNode }) {
@@ -16,7 +16,7 @@ export function Window({ window: item, active = false, onFocus, onMove, onResize
   const stopPointer = (event: React.PointerEvent) => event.stopPropagation();
   const stopClick = (handler: () => void) => (event: React.MouseEvent) => { event.stopPropagation(); handler(); };
   return <section className={`window ${active ? "window-active" : "window-inactive"} ${item.maximized ? "window-maximized" : ""} ${item.minimized ? "window-minimized" : ""}`} role="dialog" aria-label={item.title} style={{ left: item.maximized ? 0 : item.x, top: item.maximized ? 0 : item.y, width: item.maximized ? "100%" : item.width, height: item.maximized ? "100%" : item.height, zIndex: item.zIndex }} onPointerDown={onFocus}>
-    <header className="window-titlebar" onDoubleClick={toggleMaximize} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={end}><div className="window-title"><JamAppIcon appId={item.appId} fallbackIcon={manifest.icon} size="menu" /><span>{item.title}</span></div><div className="window-controls" onPointerDown={stopPointer}><button aria-label="Minimize" onPointerDown={stopPointer} onClick={stopClick(onMinimize)}><Minus size={14} /></button><button aria-label={item.maximized ? "Restore" : "Maximize"} onPointerDown={stopPointer} onClick={stopClick(onMaximize)}><Square size={12} /></button><button aria-label="Close" onPointerDown={stopPointer} onClick={stopClick(onClose)}><X size={14} /></button></div></header>
+    <header className="window-titlebar" onDoubleClick={toggleMaximize} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={end}><div className="window-title"><JamAppIcon appId={item.appId} context="window" fallbackIcon={manifest.icon} /><span>{item.title}</span></div><div className="window-controls" onPointerDown={stopPointer}><button aria-label="Minimize" onPointerDown={stopPointer} onClick={stopClick(onMinimize)}><SubtractRegular fontSize={14} primaryFill="currentColor" /></button><button aria-label={item.maximized ? "Restore" : "Maximize"} onPointerDown={stopPointer} onClick={stopClick(onMaximize)}><SquareRegular fontSize={13} primaryFill="currentColor" /></button><button aria-label="Close" onPointerDown={stopPointer} onClick={stopClick(onClose)}><DismissRegular fontSize={14} primaryFill="currentColor" /></button></div></header>
     <div className="window-content">{children}</div>
     {!item.maximized && <div className="resize-handle" aria-hidden="true" onPointerDown={(event) => { event.stopPropagation(); resize.current = { x: event.clientX, y: event.clientY, width: item.width, height: item.height }; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); }} onPointerMove={moveDrag} onPointerUp={end} />}
   </section>;

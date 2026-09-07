@@ -1,0 +1,195 @@
+:root {
+  --jam-icon-desktop: 72px;
+  --jam-icon-dock: 54px;
+  --jam-icon-launcher: 48px;
+  --jam-icon-about: 92px;
+  --jam-icon-window-glyph: 18px;
+  --jam-icon-menu-glyph: 19px;
+  --jam-icon-file-row: 24px;
+  --jam-icon-hover-lift: -4px;
+  --jam-icon-shadow: 0 8px 18px rgba(0, 0, 0, .24);
+  --jam-icon-shadow-near: 0 2px 5px rgba(0, 0, 0, .16);
+  --jam-icon-shadow-hover: 0 12px 24px rgba(0, 0, 0, .28);
+  --jam-icon-shadow-hover-near: 0 3px 7px rgba(0, 0, 0, .16);
+  --jam-icon-highlight: inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
+.jam-app-artwork {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: var(--jam-artwork-size, var(--jam-icon-desktop));
+  height: var(--jam-artwork-size, var(--jam-icon-desktop));
+  color: var(--jam-icon-color, var(--jam-artwork-color, currentColor));
+  filter: drop-shadow(var(--jam-icon-shadow)) drop-shadow(var(--jam-icon-shadow-near));
+  transform: translateZ(0);
+  transition: transform .16s var(--jam-ease-standard), filter .16s ease, opacity .16s ease;
+}
+
+.jam-app-artwork > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.jam-generated-app-icon {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #f2fbff;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 16px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--jam-generated-color) 72%, white), var(--jam-generated-color) 58%, color-mix(in srgb, var(--jam-generated-color) 62%, #07152c));
+  box-shadow: var(--jam-icon-highlight), var(--jam-icon-shadow);
+  font-size: clamp(11px, 32%, 18px);
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.jam-generated-app-icon span { opacity: .88; }
+
+.jam-app-artwork-dock { --jam-artwork-size: var(--jam-icon-dock); }
+.jam-app-artwork-launcher { --jam-artwork-size: var(--jam-icon-launcher); }
+.jam-app-artwork-about { --jam-artwork-size: var(--jam-icon-about); }
+
+.jam-app-artwork-forced { display: none; }
+
+.jam-system-glyph {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: var(--jam-icon-window-glyph);
+  height: var(--jam-icon-window-glyph);
+  color: currentColor;
+  line-height: 0;
+}
+
+.jam-system-glyph-menu { width: var(--jam-icon-menu-glyph); height: var(--jam-icon-menu-glyph); }
+.jam-system-glyph svg { display: block; }
+.jam-system-glyph.is-active { color: var(--jam-accent-cyan); }
+
+.jam-file-icon {
+  display: inline-grid;
+  place-items: center;
+  width: var(--jam-icon-file-row);
+  height: var(--jam-icon-file-row);
+  flex: 0 0 auto;
+  color: #8fd9ff;
+  line-height: 0;
+}
+
+.jam-file-icon-directory { color: #58baf6; }
+.jam-file-icon-file { color: #b9c7d6; }
+.jam-file-icon-large { width: 40px; height: 40px; }
+.jam-file-icon-sidebar { width: 20px; height: 20px; }
+.jam-file-icon svg { width: 100%; height: 100%; }
+
+.desktop-icon .jam-app-artwork { margin-top: 2px; }
+.desktop-icon:hover .jam-app-artwork,
+.desktop-icon.selected .jam-app-artwork { filter: drop-shadow(var(--jam-icon-shadow-hover)) drop-shadow(var(--jam-icon-shadow-hover-near)); transform: translateY(var(--jam-icon-hover-lift)) scale(1.025); }
+.desktop-icon:active .jam-app-artwork { transform: translateY(0) scale(.97); filter: drop-shadow(0 4px 9px rgba(0, 0, 0, .20)); }
+
+.desktop-icon-label {
+  display: -webkit-box;
+  max-width: 92px;
+  overflow: hidden;
+  color: rgba(241, 247, 255, .92);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  text-shadow: 0 2px 9px rgba(0, 0, 0, .72);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.desktop-icon.selected .desktop-icon-label {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(104, 171, 239, .24);
+}
+
+.taskbar.dock .task-item .jam-app-artwork { --jam-artwork-size: var(--jam-icon-dock); }
+.taskbar.dock .task-item:hover .jam-app-artwork { filter: drop-shadow(var(--jam-icon-shadow-hover)) drop-shadow(var(--jam-icon-shadow-hover-near)); transform: translateY(var(--jam-icon-hover-lift)) scale(1.04); }
+.taskbar.dock .task-item:active .jam-app-artwork { transform: translateY(-1px) scale(.97); }
+.taskbar.dock .task-item i { transition: opacity .16s ease, background .16s ease; }
+.taskbar.dock .task-item.running i { box-shadow: none; }
+.taskbar.dock .task-item.active i { background: #dffbff; }
+
+.window-title .jam-system-glyph { color: rgba(224, 240, 255, .78); }
+.window-title .jam-system-glyph.is-active { color: var(--jam-accent-cyan); }
+.start-menu > button .jam-app-artwork { width: var(--jam-icon-launcher); height: var(--jam-icon-launcher); }
+
+@media (forced-colors: active) {
+  .jam-app-artwork { filter: none; color: CanvasText; }
+  .jam-app-artwork > svg { display: none; }
+  .jam-generated-app-icon { color: ButtonText; border-color: ButtonText; background: ButtonFace; box-shadow: none; }
+  .jam-app-artwork-forced { display: inline-grid; place-items: center; }
+  .jam-app-artwork-forced .jam-system-glyph { color: ButtonText; }
+  .desktop-icon.selected .desktop-icon-label { background: Highlight; color: HighlightText; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jam-app-artwork { transition: none; }
+  .desktop-icon:hover .jam-app-artwork,
+  .desktop-icon.selected .jam-app-artwork,
+  .taskbar.dock .task-item:hover .jam-app-artwork { transform: none; }
+}
+
+.icon-gallery-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: auto;
+  color: #eaf5ff;
+  background: #06102a;
+}
+
+.icon-gallery-shell .jam-wallpaper { position: fixed; }
+.icon-gallery-content { position: relative; z-index: 1; width: min(1460px, calc(100% - 48px)); margin: 0 auto; padding: 28px 0 48px; }
+.icon-gallery-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.icon-gallery-brand, .icon-gallery-actions, .icon-gallery-brand > div { display: flex; align-items: center; }
+.icon-gallery-brand { gap: 12px; }
+.icon-gallery-brand > div { flex-direction: column; align-items: flex-start; gap: 3px; }
+.icon-gallery-brand strong { font-size: 18px; letter-spacing: -.02em; }
+.icon-gallery-brand small, .icon-gallery-section-heading small { color: rgba(220, 238, 255, .60); font: 10px 'DM Mono', monospace; letter-spacing: .08em; }
+.icon-gallery-actions { gap: 8px; }
+.icon-gallery-actions button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; color: #cde1f4; border: 1px solid rgba(199, 225, 255, .18); border-radius: 9px; background: rgba(9, 25, 51, .60); font-size: 11px; }
+.icon-gallery-actions button:hover, .icon-gallery-actions button.is-selected { border-color: rgba(139, 197, 255, .55); background: rgba(43, 88, 146, .48); }
+.icon-gallery-actions svg { width: 16px; height: 16px; }
+.icon-gallery-panel { padding: 22px; border: 1px solid rgba(188, 219, 255, .18); border-radius: 20px; box-shadow: 0 22px 60px rgba(0, 0, 0, .22), inset 0 1px rgba(255, 255, 255, .08); }
+.icon-gallery-panel + .icon-gallery-panel { margin-top: 16px; }
+.icon-gallery-panel-dark { background: rgba(5, 15, 37, .72); backdrop-filter: blur(20px); }
+.icon-gallery-panel-light { color: #17304a; background: rgba(242, 248, 252, .93); }
+.icon-gallery-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.icon-gallery-section-heading span { color: #77d9e8; font: 9px 'DM Mono', monospace; letter-spacing: .18em; }
+.icon-gallery-section-heading h1, .icon-gallery-section-heading h2 { margin: 5px 0 0; color: inherit; font-size: 21px; font-weight: 500; letter-spacing: -.03em; }
+.icon-gallery-section-heading h2 { font-size: 18px; }
+.icon-gallery-panel-light .icon-gallery-section-heading span { color: #18779a; }
+.icon-gallery-panel-light .icon-gallery-section-heading small { color: #60788d; }
+.icon-gallery-artwork-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.icon-gallery-app { min-width: 0; padding: 14px; border: 1px solid rgba(188, 219, 255, .12); border-radius: 14px; background: rgba(255, 255, 255, .035); }
+.icon-gallery-app-name { margin-bottom: 12px; color: #edf7ff; font-size: 12px; font-weight: 600; }
+.icon-gallery-scale-row, .icon-gallery-glyph-row, .icon-gallery-system-grid, .icon-gallery-files { display: flex; align-items: flex-end; }
+.icon-gallery-scale-row { justify-content: space-between; min-height: 111px; gap: 8px; }
+.icon-gallery-scale, .icon-gallery-glyph { display: grid; justify-items: center; gap: 6px; }
+.icon-gallery-scale small, .icon-gallery-glyph small { color: rgba(220, 238, 255, .46); font: 8px 'DM Mono', monospace; }
+.icon-gallery-glyph-row { justify-content: flex-end; gap: 13px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(188, 219, 255, .10); }
+.icon-gallery-glyph .jam-system-glyph { color: #c7def3; }
+.icon-gallery-system-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: 8px; }
+.icon-gallery-system-item { display: grid; grid-template-columns: 20px 1fr 20px; align-items: center; gap: 9px; padding: 10px 12px; color: #2e4961; border: 1px solid rgba(27, 67, 100, .12); border-radius: 10px; background: rgba(223, 238, 249, .65); font-size: 11px; }
+.icon-gallery-system-item .jam-system-glyph:last-child { color: #1675a0; }
+.icon-gallery-files { gap: 18px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(27, 67, 100, .13); }
+.icon-gallery-shell.labels-hidden .icon-gallery-app-name { opacity: .16; }
+.icon-gallery-shell.is-grayscale .icon-gallery-panel-dark { filter: grayscale(1); }
+
+@media (max-width: 1080px) {
+  .icon-gallery-artwork-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 680px) {
+  .icon-gallery-content { width: min(100% - 24px, 520px); padding-top: 18px; }
+  .icon-gallery-header, .icon-gallery-section-heading { align-items: flex-start; flex-direction: column; }
+  .icon-gallery-artwork-grid, .icon-gallery-system-grid { grid-template-columns: 1fr; }
+  .icon-gallery-scale-row { justify-content: flex-start; }
+}
