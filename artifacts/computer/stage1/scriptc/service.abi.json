@@ -1,0 +1,1607 @@
+{
+  "abi_version": 1,
+  "language_version": "0.2",
+  "package": {
+    "name": "jam-os-computer",
+    "version": "0.2.0"
+  },
+  "actions": [
+    {
+      "name": "initialize",
+      "selector": "0xd65e4894e33cb2cd",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "displayName",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "setProfile",
+      "selector": "0x6db43e2c3db7103d",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "displayName",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "bio",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "avatarRoot",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "avatarSize",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "setAppearance",
+      "selector": "0x36ad13bfab76bf37",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "wallpaperRoot",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "wallpaperSize",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "theme",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "accent",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "upsertDesktopIcon",
+      "selector": "0xa678eb998789759e",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "iconId",
+          "type": {
+            "kind": "bytes",
+            "max": 64
+          }
+        },
+        {
+          "name": "label",
+          "type": {
+            "kind": "bytes",
+            "max": 64
+          }
+        },
+        {
+          "name": "target",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "iconRoot",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "iconSize",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "visible",
+          "type": {
+            "kind": "bool"
+          }
+        },
+        {
+          "name": "x",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "y",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "removeDesktopIcon",
+      "selector": "0x33f92c85f666a0d9",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "iconId",
+          "type": {
+            "kind": "bytes",
+            "max": 64
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "setNodeMetadata",
+      "selector": "0xa398af675307c322",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "kind",
+          "type": {
+            "kind": "bytes",
+            "max": 16
+          }
+        },
+        {
+          "name": "parent",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "mime",
+          "type": {
+            "kind": "bytes",
+            "max": 96
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "contentRoot",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "removeNodeMetadata",
+      "selector": "0x8e1fa7e0930b66e8",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "publishSite",
+      "selector": "0x62397d54cf31c62f",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "index",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "entries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        },
+        {
+          "name": "publishedAt",
+          "type": {
+            "kind": "u32"
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "setDesktopIndex",
+      "selector": "0xbddba710d9554704",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "entries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "setDirectoryIndex",
+      "selector": "0xc468726e148410ba",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "entries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "writeFile",
+      "selector": "0x7e944c91d47cde38",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "parent",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "mime",
+          "type": {
+            "kind": "bytes",
+            "max": 96
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "contentRoot",
+          "type": {
+            "kind": "bytes",
+            "max": 32
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "parentEntries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "mkdir",
+      "selector": "0xd8b8eef579f6f936",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "parent",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "parentEntries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "removeNode",
+      "selector": "0x088ae5722f7646e8",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "path",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "parentEntries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    },
+    {
+      "name": "renameFile",
+      "selector": "0x84deab86898de85f",
+      "auth": "wallet",
+      "input": [
+        {
+          "name": "key",
+          "type": {
+            "kind": "bytes",
+            "max": 1
+          }
+        },
+        {
+          "name": "from",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "to",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "fromParent",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "toParent",
+          "type": {
+            "kind": "bytes",
+            "max": 256
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "u32"
+          }
+        },
+        {
+          "name": "fromEntries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        },
+        {
+          "name": "toEntries",
+          "type": {
+            "kind": "bytes",
+            "max": 4096
+          }
+        }
+      ],
+      "executeOutput": {
+        "kind": "unit"
+      }
+    }
+  ],
+  "queries": [
+    {
+      "name": "getProfile",
+      "kind": "state_get",
+      "state": "profiles",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "owner",
+              "type": {
+                "kind": "address"
+              }
+            },
+            {
+              "name": "displayName",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            },
+            {
+              "name": "bio",
+              "type": {
+                "kind": "bytes",
+                "max": 256
+              }
+            },
+            {
+              "name": "avatarRoot",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            },
+            {
+              "name": "avatarSize",
+              "type": {
+                "kind": "u32"
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getAppearance",
+      "kind": "state_get",
+      "state": "appearances",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "wallpaperRoot",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            },
+            {
+              "name": "wallpaperSize",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "theme",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            },
+            {
+              "name": "accent",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getDesktopIcon",
+      "kind": "state_get",
+      "state": "desktopIcons",
+      "keyType": {
+        "kind": "bytes",
+        "max": 64
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "label",
+              "type": {
+                "kind": "bytes",
+                "max": 64
+              }
+            },
+            {
+              "name": "target",
+              "type": {
+                "kind": "bytes",
+                "max": 256
+              }
+            },
+            {
+              "name": "iconRoot",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            },
+            {
+              "name": "iconSize",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "visible",
+              "type": {
+                "kind": "bool"
+              }
+            },
+            {
+              "name": "removed",
+              "type": {
+                "kind": "bool"
+              }
+            },
+            {
+              "name": "x",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "y",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "updatedAt",
+              "type": {
+                "kind": "u32"
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getNodeMetadata",
+      "kind": "state_get",
+      "state": "nodes",
+      "keyType": {
+        "kind": "bytes",
+        "max": 256
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "path",
+              "type": {
+                "kind": "bytes",
+                "max": 256
+              }
+            },
+            {
+              "name": "kind",
+              "type": {
+                "kind": "bytes",
+                "max": 16
+              }
+            },
+            {
+              "name": "parent",
+              "type": {
+                "kind": "bytes",
+                "max": 256
+              }
+            },
+            {
+              "name": "mime",
+              "type": {
+                "kind": "bytes",
+                "max": 96
+              }
+            },
+            {
+              "name": "size",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "contentRoot",
+              "type": {
+                "kind": "bytes",
+                "max": 32
+              }
+            },
+            {
+              "name": "removed",
+              "type": {
+                "kind": "bool"
+              }
+            },
+            {
+              "name": "updatedAt",
+              "type": {
+                "kind": "u32"
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getSiteManifest",
+      "kind": "state_get",
+      "state": "manifests",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "index",
+              "type": {
+                "kind": "bytes",
+                "max": 256
+              }
+            },
+            {
+              "name": "entries",
+              "type": {
+                "kind": "bytes",
+                "max": 4096
+              }
+            },
+            {
+              "name": "publishedAt",
+              "type": {
+                "kind": "u32"
+              }
+            },
+            {
+              "name": "published",
+              "type": {
+                "kind": "bool"
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getDesktopIndex",
+      "kind": "state_get",
+      "state": "desktopIndexes",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "entries",
+              "type": {
+                "kind": "bytes",
+                "max": 4096
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    },
+    {
+      "name": "getDirectoryIndex",
+      "kind": "state_get",
+      "state": "directoryIndexes",
+      "keyType": {
+        "kind": "bytes",
+        "max": 256
+      },
+      "output": {
+        "type": {
+          "kind": "record",
+          "fields": [
+            {
+              "name": "entries",
+              "type": {
+                "kind": "bytes",
+                "max": 4096
+              }
+            }
+          ]
+        },
+        "nullable": true
+      }
+    }
+  ],
+  "types": {
+    "Bytes<16>": {
+      "kind": "bytes",
+      "max": 16,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 16
+      }
+    },
+    "Bytes<1>": {
+      "kind": "bytes",
+      "max": 1,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 1
+      }
+    },
+    "Bytes<256>": {
+      "kind": "bytes",
+      "max": 256,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 256
+      }
+    },
+    "Bytes<32>": {
+      "kind": "bytes",
+      "max": 32,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 32
+      }
+    },
+    "Bytes<4096>": {
+      "kind": "bytes",
+      "max": 4096,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 4096
+      }
+    },
+    "Bytes<64>": {
+      "kind": "bytes",
+      "max": 64,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 64
+      }
+    },
+    "Bytes<96>": {
+      "kind": "bytes",
+      "max": 96,
+      "descriptor": {
+        "kind": "bytes",
+        "max": 96
+      }
+    },
+    "Record<entries:Bytes<4096>>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          }
+        ]
+      }
+    },
+    "Record<index:Bytes<256>,entries:Bytes<4096>,publishedAt:u32,published:bool>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "index",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          },
+          {
+            "name": "publishedAt",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "published",
+            "type": {
+              "kind": "bool"
+            }
+          }
+        ]
+      }
+    },
+    "Record<label:Bytes<64>,target:Bytes<256>,iconRoot:Bytes<32>,iconSize:u32,visible:bool,removed:bool,x:u32,y:u32,updatedAt:u32>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "label",
+            "type": {
+              "kind": "bytes",
+              "max": 64
+            }
+          },
+          {
+            "name": "target",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "iconRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "iconSize",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "visible",
+            "type": {
+              "kind": "bool"
+            }
+          },
+          {
+            "name": "removed",
+            "type": {
+              "kind": "bool"
+            }
+          },
+          {
+            "name": "x",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "y",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    "Record<owner:address,displayName:Bytes<32>,bio:Bytes<256>,avatarRoot:Bytes<32>,avatarSize:u32>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "owner",
+            "type": {
+              "kind": "address"
+            }
+          },
+          {
+            "name": "displayName",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "bio",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "avatarRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "avatarSize",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    "Record<path:Bytes<256>,kind:Bytes<16>,parent:Bytes<256>,mime:Bytes<96>,size:u32,contentRoot:Bytes<32>,removed:bool,updatedAt:u32>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "path",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "kind",
+            "type": {
+              "kind": "bytes",
+              "max": 16
+            }
+          },
+          {
+            "name": "parent",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "mime",
+            "type": {
+              "kind": "bytes",
+              "max": 96
+            }
+          },
+          {
+            "name": "size",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "contentRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "removed",
+            "type": {
+              "kind": "bool"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    "Record<wallpaperRoot:Bytes<32>,wallpaperSize:u32,theme:Bytes<32>,accent:Bytes<32>>": {
+      "kind": "record",
+      "max": null,
+      "descriptor": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "wallpaperRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "wallpaperSize",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "theme",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "accent",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          }
+        ]
+      }
+    },
+    "address": {
+      "kind": "address",
+      "max": 32,
+      "descriptor": {
+        "kind": "address"
+      }
+    },
+    "bool": {
+      "kind": "bool",
+      "max": null,
+      "descriptor": {
+        "kind": "bool"
+      }
+    },
+    "u32": {
+      "kind": "u32",
+      "max": null,
+      "descriptor": {
+        "kind": "u32"
+      }
+    },
+    "u64": {
+      "kind": "u64",
+      "max": null,
+      "descriptor": {
+        "kind": "u64"
+      }
+    }
+  },
+  "state": [
+    {
+      "name": "profiles",
+      "schema": "computer.profile/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "owner",
+            "type": {
+              "kind": "address"
+            }
+          },
+          {
+            "name": "displayName",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "bio",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "avatarRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "avatarSize",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "appearances",
+      "schema": "computer.appearance/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "wallpaperRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "wallpaperSize",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "theme",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "accent",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "desktopIcons",
+      "schema": "computer.desktop-icons/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 64
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "label",
+            "type": {
+              "kind": "bytes",
+              "max": 64
+            }
+          },
+          {
+            "name": "target",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "iconRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "iconSize",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "visible",
+            "type": {
+              "kind": "bool"
+            }
+          },
+          {
+            "name": "removed",
+            "type": {
+              "kind": "bool"
+            }
+          },
+          {
+            "name": "x",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "y",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "nodes",
+      "schema": "computer.nodes/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 256
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "path",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "kind",
+            "type": {
+              "kind": "bytes",
+              "max": 16
+            }
+          },
+          {
+            "name": "parent",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "mime",
+            "type": {
+              "kind": "bytes",
+              "max": 96
+            }
+          },
+          {
+            "name": "size",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "contentRoot",
+            "type": {
+              "kind": "bytes",
+              "max": 32
+            }
+          },
+          {
+            "name": "removed",
+            "type": {
+              "kind": "bool"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "type": {
+              "kind": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "manifests",
+      "schema": "computer.site-manifest/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "index",
+            "type": {
+              "kind": "bytes",
+              "max": 256
+            }
+          },
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          },
+          {
+            "name": "publishedAt",
+            "type": {
+              "kind": "u32"
+            }
+          },
+          {
+            "name": "published",
+            "type": {
+              "kind": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "desktopIndexes",
+      "schema": "computer.desktop-index/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 1
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "directoryIndexes",
+      "schema": "computer.directory-index/v1",
+      "kind": "map",
+      "keyType": {
+        "kind": "bytes",
+        "max": 256
+      },
+      "valueType": {
+        "kind": "record",
+        "fields": [
+          {
+            "name": "entries",
+            "type": {
+              "kind": "bytes",
+              "max": 4096
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

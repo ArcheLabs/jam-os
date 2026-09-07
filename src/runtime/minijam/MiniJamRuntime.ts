@@ -8,7 +8,7 @@ import type { ComputerRuntime, DoomRuntime, EventRuntime, FileSystemRuntime, Jam
 import { MiniJamApiClient } from "./MiniJamApiClient";
 import { LiveFileSystemRuntime } from "./LiveFileSystemRuntime";
 import { LiveWorkRuntime } from "./LiveWorkRuntime";
-import { RealDoomRunnerRuntime } from "../doom/RealDoomRunnerRuntime";
+import { DeferredDoomRuntime } from "../doom/DeferredDoomRuntime";
 import { bytesToBase64 } from "../../jam/encoding";
 import { HttpContentProvider } from "../../jam/contentProvider";
 
@@ -54,7 +54,7 @@ export class MiniJamRuntime implements JamOsRuntimeV2 {
   readonly work: WorkRuntime = new LiveWorkRuntime(this.api, this.account, this.events);
   readonly content = import.meta.env.VITE_CONTENT_PROVIDER_URL ? new HttpContentProvider(import.meta.env.VITE_CONTENT_PROVIDER_URL, Number(import.meta.env.VITE_CONTENT_MAX_BYTES || 5 * 1024 * 1024), { account: this.account, providerDomain: import.meta.env.VITE_CONTENT_PROVIDER_DOMAIN || "0x0000000000000000000000000000000000000000000000000000000000000000" }) : undefined;
   readonly fs: FileSystemRuntime = new LiveFileSystemRuntime(this.api, this.work, this.account, undefined, this.content);
-  readonly doom: DoomRuntime = new RealDoomRunnerRuntime(this.account, import.meta.env.VITE_DOOM_GATEWAY_URL, import.meta.env.VITE_DOOM_RUNNER_DOMAIN, import.meta.env.VITE_DOOM_RULESET_HASH);
+  readonly doom: DoomRuntime = new DeferredDoomRuntime();
   readonly system: JamOsRuntimeV2["system"] = { getInfo: async () => { const network = await this.network.getInfo(); return { osVersion: "0.1", networkName: network.name, status: network.healthy ? "online" as const : "offline" as const }; } };
   readonly network: NetworkRuntime = { getInfo: async () => { try { const network = await this.client.network(); const info = { ...network, source: "real" as const }; this.liveEvents.emit("network:online", info); return info; } catch { const info = { name: import.meta.env.VITE_MINIJAM_NETWORK_NAME || "MiniJAM Testnet", endpoint: this.transport.base || "unconfigured", healthy: false, source: "unavailable" as const }; this.liveEvents.emit("network:offline", info); return info; } } };
   readonly services: ServiceRuntime = { list: async () => { try { const current = await this.computerAdapter.current(); return [{ id: "computer", name: "Computer Service", status: current ? "running" as const : "stopped" as const, source: current ? "real" as const : "unavailable" as const }]; } catch { return [{ id: "computer", name: "Computer Service", status: "stopped" as const, source: "unavailable" as const }]; } }, inspect: (id: string) => this.computerAdapter.inspect(id), call: async (id: string, payload: Uint8Array, account?: AccountInfo | null) => (await this.client.invokeService(id, payload, { account })).output };
