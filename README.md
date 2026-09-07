@@ -13,34 +13,41 @@ npm run dev
 
 The default `VITE_JAM_MODE=mock` mode is fully usable without a testnet and is used by CI.
 
-## Live deployment
+## Stage-1 Public Preview
 
-Production GitHub Pages deployment is self-contained and does not require GitHub Repository Variables.
+The release path is fail-closed and uses the reviewed artifact produced from
+`services/computer/src/service.ts` by the pinned JamScript and MiniJAM
+toolchains. CI rebuilds and compares that artifact; GitHub Pages only copies
+`artifacts/computer/stage1/scriptc/service.blob` to the site. The historical
+`services/computer/src/service.c` fixture is never deployed.
 
-`.github/workflows/deploy-pages.yml` pins the public MiniJAM Playground API URL, network label, and Computer Service gas limits directly in the repository. During every Pages deployment, the workflow compiles `services/computer/src/service.c` through the live Playground API, writes the reviewed result to `computer-service.bin`, injects the returned Blake2-256 code hash into the frontend build, and verifies that the artifact is present in the final `dist` output.
+Pages requires repository Variables for `MINIJAM_NODE_RPC_URL`,
+`MINIJAM_WORK_RPC_URL`, `MINIJAM_DEPLOYMENT_RPC_URL`, and
+`MINIJAM_GENESIS_HASH`. These are public network endpoints and identity data;
+signing keys and other secrets must remain outside this repository.
 
-The live client still fails closed: it verifies the downloaded Computer Service artifact hash before deployment and verifies the deployed Service controller/code hash before reuse. Genesis identity is read from the Playground `/config` endpoint. JNS is now owned here as a downstream JamScript application, but live use remains disabled until the typed runtime bridge and a complete canonical deployment descriptor are intentionally promoted.
+The live client verifies the downloaded Computer artifact and the finalized
+service code hash before use. The browser uses the neutral Node RPC, Formal
+Work RPC, and deployment ingress directly. `npm run smoke:live:read` performs
+the read gate; `npm run smoke:live:write` performs the authorized mutation gate
+when supplied with a dedicated canary signer.
 
-Phase 3B adds the ordinary MiniJAM DOOM Service in `services/doom`. Its
-versioned requests are submitted through the existing Work path and its
-recoverable state is read from finalized `doom:session:<id>:*` storage. Set the
-deployed service ID through the `MINIJAM_DOOM_SERVICE_ID` Pages variable; an
-unset value keeps the Live DOOM adapter unavailable.
-
-Phase 3C adds a separate realtime path. Preview sessions run locally at 30 FPS
-with deterministic Canvas frames and input buffering. Live sessions use the
-same frame/input contract over a WebSocket gateway configured with
-`MINIJAM_DOOM_GATEWAY_URL`; the gateway relays messages but does not author
-game state. Checkpoints still use the verified MiniJAM path.
+DOOM is deferred pending the official JAM CoreVM. Its research source and
+provenance remain in the repository, but it is hidden from the Stage-1 product
+registry and is not a release dependency.
 
 A Polkadot wallet extension with an sr25519 account is required for state-changing live operations.
 
-Run the non-mutating live smoke check with `VITE_SMOKE_COMPUTER_SERVICE_ID` when testing an existing Computer Service:
+Run the read smoke against a deployed canary Computer Service:
 
 ```bash
-VITE_JAM_MODE=live VITE_MINIJAM_NODE_RPC_URL=http://127.0.0.1:9944 \
-VITE_MINIJAM_WORK_RPC_URL=http://127.0.0.1:8080 \
-VITE_SMOKE_COMPUTER_SERVICE_ID=<service-id> npm run smoke:live
+VITE_JAM_MODE=live \
+VITE_MINIJAM_NODE_RPC_URL=https://node.example.invalid \
+VITE_MINIJAM_WORK_RPC_URL=https://work.example.invalid \
+VITE_MINIJAM_DEPLOYMENT_RPC_URL=https://deploy.example.invalid \
+VITE_MINIJAM_GENESIS_HASH=0x<genesis-hash> \
+VITE_COMPUTER_SERVICE_CODE_HASH=0x<code-hash> \
+VITE_SMOKE_COMPUTER_SERVICE_ID=<service-id> npm run smoke:live:read
 ```
 
 ## First demo
@@ -57,8 +64,8 @@ The Browser also supports best-effort ordinary HTTP(S) iframe navigation. Sites 
 
 The Stage-1 production path composes the neutral MiniJAM node, Formal Work,
 state, and deployment RPCs. Playground is a legacy Stage-0 product and is not
-a runtime or build dependency. Computer and DOOM artifacts are compiled by a
-pinned local MiniJAM toolchain.
+a runtime or build dependency. The Computer artifact is compiled by CI with
+the pinned local MiniJAM toolchain and promoted as a reviewed release input.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md). The implementation has no jam-os backend, database, proxy, AI agent, or client-only DOOM claim.
 
@@ -68,7 +75,7 @@ Local browser: pixels, windows, keyboard/mouse input, Monaco, xterm, browser his
 
 MiniJAM: Computer Service state, files, published site snapshots, JNS records when enabled, and Service execution.
 
-MiniJAM Playground infrastructure: C/C++ compilation, Service deployment, and Work submission.
+MiniJAM: Service deployment, Formal Work submission, and finalized state.
 
 Traditional jam-os backend: none.
 

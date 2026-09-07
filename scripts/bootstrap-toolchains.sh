@@ -17,21 +17,26 @@ done < <(node "$ROOT_DIR/scripts/read-toolchain-pins.mjs")
 
 ensure_checkout() {
   local label="$1" repository="$2" revision="$3" directory="$4"
+  local fresh=false
   if [[ ! -e "$directory" ]]; then
     $VERIFY_ONLY && { echo "TOOLCHAIN_LAYOUT_MISSING: $directory" >&2; exit 1; }
     mkdir -p "$(dirname "$directory")"
     git clone --no-checkout "$repository" "$directory"
+    fresh=true
   fi
   test -e "$directory/.git" || { echo "$label checkout is not a git repository: $directory" >&2; exit 1; }
   if ! git -C "$directory" cat-file -e "$revision^{commit}" 2>/dev/null; then
     $VERIFY_ONLY && { echo "$label revision is unavailable in $directory" >&2; exit 1; }
     git -C "$directory" fetch --depth=1 origin "$revision"
   fi
-  if ! git -C "$directory" diff --quiet || ! git -C "$directory" diff --cached --quiet; then
+  if [[ "$fresh" == true ]]; then
+    git -C "$directory" checkout --detach --force "$revision" >/dev/null
+  elif ! git -C "$directory" diff --quiet || ! git -C "$directory" diff --cached --quiet; then
     echo "$label checkout has local changes: $directory" >&2
     exit 1
   fi
   $VERIFY_ONLY && return
+  [[ "$fresh" == true ]] && return
   git -C "$directory" checkout --detach --force "$revision" >/dev/null
 }
 
