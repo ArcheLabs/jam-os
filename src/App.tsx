@@ -18,7 +18,7 @@ import { PublicComputerPage } from "./public/PublicComputerPage";
 type Phase = "boot" | "login" | "connecting" | "account" | "provisioning" | "desktop" | "error";
 
 export default function App() {
-  const preview = new URLSearchParams(window.location.search).get("preview") === "1" || window.location.hash === "#preview";
+  const preview = import.meta.env.VITE_JAM_MODE !== "live" && (new URLSearchParams(window.location.search).get("preview") === "1" || window.location.hash === "#preview");
   const runtime = useMemo(() => createRuntime(preview), [preview]);
   const publicName = window.location.pathname.match(/^\/@([a-z0-9-]+)$/i)?.[1]?.toLowerCase();
   const [phase, setPhase] = useState<Phase>("boot"); const [account, setAccount] = useState<AccountInfo | null>(null); const [serviceId, setServiceId] = useState<string | null>(null); const [progress, setProgress] = useState<ProvisionProgress[]>([]); const [error, setError] = useState(""); const [windows, setWindows] = useState<WindowInstance[]>([]); const [showStart, setShowStart] = useState(false); const [selected, setSelected] = useState<string | null>(null); const [networkName, setNetworkName] = useState("MiniJAM"); const zIndex = useRef(20);

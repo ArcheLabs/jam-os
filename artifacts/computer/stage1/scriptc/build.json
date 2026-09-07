@@ -32,11 +32,11 @@
   "targetEnvironment": "polkavm",
   "minimumStackBytes": 2097152,
   "clang_version": "Ubuntu clang version 20.1.8 (++20250708083436+6fb913d3e2ec-1~exp1~20250708203453.133)",
-  "minijam_sdk_revision": "0b79686996191edb608f46ea9c328e0863de5497",
-  "minijamConverterRevision": "0b79686996191edb608f46ea9c328e0863de5497",
+  "minijam_sdk_revision": "18de55e175abb1cb40679be2e538644e2387655f",
+  "minijamConverterRevision": "18de55e175abb1cb40679be2e538644e2387655f",
   "source_hash": "0x3eb087a396090e1372c906339d25463c23b031d9ebd528c00f529330c4e06741",
   "abi_hash": "0xffa85759e25f30914277ae84d8860f42726588462cdb42786a516ef657fd5f6a",
-  "code_hash": "0x09d6afa902b7f7efe9fb8099f4cd93013815eb22d941a6e58652108fe9301672",
+  "code_hash": "0xcf86cc5320d0ea6ba090554c752ac87694716accbb87e2ba505efad5b0bfec44",
   "native_abi_version": 1,
   "native_modules": [],
   "backend": "scriptc-m2",
@@ -46,6 +46,7 @@
   "typescript_version": "7.0.2",
   "surface_manifest_hash": "0x5bc22383db4e57edf171bfeb6dd518e964844efae54b6a2574e2bd29afb134c9",
   "package_lock_hash": "0x2f77827ddb076bd238bc5d82a5f1f66daf6c73689971d4fcc2f1f5be2c6d9d4d",
+  "native_ffi_manifest_hash": "0x3bab89d35fcf7c18d1752f857473d71a20f7c4833890d0cb06abb329632db713",
   "runtime_profile_version": "scriptc-deterministic-v1",
   "generated_actions": [
     {

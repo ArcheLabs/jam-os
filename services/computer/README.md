@@ -4,18 +4,24 @@ This directory contains the canonical Computer Service boundary used by JAM Comp
 
 The JamScript state schema is split into `computer.profile/v1`, `computer.appearance/v1`, `computer.desktop-icons/v1`, `computer.nodes/v1`, and `computer.site-manifest/v1`. Only bounded metadata and content references are stored on-chain. Public reads use finalized service state; mutations are wallet-authorized and always compare `ctx.sender` with the immutable owner recorded by `initialize`. File bytes and artwork are supplied by the content-addressed provider in `src/jam/contentProvider.ts`.
 
-For local artifact validation from a checkout that also contains `minijam-client`:
+The only production Computer source is `src/service.ts`. `src/service.c` is a
+historical protocol fixture and must not be used to make a release artifact.
+
+For local artifact validation after bootstrapping the locked toolchains:
 
 ```bash
-.toolchain/JamScript/target/debug/jamscript check services/computer
-.toolchain/JamScript/target/debug/jamscript build services/computer --output artifacts/computer/stage1/scriptc
+npm run computer:artifact:check
 ```
 
-`src/service.c` is retained as a historical protocol fixture only; it is not the production Computer implementation. Keep generated blobs out of source control unless they are intentionally promoted as reviewed canonical artifacts.
+`npm run computer:artifact:build` writes a fresh artifact to a temporary
+directory. `npm run computer:artifact:promote` is the explicit operation that
+rebuilds twice, proves byte identity, and replaces the reviewed artifact.
 
-The reviewed Stage-1 ScriptC artifact is promoted under `artifacts/computer/stage1/scriptc/` with code hash
-`0x09d6afa902b7f7efe9fb8099f4cd93013815eb22d941a6e58652108fe9301672`.
+The reviewed Stage-1 ScriptC artifact is promoted under
+`artifacts/computer/stage1/scriptc/`. Its code hash and toolchain revisions
+are recorded in the accompanying `build.json`; never update those values by
+hand.
 
-The accompanying `build.json` records the exact JamScript SDK revision
-(`37828e00ff2b503ea86e3f70b42c5850b03d022a`), ScriptC `0.0.34`, Node
-`24.15.0`, and pinned MiniJAM build metadata.
+DOOM is deferred pending official JAM CoreVM. MiniJAM will not implement a
+duplicate CoreVM runtime; the existing Polkadoom work is retained as a future
+CoreVM compatibility fixture.

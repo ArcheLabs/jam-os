@@ -1,0 +1,157 @@
+{
+  "profile_format": 1,
+  "name": "jamscript-m2-jam-os-computer",
+  "entry": "<canonical-artifact-root>/scriptc/scriptc_service.transformed.ts",
+  "emission": "c",
+  "optimization": "dev",
+  "abi": {
+    "prefix": "jamscript_scriptc_",
+    "init_symbol": "jamscript_scriptc_service_init",
+    "sink_register_symbol": "jamscript_scriptc_service_set_panic_sink",
+    "collect_symbol": null,
+    "result_reset_symbol": null,
+    "localize_runtime": false
+  },
+  "exports": [
+    {
+      "export": "__jamscript_action_initialize_v1",
+      "symbol": "jamscript_scriptc_initialize_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_setProfile_v1",
+      "symbol": "jamscript_scriptc_setProfile_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_setAppearance_v1",
+      "symbol": "jamscript_scriptc_setAppearance_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_upsertDesktopIcon_v1",
+      "symbol": "jamscript_scriptc_upsertDesktopIcon_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_removeDesktopIcon_v1",
+      "symbol": "jamscript_scriptc_removeDesktopIcon_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_setNodeMetadata_v1",
+      "symbol": "jamscript_scriptc_setNodeMetadata_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_removeNodeMetadata_v1",
+      "symbol": "jamscript_scriptc_removeNodeMetadata_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_publishSite_v1",
+      "symbol": "jamscript_scriptc_publishSite_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_setDesktopIndex_v1",
+      "symbol": "jamscript_scriptc_setDesktopIndex_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_setDirectoryIndex_v1",
+      "symbol": "jamscript_scriptc_setDirectoryIndex_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_writeFile_v1",
+      "symbol": "jamscript_scriptc_writeFile_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_mkdir_v1",
+      "symbol": "jamscript_scriptc_mkdir_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_removeNode_v1",
+      "symbol": "jamscript_scriptc_removeNode_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    },
+    {
+      "export": "__jamscript_action_renameFile_v1",
+      "symbol": "jamscript_scriptc_renameFile_entry_v1",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bytes"
+    }
+  ]
+}
