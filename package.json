@@ -33,6 +33,7 @@
     "toolchain:client:build": "npm --prefix .toolchain/JamScript/packages/client run build"
   },
   "dependencies": {
+    "@fluentui/react-icons": "^2.0.339",
     "@jamscript/minijam-client": "file:.toolchain/JamScript/packages/client",
     "@monaco-editor/react": "^4.7.0",
     "@polkadot/extension-dapp": "^0.62.6",
