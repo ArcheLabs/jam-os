@@ -24,8 +24,8 @@ No JAM, MiniJAM, Computer Service, artifact, or protocol semantics were changed.
 - Baseline branch: `main`
 - Baseline commit: `82017baaed44f8cbaa8c827a41436f28f8c84334`
 - Current implementation branch: `codex/jam-os-modern-ui`
-- Stack: React 19, TypeScript, Vite, Lucide React, Monaco, xterm, JAM/MiniJAM adapters.
-- No new runtime dependency was added. Existing Lucide icons are reused.
+- Stack: React 19, TypeScript, Vite, Fluent UI System Icons, Lucide React, Monaco, xterm, JAM/MiniJAM adapters.
+- `@fluentui/react-icons` supplies the primary OS/app glyphs; Lucide remains for compact utility controls.
 - Window state remains `{ id, title, x, y, width, height, zIndex, minimized, maximized }`.
 - Boot flow remains boot → login → connecting/account → provisioning → desktop/error.
 - Mock mode remains selected through `VITE_JAM_MODE=mock`; preview routes force mock runtime for visual iteration.
@@ -99,7 +99,7 @@ The first pass was too close to the legacy developer-workbench composition. The 
 - `SYSTEM`, `JAM SERVICES`, and `LOGS` are no longer mounted on the default desktop. Their useful JAM-native status remains available in Control Center.
 - The desktop now exposes only Computer and Trash as optional desktop icons; core apps are pinned in a centered Dock.
 - The top capsule is replaced by a thin menu bar with small Preview/Live status treatment.
-- `JamAppIcon` uses Phosphor Duotone glyphs inside a JAM-specific 64px layered icon container. Lucide remains for utility controls.
+- `JamAppIcon` uses Fluent Filled glyphs inside a JAM-specific 64px layered icon container. Lucide remains for utility controls.
 - The default desktop no longer renders a developer diagnostics column or a full-width taskbar layout.
 
 The previous broad report remains valid for the shell behavior; this v2 correction changes composition and icon identity without changing runtime boundaries.

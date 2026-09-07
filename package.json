@@ -21,9 +21,9 @@
     "toolchain:client:build": "npm --prefix .toolchain/JamScript/packages/client run build"
   },
   "dependencies": {
+    "@fluentui/react-icons": "^2.0.339",
     "@jamscript/minijam-client": "file:.toolchain/JamScript/packages/client",
     "@monaco-editor/react": "^4.7.0",
-    "@phosphor-icons/react": "^2.1.10",
     "@polkadot/extension-dapp": "^0.62.6",
     "@polkadot/util": "^14.0.1",
     "@polkadot/util-crypto": "^14.0.1",
