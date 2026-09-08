@@ -16,6 +16,6 @@ export function ControlCenter({ runtime, networkName, serviceId, account, onClos
       <article className="control-tile"><Palette size={18} /><span>Appearance</span><strong>JAM Dark</strong></article>
       <article className="control-tile"><SlidersHorizontal size={18} /><span>Motion</span><strong>System default</strong></article>
     </div>
-    <footer className="control-center-footer"><CheckCircle2 size={15} /><span>Only JAM-native status is shown here. Browser hardware controls are not simulated.</span></footer>
+    <footer className="control-center-footer"><CheckCircle2 size={15} /><span>Available JAM system controls</span></footer>
   </aside>;
 }

@@ -1,26 +1,51 @@
 :root {
-  --jam-bg-0: #050a18;
-  --jam-bg-1: #081327;
-  --jam-bg-2: #10234a;
-  --jam-accent-cyan: #35c9ff;
-  --jam-accent-blue: #357cff;
-  --jam-accent-violet: #6b5cff;
-  --jam-text-primary: rgba(255, 255, 255, .96);
-  --jam-text-secondary: rgba(255, 255, 255, .70);
-  --jam-text-muted: rgba(255, 255, 255, .45);
-  --jam-surface-1: rgba(15, 28, 56, .70);
-  --jam-surface-2: rgba(255, 255, 255, .08);
-  --jam-surface-hover: rgba(255, 255, 255, .12);
-  --jam-border: rgba(255, 255, 255, .12);
-  --jam-border-strong: rgba(255, 255, 255, .20);
-  --jam-radius-sm: 8px;
-  --jam-radius-md: 12px;
-  --jam-radius-lg: 18px;
-  --jam-radius-xl: 24px;
-  --jam-blur-sm: 10px;
-  --jam-blur-md: 20px;
-  --jam-blur-lg: 32px;
-  --jam-shadow-window: 0 28px 80px rgba(0, 0, 0, .38);
+  color-scheme: dark;
+
+  --jam-bg-deep: #050a13;
+  --jam-bg-navy: #071426;
+  --jam-bg-blue: #0c2342;
+  --jam-light-cyan: #67e6ef;
+  --jam-light-blue: #6aa7ff;
+  --jam-light-violet: #8d7bff;
+
+  --jam-text-primary: rgba(244, 249, 255, .96);
+  --jam-text-secondary: rgba(198, 214, 234, .72);
+  --jam-text-muted: rgba(172, 192, 217, .50);
+  --jam-text-disabled: rgba(172, 192, 217, .34);
+
+  --jam-glass-fill: rgba(12, 29, 56, .52);
+  --jam-glass-fill-strong: rgba(9, 24, 47, .78);
+  --jam-glass-border: rgba(204, 229, 255, .15);
+  --jam-glass-highlight: rgba(255, 255, 255, .13);
+  --jam-raised-fill: rgba(105, 150, 211, .15);
+  --jam-raised-border: rgba(211, 235, 255, .17);
+
+  --jam-shadow-soft: 0 24px 68px rgba(0, 0, 0, .27);
+  --jam-shadow-menu: 0 28px 76px rgba(0, 0, 0, .42);
+  --jam-shadow-window: 0 32px 100px rgba(0, 0, 0, .42);
+  --jam-shadow-control: 0 10px 28px rgba(23, 115, 190, .22);
+
+  --jam-radius-control: 12px;
+  --jam-radius-panel: 22px;
+  --jam-radius-window: 20px;
+  --jam-radius-dock: 26px;
+  --jam-blur-panel: 30px;
+  --jam-blur-menu: 24px;
+
+  --jam-space-1: 4px;
+  --jam-space-2: 8px;
+  --jam-space-3: 12px;
+  --jam-space-4: 16px;
+  --jam-space-5: 20px;
+  --jam-space-6: 24px;
+  --jam-space-8: 32px;
+  --jam-space-10: 40px;
+  --jam-space-12: 48px;
+  --jam-space-16: 64px;
+
   --jam-ease-standard: cubic-bezier(.2, .8, .2, 1);
   --jam-ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --jam-duration-fast: 140ms;
+  --jam-duration-menu: 200ms;
+  --jam-duration-window: 260ms;
 }
