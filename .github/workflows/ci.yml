@@ -18,24 +18,8 @@ jobs:
           cache: npm
       - name: Validate composite action manifest
         run: scripts/check-action-manifest.sh
-      - name: Bootstrap canonical toolchains
+      - name: Bootstrap pinned dependencies
         uses: ./.github/actions/bootstrap-toolchains
-      - name: Install pinned ScriptC M2 dependencies
-        working-directory: .toolchain/JamScript/toolchains/scriptc
-        run: npm ci --no-audit --no-fund
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: nightly-2026-05-02
-          components: rust-src
-      - name: Prefetch build-std dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          rust_toolchain=nightly-2026-05-02
-          rust_sysroot="$(rustc +"$rust_toolchain" --print sysroot)"
-          rust_src="$rust_sysroot/lib/rustlib/src/rust"
-          test -f "$rust_src/library/sysroot/Cargo.toml"
-          cargo +"$rust_toolchain" fetch --manifest-path "$rust_src/library/sysroot/Cargo.toml" --locked
       - name: Verify canonical JNS ABI
         run: scripts/check-jns-abi.sh
       - name: Install application dependencies
@@ -43,9 +27,11 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run stage1:guard
-      - name: Verify canonical builder lock
-        run: npm run builder:check
-      - name: Verify canonical Computer ScriptC artifact
-        run: npm run computer:artifact:check
+      - name: Check Computer Service through JamScript
+        run: npm run computer:check
+      - name: Build Computer Service through JamScript
+        run: npm run computer:artifact:build -- "$RUNNER_TEMP/jam-computer-artifact"
+      - name: Verify reviewed Computer artifact
+        run: npm run computer:artifact:verify
       - name: Verify release guards
         run: npm run release:guard

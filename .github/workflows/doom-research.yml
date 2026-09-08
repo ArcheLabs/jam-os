@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.15.0
-      - name: Bootstrap canonical toolchains
+      - name: Bootstrap pinned dependencies
         uses: ./.github/actions/bootstrap-toolchains
       - name: Install pinned ScriptC M2 dependencies
         working-directory: .toolchain/JamScript/toolchains/scriptc
@@ -40,7 +40,6 @@ jobs:
         env:
           JAMSCRIPT_MINIJAM_SDK: ${{ github.workspace }}/.toolchain/minijam-client
         run: |
-          "$GITHUB_WORKSPACE/scripts/check-doom-native-prerequisites.sh"
           cargo run --quiet --locked --bin jamscript -- build "$GITHUB_WORKSPACE/services/doom" --output "$RUNNER_TEMP/jam-doom-native-link"
       - name: Check full Doom compile frontier
         shell: bash

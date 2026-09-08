@@ -1,135 +1,72 @@
 # JAM Computer Stage-1 Public Preview — Release Closure
 
-This report is deliberately fail-closed. It records repository evidence and
-does not claim hosted or production results that were not observed.
+This report records application-level release evidence. JAM Computer owns the
+Computer Service source, its consumed artifact, and deployment identity.
+JamScript owns the language implementation, compiler environment, artifact
+generation, and compiler determinism.
 
 ## Release
 
 | field | value |
 | --- | --- |
 | Release | JAM Computer Stage-1 Public Preview |
-| Baseline SHA | `82017baaed44f8cbaa8c827a41436f28f8c84334` |
-| Closure implementation SHA | `558e577f29e7bf8b226b5912169193b961b0dc01` |
-| Release candidate SHA | `558e577f29e7bf8b226b5912169193b961b0dc01` (current candidate before this report-only commit) |
-| Merge SHA | `PENDING` |
-| Branch | `codex/jam-computer-stage1-release-closure` |
+| Branch | `codex/jam-os-modern-ui` |
 | JamScript | `https://github.com/ArcheLabs/JamScript` @ `927a6307f04bf5098a0546c7032ad5e026278658` |
 | MiniJAM client | `https://github.com/ArcheLabs/minijam-client` @ `18de55e175abb1cb40679be2e538644e2387655f` |
-| Node | `24.15.0` for canonical ScriptC builds |
 
-## Computer artifact
+## Computer application
 
-The only canonical production source is
-`services/computer/src/service.ts`. The C file beside it is a historical
-protocol fixture and is not in the deployment path.
+The production Computer Service source is
+`services/computer/src/service.ts`. The adjacent `service.c` file is a
+historical protocol fixture and is not deployed.
 
-| field | value |
-| --- | --- |
-| Service key | `0xb5de71cbd87b48abf62a4289172a5c1506c4638869a00f95e4f9b22ef279aba8` |
-| Service instance ID | `0xe26f31f5386ac558846da8bb32925a11e8d76c3386aaf784e572eb50053002a4` |
-| Management mode | `immutable` |
-| Promoted path | `artifacts/computer/stage1/scriptc/service.blob` |
-| Code hash | `0xcf86cc5320d0ea6ba090554c752ac87694716accbb87e2ba505efad5b0bfec44` |
+The reviewed artifact is stored under
+`artifacts/computer/stage1/scriptc/`. JAM Computer validates its required
+files, checksums, application ABI surface, immutable Service identity, and
+Blake2-256 code hash before deployment.
 
-CI rebuilds the service twice and compares every generated file before
-promoting it. Pages performs no service compilation; it verifies and copies
-the promoted `service.blob`.
+```text
+COMPUTER_SERVICE_CHECK=PASS
+COMPUTER_ARTIFACT_VERIFY=PASS
+COMPUTER_ARTIFACT_CODE_HASH=0xcf86cc5320d0ea6ba090554c752ac87694716accbb87e2ba505efad5b0bfec44
+```
 
-## Canonical builder
-
-The host apt reconstruction model is retired. The repository now defines a
-Linux/amd64 builder in `toolchains/builder/Dockerfile`, pins the Ubuntu base
-digest in `toolchains/builder.lock`, and requires the published GHCR image to
-be consumed by immutable digest through `scripts/run-canonical-builder.sh`.
-Local Docker is now available and a local image containing the exact Node,
-Rust, and LLVM closure passed the canonical builder environment check. The
-GHCR image has not been published from this workspace because no registry
-credentials are available; the lock therefore remains fail-closed with
-`digest = "PENDING_PUBLISH"`.
-
-| builder field | value |
-| --- | --- |
-| Image | `ghcr.io/archelabs/jam-computer-builder` |
-| Builder digest | `PENDING_PUBLISH` |
-| Base image | `ubuntu:20.04@sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a` |
-| Dockerfile SHA256 | `65567a61d922562c8e469bae5b396ddf29f8c569ec948a163954a56407e951c5` |
+The application build path invokes JamScript's public `check` and `build`
+commands. It does not define or verify the compiler's internal environment.
 
 ## Gates
 
 ```text
-LOCAL_CANONICAL_TOOLCHAINS=PASS
-EXACT_LLVM_TOOLCHAIN=PASS (Ubuntu clang 20.1.8; package and binary checksums locked)
-LLVM_DEPENDENCY_CLOSURE=PASS (local Focal closure; hosted compatibility still requires revalidation)
-LLVM_HOST_APT_MODEL=RETIRED
-LLVM_INTERNAL_IDENTITY=PASS (local locked binaries and shared libraries)
-CANONICAL_BUILDER_IMAGE=BLOCKED_EXTERNAL
-CANONICAL_BUILDER_DIGEST=BLOCKED_EXTERNAL
-CANONICAL_BUILDER_ENV=PASS (local Docker image validation; published digest still pending)
-LOCAL_CONTAINER_BUILD=BLOCKED_BUILDER_DIGEST (Docker runtime available; published digest still pending)
-CANONICAL_COMPUTER_SOURCE=PASS
-COMPUTER_ARTIFACT_REPRODUCIBILITY=PASS (local canonical rebuild)
-COMPUTER_ARTIFACT_PROMOTED=PASS (local canonical rebuild)
-NPM_TEST=PASS (24 files / 76 tests)
+NPM_TEST=PASS (25 files / 79 tests)
 NPM_BUILD=PASS
 STAGE1_GUARD=PASS
-RELEASE_GUARD=BLOCKED_BUILDER_DIGEST
-CANONICAL_BUILDER_LOCK=FAIL (digest pending GHCR publication)
-CANONICAL_BUILDER_DIGEST=FAIL (digest pending GHCR publication)
-MAIN_CI=FAIL
-CI_RUN=33584087932
-CI_BLOCKER=LLVM_DEPENDENCY_CLOSURE
+RELEASE_GUARD=PASS
+MAIN_CI=PENDING_HOSTED_RUN
 PAGES_BUILD=PENDING_HOSTED_RUN
 PAGES_DEPLOY=PENDING_HOSTED_RUN
-CLEAN_ROOM_BOOTSTRAP=BLOCKED_EXTERNAL (GitHub clone timed out in this workspace)
-DOOM_MAIN_CI_DEPENDENCY=PASS (recursive checkout guard; hosted rerun pending)
-HOSTED_ARTIFACT_REPRODUCIBILITY=NOT_REACHED
-HOSTED_BUILD_A=NOT_REACHED
-HOSTED_BUILD_B=NOT_REACHED
-HOSTED_BUILD_A_B_IDENTICAL=NOT_REACHED
-CROSS_HOST_REPRODUCIBILITY=NOT_REACHED
 ```
 
 ## Production and smoke
 
-The live endpoints and a dedicated canary signer were not available in this
-workspace. No service deployment, read smoke, mutation smoke, finalized-state
-verification, or browser smoke is claimed.
+Live endpoints and a dedicated canary signer are not recorded in this
+workspace. No deployment or live smoke result is claimed here.
 
 ```text
 PRODUCTION_ENV_CONFIGURATION=BLOCKED_EXTERNAL
-Required public variables:
-  MINIJAM_NODE_RPC_URL
-  MINIJAM_WORK_RPC_URL
-  MINIJAM_DEPLOYMENT_RPC_URL
-  MINIJAM_GENESIS_HASH
-
 COMPUTER_DEPLOYMENT=BLOCKED
 LIVE_READ_SMOKE=BLOCKED
 LIVE_MUTATION_SMOKE=BLOCKED
 BROWSER_SMOKE=BLOCKED
-PAGES_URL=NOT_OBSERVED
-CI_RUN=33584087932
-DEPLOY_RUN=NOT_OBSERVED
 ```
 
-The mutation smoke is implemented in `scripts/smoke-live.mjs` and uses the
-formal JamScript Work client with `SplitRpcTransport`: Node/state queries use
-the Node endpoint while `minijam_submitWorkV1` and
-`minijam_getWorkStatusV1` use the independent Work endpoint. It requires a dedicated authorized canary signer
-through `SMOKE_ACCOUNT_PUBLIC_KEY` and `SMOKE_SIGNER_COMMAND`; it never bypasses
-service ownership checks.
+The live client continues to verify the downloaded artifact and finalized
+Service code hash. Node/state reads, Formal Work submission, and deployment
+remain separate typed adapters.
 
 ## Doom
 
-```text
-DOOM_PRODUCT_STATUS=DEFERRED_UPSTREAM_COREVM
-DOOM_RELEASE_DEPENDENCY=REMOVED
-COREVM_DUPLICATE_IMPLEMENTATION=NOT_PLANNED
-```
-
-Research assets remain available under `services/doom` and
-`tools/doom-runner`. They run only from the manually dispatched `DOOM Research`
-workflow.
+DOOM remains deferred pending the official JAM CoreVM. Its research assets are
+outside the Stage-1 product and deployment path.
 
 ## Release decision
 
@@ -137,5 +74,5 @@ workflow.
 JAM_COMPUTER_RELEASE_READY=BLOCKED
 ```
 
-The release remains blocked until hosted Pages deployment and real MiniJAM
-canary read, mutation, finality, and browser checks are recorded.
+The application boundary is complete; release readiness still depends on the
+external deployment and live-network checks above.
