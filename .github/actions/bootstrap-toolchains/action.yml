@@ -1,9 +1,9 @@
-name: Bootstrap canonical toolchains
-description: Checkout and verify the JamScript and MiniJAM client revisions from toolchain locks.
+name: Bootstrap pinned dependencies
+description: Checkout and verify the pinned JamScript and MiniJAM client revisions.
 runs:
   using: composite
   steps:
-    - name: Read canonical toolchain pins
+    - name: Read dependency pins
       id: pins
       shell: bash
       run: node "$GITHUB_WORKSPACE/scripts/read-toolchain-pins.mjs" >> "$GITHUB_OUTPUT"
@@ -32,16 +32,16 @@ runs:
       run: |
         "$GITHUB_WORKSPACE/scripts/check-minijam-client-pin.sh" .toolchain/minijam-client
 
-    - name: Verify toolchain layout
+    - name: Verify dependency layout
       shell: bash
       run: |
         "$GITHUB_WORKSPACE/scripts/check-toolchain-layout.sh"
 
-    - name: Summarize canonical toolchains
+    - name: Summarize pinned dependencies
       shell: bash
       run: |
         {
-          echo "## Canonical toolchains"
+          echo "## Pinned dependencies"
           echo
           echo "JamScript: \`${{ steps.pins.outputs.JAMSCRIPT_REVISION }}\`"
           echo "MiniJAM client: \`${{ steps.pins.outputs.MINIJAM_CLIENT_REVISION }}\`"

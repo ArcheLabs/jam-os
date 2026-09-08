@@ -170,24 +170,6 @@ select:focus-visible {
   transform: scale(.96);
 }
 
-.icon-glyph {
-  width: 46px;
-  height: 46px;
-  color: #e2f2ff;
-  border: 1px solid rgba(206, 232, 255, .28);
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgba(97, 164, 238, .62), rgba(27, 52, 91, .86));
-  box-shadow: inset 0 1px rgba(255,255,255,.25), 0 10px 20px rgba(0,0,0,.28);
-}
-
-.desktop-icon:nth-child(3n) .icon-glyph {
-  background: linear-gradient(145deg, rgba(133, 125, 237, .72), rgba(50, 43, 104, .88));
-}
-
-.desktop-icon:nth-child(3n + 2) .icon-glyph {
-  background: linear-gradient(145deg, rgba(80, 204, 191, .68), rgba(21, 74, 87, .88));
-}
-
 .desktop-caption {
   left: 238px;
   bottom: 30px;
@@ -1471,77 +1453,6 @@ select:focus-visible {
   border-color: rgba(221, 239, 255, .16);
 }
 
-.icon-glyph {
-  width: 64px;
-  height: 64px;
-  border: 0;
-  border-radius: 18px;
-  background: transparent;
-  box-shadow: none;
-}
-
-.jam-app-icon {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  overflow: hidden;
-  color: #f4fbff;
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 17px;
-  background: linear-gradient(145deg, #35d9ff, #357cff 56%, #5246da);
-  box-shadow: inset 0 1px rgba(255,255,255,.46), inset 0 -9px 16px rgba(0,0,0,.15), 0 10px 25px rgba(0,0,0,.30);
-  transform: translateZ(0);
-  transition: transform .18s var(--jam-ease-standard), box-shadow .18s ease;
-}
-
-.jam-app-icon-shine {
-  position: absolute;
-  top: -45%;
-  left: -18%;
-  width: 125%;
-  height: 80%;
-  transform: rotate(-17deg);
-  background: linear-gradient(180deg, rgba(255,255,255,.36), transparent 72%);
-  opacity: .58;
-  pointer-events: none;
-}
-
-.jam-app-icon svg {
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 2px 4px rgba(4, 19, 43, .35));
-}
-
-.jam-app-icon-dock {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-}
-
-.jam-app-icon-menu {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-}
-
-.jam-app-icon-computer { background: linear-gradient(145deg, #71eff1, #318fff 58%, #4c56d9); }
-.jam-app-icon-files { background: linear-gradient(145deg, #76ebff, #2698ef 58%, #3c6de8); }
-.jam-app-icon-browser { background: linear-gradient(145deg, #a9b9ff, #477cff 52%, #35c7df); }
-.jam-app-icon-terminal { background: linear-gradient(145deg, #263d69, #0d1a35 65%, #1189b0); }
-.jam-app-icon-playground { background: linear-gradient(145deg, #a994ff, #7149d9 50%, #27c7d1); }
-.jam-app-icon-settings { background: linear-gradient(145deg, #b2c5d5, #556d89 55%, #263a55); }
-.jam-app-icon-doom { background: linear-gradient(145deg, #ff9c83, #d84d62 54%, #632d72); }
-.jam-app-icon-help { background: linear-gradient(145deg, #ffe39c, #c88b55 56%, #5b63b9); }
-.jam-app-icon-trash { background: linear-gradient(145deg, #d8e8f1, #8299ad 58%, #435a75); }
-
-.desktop-icon:hover .jam-app-icon,
-.desktop-icon.selected .jam-app-icon {
-  box-shadow: inset 0 1px rgba(255,255,255,.52), inset 0 -9px 16px rgba(0,0,0,.12), 0 14px 30px rgba(44, 150, 255, .28);
-  transform: translateY(-2px) scale(1.03);
-}
-
 .desktop-caption {
   display: none;
 }
@@ -1608,7 +1519,7 @@ select:focus-visible {
   background: rgba(160, 209, 255, .12);
 }
 
-.taskbar.dock .task-item > span:not(.jam-app-icon) {
+.taskbar.dock .task-item > span:not(.jam-app-artwork) {
   display: none;
 }
 
@@ -1627,11 +1538,6 @@ select:focus-visible {
 
 .taskbar.dock .task-item.running i {
   opacity: 1;
-}
-
-.taskbar.dock .task-item:hover .jam-app-icon {
-  box-shadow: inset 0 1px rgba(255,255,255,.52), inset 0 -9px 16px rgba(0,0,0,.10), 0 14px 30px rgba(44, 150, 255, .35);
-  transform: translateY(-7px) scale(1.08);
 }
 
 .taskbar.dock .task-status {
@@ -1831,17 +1737,6 @@ select:focus-visible {
   white-space: nowrap;
 }
 
-.window-title .jam-app-icon-menu {
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-}
-
-.window-title .jam-app-icon-menu svg {
-  width: 15px;
-  height: 15px;
-}
-
 .window-controls button {
   display: grid;
   place-items: center;
@@ -1999,75 +1894,4 @@ select:focus-visible {
   .desktop-widget-rail {
     display: none;
   }
-}
-
-/* Fluent app-icon correction: solid OS glyphs, restrained material, and no
-   neon halo. The JAM palette stays in the tile rather than the glyph. */
-.jam-app-icon {
-  width: 64px;
-  height: 64px;
-  border-color: rgba(255,255,255,.18);
-  border-radius: 16px;
-  background: #2a83d9;
-  box-shadow: inset 0 1px rgba(255,255,255,.30), inset 0 -5px 10px rgba(0,0,0,.12), 0 6px 14px rgba(0,0,0,.22);
-}
-
-.jam-app-icon-shine {
-  top: -53%;
-  left: -10%;
-  width: 120%;
-  height: 80%;
-  opacity: .20;
-  filter: blur(1px);
-}
-
-.jam-app-icon svg {
-  filter: none;
-}
-
-.jam-app-icon-dock {
-  width: 54px;
-  height: 54px;
-  border-radius: 15px;
-}
-
-.jam-app-icon-menu {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-}
-
-.jam-app-icon-computer { background: linear-gradient(150deg, #48c6e8, #2876ca); }
-.jam-app-icon-files { background: linear-gradient(150deg, #3fc2f4, #247bd1); }
-.jam-app-icon-browser { background: linear-gradient(150deg, #527edb, #275aaf); }
-.jam-app-icon-terminal { background: linear-gradient(150deg, #304a70, #13243e); }
-.jam-app-icon-playground { background: linear-gradient(150deg, #8c7adb, #4c5fb7); }
-.jam-app-icon-settings { background: linear-gradient(150deg, #8298ad, #46596d); }
-.jam-app-icon-doom { background: linear-gradient(150deg, #c96868, #743f68); }
-.jam-app-icon-help { background: linear-gradient(150deg, #c9a467, #6a668e); }
-.jam-app-icon-trash { background: linear-gradient(150deg, #aabac5, #63788b); }
-
-.desktop-icon:hover .jam-app-icon,
-.desktop-icon.selected .jam-app-icon,
-.taskbar.dock .task-item:hover .jam-app-icon {
-  box-shadow: inset 0 1px rgba(255,255,255,.34), inset 0 -5px 10px rgba(0,0,0,.10), 0 9px 18px rgba(0,0,0,.26);
-}
-
-.taskbar.dock .task-item {
-  width: 60px;
-  max-width: 60px;
-  height: 62px;
-}
-
-.taskbar.dock .task-item:hover .jam-app-icon {
-  transform: translateY(-5px) scale(1.05);
-}
-
-.file-row-icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.file-places button svg {
-  flex: 0 0 auto;
 }

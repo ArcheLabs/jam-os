@@ -44,7 +44,7 @@ jobs:
       - name: Validate composite action manifest
         run: scripts/check-action-manifest.sh
 
-      - name: Bootstrap canonical toolchains
+      - name: Bootstrap pinned dependencies
         uses: ./.github/actions/bootstrap-toolchains
 
       - name: Install dependencies

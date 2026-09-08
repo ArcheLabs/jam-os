@@ -15,7 +15,8 @@ Implemented:
 - JAM-native Control Center for network, wallet, Computer Service, appearance, and motion state.
 - Active and inactive window visual states, visible focus rings, semantic dialog labels, and preserved drag/resize behavior.
 - Shared application chrome for Files, Terminal, Browser, Settings, and Playground.
-- Deterministic mock preview routes: `/?preview=boot`, `/?preview=login`, and `/?preview=desktop`.
+- Separate JAM App Artwork, Fluent system glyphs, and Fluent content/file icons.
+- Deterministic mock preview routes: `/?preview=boot`, `/?preview=login`, `/?preview=desktop`, and `/?preview=icons`.
 
 No JAM, MiniJAM, Computer Service, artifact, or protocol semantics were changed.
 
@@ -65,8 +66,8 @@ git diff --check                                        PASS
 
 Results:
 
-- 24 test files passed.
-- 76 unit tests passed.
+- 25 test files passed.
+- 79 unit tests passed.
 - TypeScript and Vite production build passed.
 - Build emitted existing third-party Rollup annotation/chunk-size warnings only.
 
@@ -99,7 +100,8 @@ The first pass was too close to the legacy developer-workbench composition. The 
 - `SYSTEM`, `JAM SERVICES`, and `LOGS` are no longer mounted on the default desktop. Their useful JAM-native status remains available in Control Center.
 - The desktop now exposes only Computer and Trash as optional desktop icons; core apps are pinned in a centered Dock.
 - The top capsule is replaced by a thin menu bar with small Preview/Live status treatment.
-- `JamAppIcon` uses Fluent Filled glyphs inside a JAM-specific 64px layered icon container. Lucide remains for utility controls.
+- `JamAppIcon` now uses custom 128×128 JAM SVG artwork for large contexts and Fluent Regular/Filled glyphs for window/menu contexts. Lucide remains for existing utility controls.
+- The icon Gallery route covers optical sizing, label removal, grayscale review, forced-colors fallback, and content icons.
 - The default desktop no longer renders a developer diagnostics column or a full-width taskbar layout.
 
 The previous broad report remains valid for the shell behavior; this v2 correction changes composition and icon identity without changing runtime boundaries.

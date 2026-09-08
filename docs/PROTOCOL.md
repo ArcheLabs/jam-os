@@ -31,7 +31,9 @@ not DNS and has no pricing, expiry, auction, or subdomain semantics.
 ## Playground
 
 The live adapter uses the neutral MiniJAM node RPC, Formal Work RPC, and
-deployment ingress. The production Computer artifact is built by the pinned
-JamScript toolchain before release; the browser never calls a compiler or a
-Playground build endpoint. Signing details and the Service ABI stay behind
-typed adapters so apps never call raw endpoints.
+deployment ingress. The production Computer artifact is built through
+JamScript's public build interface before release; the browser never calls a
+compiler or a Playground build endpoint. JamScript owns compiler implementation
+and packaging, while JAM Computer verifies the artifact, code hash, and Service
+identity it consumes. Signing details and the Service ABI stay behind typed
+adapters so apps never call raw endpoints.

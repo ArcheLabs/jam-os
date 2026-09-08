@@ -1,9 +1,10 @@
 # Computer Stage-1 artifact
 
-`scriptc/` is the reviewed JamScript 0.2 production artifact. Its ABI is
-`services/computer/abi/service.abi.json`; the content-addressed code hash is
-`0x09d6afa902b7f7efe9fb8099f4cd93013815eb22d941a6e58652108fe9301672`.
+The reviewed JamScript 0.2 production artifact has ABI
+`services/computer/abi/service.abi.json`; its content-addressed code hash is
+`0xcf86cc5320d0ea6ba090554c752ac87694716accbb87e2ba505efad5b0bfec44`.
 
 The sibling `service.blob`, `service.polkavm`, `service.abi.json`, and
 `build.json` are the production deployment outputs. `build.json` records the
-compiler, Node, JamScript, and MiniJAM revisions used to produce them.
+application identity and hashes needed to verify the artifact; compiler
+provenance belongs to JamScript.

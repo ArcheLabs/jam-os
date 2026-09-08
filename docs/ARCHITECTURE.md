@@ -20,9 +20,10 @@ Window positions, focus, and open windows are ephemeral local UI state. Files, p
 
 The Stage-1 `MiniJamTransport` composes the node JSON-RPC, Formal Work RPC,
 neutral deployment RPC, and finalized state reads. It neither compiles source
-nor uses Playground identity. Service artifacts are built locally, Work is
-submitted with `minijam_submitWorkV1`, and deployment succeeds only after the
-finalized ServiceInfo code hash matches the local artifact.
+nor uses Playground identity. Service artifacts are produced through
+JamScript's public build interface, Work is submitted with
+`minijam_submitWorkV1`, and deployment succeeds only after the finalized
+ServiceInfo code hash matches the local artifact.
 
 JNS is no longer a JSON operation inside the generic JamClient. `JamNameService`
 is the UI-facing facade and delegates to `JnsBackend`. Mock mode uses

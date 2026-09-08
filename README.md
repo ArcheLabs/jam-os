@@ -16,10 +16,11 @@ The default `VITE_JAM_MODE=mock` mode is fully usable without a testnet and is u
 ## Stage-1 Public Preview
 
 The release path is fail-closed and uses the reviewed artifact produced from
-`services/computer/src/service.ts` by the pinned JamScript and MiniJAM
-toolchains. CI rebuilds and compares that artifact; GitHub Pages only copies
-`artifacts/computer/stage1/scriptc/service.blob` to the site. The historical
-`services/computer/src/service.c` fixture is never deployed.
+`services/computer/src/service.ts` through the public JamScript build
+interface. JAM Computer verifies the application artifact and its identity;
+JamScript owns the compiler environment and compiler determinism. GitHub Pages
+only copies `artifacts/computer/stage1/scriptc/service.blob` to the site. The
+historical `services/computer/src/service.c` fixture is never deployed.
 
 Pages requires repository Variables for `MINIJAM_NODE_RPC_URL`,
 `MINIJAM_WORK_RPC_URL`, `MINIJAM_DEPLOYMENT_RPC_URL`, and
@@ -65,7 +66,8 @@ The Browser also supports best-effort ordinary HTTP(S) iframe navigation. Sites 
 The Stage-1 production path composes the neutral MiniJAM node, Formal Work,
 state, and deployment RPCs. Playground is a legacy Stage-0 product and is not
 a runtime or build dependency. The Computer artifact is compiled by CI with
-the pinned local MiniJAM toolchain and promoted as a reviewed release input.
+the pinned JamScript dependency and promoted as a reviewed application release
+input.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md). The implementation has no jam-os backend, database, proxy, AI agent, or client-only DOOM claim.
 

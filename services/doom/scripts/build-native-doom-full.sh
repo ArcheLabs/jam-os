@@ -5,7 +5,7 @@ SERVICE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ROOT_DIR="$SERVICE_ROOT/native/doom"
 MANIFEST="$ROOT_DIR/full-engine-sources.txt"
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/jam-doom-full-build.XXXXXX")"
-CLANG="${JAMSCRIPT_LLVM_CLANG:-/usr/lib/llvm-20/bin/clang}"
+CLANG="${CLANG:-$(command -v clang || true)}"
 
 "$SERVICE_ROOT/scripts/prepare-native-doom.sh"
 test -x "$CLANG" || CLANG="$(command -v clang)"

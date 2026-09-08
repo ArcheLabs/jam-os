@@ -1,16 +1,16 @@
-# Deploy toolchain closure
+# Deploy artifact closure
 
 The Pages workflow is an artifact publisher. It checks the promoted
 `artifacts/computer/stage1/scriptc` bundle, verifies its checksums and
 `build.json` code hash, copies `service.blob` to
 `public/computer-service.bin`, and then builds the static frontend.
 
-The Computer artifact is rebuilt in CI from
-`services/computer/src/service.ts` using the revisions in
-`toolchains/jamscript.lock` and `toolchains/minijam-client.lock`. Pages does
-not install LLVM, Rust, ScriptC, or the MiniJAM compiler to create a new
-service artifact. The historical C fixture and all Doom executables are
-outside the release path.
+The Computer artifact is produced through the public JamScript build
+interface from `services/computer/src/service.ts`. JAM Computer pins the
+JamScript and MiniJAM dependency revisions, but does not own the compiler
+environment, LLVM distribution, or compiler provenance. Pages consumes the
+reviewed artifact and does not compile the historical C fixture or any Doom
+executable.
 
 Production Pages configuration is supplied through public GitHub Repository
 Variables:
