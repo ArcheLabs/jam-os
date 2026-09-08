@@ -1,0 +1,40 @@
+button,
+input,
+select {
+  transition:
+    color var(--jam-duration-fast) ease,
+    background var(--jam-duration-fast) ease,
+    border-color var(--jam-duration-fast) ease,
+    box-shadow var(--jam-duration-fast) ease,
+    filter var(--jam-duration-fast) ease,
+    transform var(--jam-duration-fast) var(--jam-ease-standard);
+}
+
+@keyframes jam-surface-enter {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes jam-wallpaper-drift {
+  from { transform: translate3d(-.7%, -.5%, 0) scale(1.018); }
+  to { transform: translate3d(.7%, .5%, 0) scale(1.035); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+
+  .jam-wallpaper::before,
+  .jam-wallpaper::after,
+  .window,
+  .start-menu,
+  .control-center {
+    transform: none;
+  }
+}
